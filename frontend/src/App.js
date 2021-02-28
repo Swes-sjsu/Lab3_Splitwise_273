@@ -5,6 +5,11 @@ import Main from './components/Main';
 
 // App Component
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     return (
       // Use Browser Router to route to different pages

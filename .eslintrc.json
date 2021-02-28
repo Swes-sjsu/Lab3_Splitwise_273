@@ -6,7 +6,7 @@
         "node": true
       },
     "extends": ["airbnb", "prettier"],
-    "plugins": ["prettier", "@babel/plugin-proposal-class-properties"],
+    "plugins": ["prettier"],
     "parser": "babel-eslint",
     "parserOptions": {
       "ecmaFeatures": {

@@ -6,6 +6,11 @@ import { Link } from 'react-router-dom';
 
 // defining landingpage component
 class LandingPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     return (
       <div>
@@ -13,8 +18,12 @@ class LandingPage extends Component {
           <h1>Splitwise</h1>
         </div>
         <ul className="nav navbar-nav">
-          <li><Link to="/Login">Login</Link></li>
-          <li><Link to="/Signup">Signup</Link></li>
+          <li>
+            <Link to="/login">Login</Link>
+          </li>
+          <li>
+            <Link to="/signup">Signup</Link>
+          </li>
         </ul>
       </div>
     );
