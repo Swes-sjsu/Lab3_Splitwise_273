@@ -55,7 +55,6 @@ dbconnection.query("INSERT INTO users(users_name,email,password) VALUES (?,?,?) 
     
 });
 
-//Route to get All Books when user visits the Home Page
 app.post('/login', function(req,res){
 
     console.log("Inside  Login");    

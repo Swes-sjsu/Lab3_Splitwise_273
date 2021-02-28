@@ -2,6 +2,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
+    "concurrently": "^6.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "ejs": "^3.1.6",
@@ -16,10 +17,11 @@
   "scripts": {
     "scripts": "node index.js",
     "test": "mocha",
-    "dev": "nodemon index.js"
+    "server": "nodemon index.js",
+    "client": " cd .. && cd frontend && npm start",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "author": "",
   "license": "ISC",
   "description": ""
-
 }

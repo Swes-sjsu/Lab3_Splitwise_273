@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
+// import landingPage from '../landingPage/landingPage';
+
 // import cookie from 'react-cookies';
 // import { Redirect } from 'react-router';
 
 // Define a Signup Component
-class Signup extends Component {
+class signup extends Component {
   // call the constructor method
   constructor(props) {
     // Call the constrictor of Super class i.e The Component
@@ -65,7 +67,7 @@ class Signup extends Component {
     axios.defaults.withCredentials = true;
     // make a post request with the user data
     axios.post('http://localhost:3001/signup', data).then((response) => {
-      console.log('Status Code : ', response.status);
+      // console.log('Status Code : ', response.status);
       if (response.status === 200) {
         this.setState({
           // authFlag: true,
@@ -130,4 +132,4 @@ class Signup extends Component {
   }
 }
 // export Signup Component
-export default Signup;
+export default signup;

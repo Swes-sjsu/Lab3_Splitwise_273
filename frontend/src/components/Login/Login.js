@@ -5,7 +5,7 @@ import axios from 'axios';
 // import { Redirect } from 'react-router';
 
 // Define a Login Component
-class Login extends Component {
+class login extends Component {
   // call the constructor method
   constructor(props) {
     // Call the constrictor of Super class i.e The Component
@@ -56,7 +56,7 @@ class Login extends Component {
     axios.defaults.withCredentials = true;
     // make a post request with the user data
     axios.post('http://localhost:3001/login', data).then((response) => {
-      console.log('Status Code : ', response.status);
+      // console.log('Status Code : ', response.status);
       if (response.status === 200) {
         this.setState({
           // authFlag: true,
@@ -107,4 +107,4 @@ class Login extends Component {
   }
 }
 // export Login Component
-export default Login;
+export default login;
