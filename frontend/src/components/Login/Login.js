@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
@@ -31,34 +29,33 @@ class Login extends Component {
     });
   }
 
-// username change handler to update state variable with the text entered by the user
-usernameChangeHandler = (e) => {
-  this.setState({
-    username: e.target.value,
-  });
-}
-
-// password change handler to update state variable with the text entered by the user
-passwordChangeHandler = (e) => {
-  this.setState({
-    password: e.target.value,
-  });
-}
-
-// submit Login handler to send a request to the node backend
-submitLogin = (e) => {
-  // prevent page from refresh
-  e.preventDefault();
-  const { username, password } = this.state;
-  const data = {
-    username,
-    password,
+  // username change handler to update state variable with the text entered by the user
+  usernameChangeHandler = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
   };
-  // set the with credentials to true
-  axios.defaults.withCredentials = true;
-  // make a post request with the user data
-  axios.post('http://localhost:3001/login', data)
-    .then((response) => {
+
+  // password change handler to update state variable with the text entered by the user
+  passwordChangeHandler = (e) => {
+    this.setState({
+      password: e.target.value,
+    });
+  };
+
+  // submit Login handler to send a request to the node backend
+  submitLogin = (e) => {
+    // prevent page from refresh
+    e.preventDefault();
+    const { username, password } = this.state;
+    const data = {
+      username,
+      password,
+    };
+    // set the with credentials to true
+    axios.defaults.withCredentials = true;
+    // make a post request with the user data
+    axios.post('http://localhost:3001/login', data).then((response) => {
       console.log('Status Code : ', response.status);
       if (response.status === 200) {
         this.setState({
@@ -70,33 +67,44 @@ submitLogin = (e) => {
         });
       }
     });
-}
+  };
 
-render() {
-  return (
-    <div>
-      <div className="container">
+  render() {
+    return (
+      <div>
+        <div className="container">
+          <div className="login-form">
+            <div className="main-div">
+              <div className="panel">
+                <h2>Login</h2>
+                <p>Please enter your email address and password</p>
+              </div>
 
-        <div className="login-form">
-          <div className="main-div">
-            <div className="panel">
-              <h2>Login</h2>
-              <p>Please enter your email address and password</p>
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="email"
+                  placeholder="Email"
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="password"
+                  className="form-control"
+                  name="password"
+                  placeholder="Password"
+                />
+              </div>
+              <button type="button" className="btn btn-primary">
+                Login
+              </button>
             </div>
-
-            <div className="form-group">
-              <input type="text" className="form-control" name="email" placeholder="Email" />
-            </div>
-            <div className="form-group">
-              <input type="password" className="form-control" name="password" placeholder="Password" />
-            </div>
-            <button type="button" className="btn btn-primary">Login</button>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 }
 // export Login Component
 export default Login;

@@ -1,0 +1,28 @@
+{
+    "env": {
+        "mocha": true,
+        "jest": true,
+        "browser":true,
+        "node": true
+      },
+    "extends": ["airbnb", "prettier"],
+    "plugins": ["prettier", "@babel/plugin-proposal-class-properties"],
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
+      }
+    },
+    "rules": {
+        "prettier/prettier": ["error"],
+          "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+      },
+    "settings": {
+        "react" : {
+            "pragma": "React",
+            "version": "16.8"
+        }
+    }
+    
+  }

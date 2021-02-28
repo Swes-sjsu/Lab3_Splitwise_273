@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
@@ -18,7 +17,7 @@ class Signup extends Component {
       password: '',
     };
     // Bind the handlers to this class
-    this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
+    this.usrchangeHandler = this.usrchangeHandler.bind(this);
     this.emailChangeHandler = this.emailChangeHandler.bind(this);
     this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
     this.submitLogin = this.submitLogin.bind(this);
@@ -30,9 +29,8 @@ class Signup extends Component {
       // authFlag: false,
     });
   }
-  // username change handler to update state variable with the text entered by the user
 
-  usernameChangeHandler = (e) => {
+  usrchangeHandler = (e) => {
     this.setState({
       username: e.target.value,
     });
@@ -51,8 +49,9 @@ class Signup extends Component {
     });
   };
 
+  // username change handler to update state variable with the text entered by the user
+
   // submit Login handler to send a request to the node backend
-  // eslint-disable-next-line no-undef
   submitLogin = (e) => {
     // prevent page from refresh
     e.preventDefault();
@@ -92,7 +91,7 @@ class Signup extends Component {
               <div className="form-group">
                 <input
                   type="text"
-                  onChange={this.usernameChangeHandler}
+                  onChange={this.usrchangeHandler}
                   className="form-control"
                   name="username"
                   placeholder="Username"
@@ -116,7 +115,11 @@ class Signup extends Component {
                   placeholder="Password"
                 />
               </div>
-              <button type="button" onClick={this.submitLogin} className="btn btn-primary">
+              <button
+                type="button"
+                onClick={this.submitLogin}
+                className="btn btn-primary"
+              >
                 Sign Up
               </button>
             </div>
