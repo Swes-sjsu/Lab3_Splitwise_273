@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import login from './login/Login';
 import signup from './signup/Signup';
 import landingPage from './landingPage/LandingPage';
+import dashboard from './dashboard/dashboard';
 // Create a Main Component
 class Main extends Component {
   constructor(props) {
@@ -18,6 +19,7 @@ class Main extends Component {
           <Route path="/" component={landingPage} />
           <Route path="/signup" component={signup} />
           <Route path="/login" component={login} />
+          <Route path="/dashboard" component={dashboard} />
         </Router>
       </div>
     );

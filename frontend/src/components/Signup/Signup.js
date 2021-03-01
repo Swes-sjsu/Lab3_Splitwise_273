@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
-// import landingPage from '../landingPage/landingPage';
+import bcrypt from 'bcryptjs';
+import cookie from 'react-cookies';
+import { Redirect } from 'react-router';
 
-// import cookie from 'react-cookies';
-// import { Redirect } from 'react-router';
+const saltRounds = 10;
 
 // Define a Signup Component
 class signup extends Component {
@@ -17,19 +18,17 @@ class signup extends Component {
       username: '',
       email: '',
       password: '',
+      usernameerrors: '',
+      emailerrors: '',
+      passworderrors: '',
+      redirecttohome: null,
     };
+
     // Bind the handlers to this class
     this.usrchangeHandler = this.usrchangeHandler.bind(this);
     this.emailChangeHandler = this.emailChangeHandler.bind(this);
     this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
-    this.submitLogin = this.submitLogin.bind(this);
-  }
-
-  // Call the Will Mount to set the auth Flag to false
-  componentWillMount() {
-    this.setState({
-      // authFlag: false,
-    });
+    this.submitsignup = this.submitsignup.bind(this);
   }
 
   usrchangeHandler = (e) => {
@@ -43,7 +42,6 @@ class signup extends Component {
       email: e.target.value,
     });
   };
-  // password change handler to update state variable with the text entered by the user
 
   passwordChangeHandler = (e) => {
     this.setState({
@@ -51,83 +49,174 @@ class signup extends Component {
     });
   };
 
-  // username change handler to update state variable with the text entered by the user
+  isformvalid = () => {
+    let formisvalid = true;
+    const signuperrors = {
+      usernameerrors: '',
+      emailerrors: '',
+      passworderrors: '',
+    };
+
+    const emailpattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,4})$/;
+    const pwdpattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/;
+
+    const { username, email, password } = this.state;
+
+    if (username.length === 0) {
+      formisvalid = false;
+      signuperrors.usernameerrors = 'Username is required!';
+      console.log(signuperrors.usernameerrors);
+    }
+
+    if (!emailpattern.test(email)) {
+      formisvalid = false;
+      signuperrors.emailerrors = 'Email ID is not Valid!';
+      console.log(signuperrors.emailerrors);
+    }
+    if (!pwdpattern.test(password)) {
+      formisvalid = false;
+      signuperrors.passworderrors =
+        'Password is not Valid and must contain at least 8 characters with a numeric, special character , lower and upper case letters!';
+      console.log(signuperrors.passworderrors);
+    }
+    this.setState((prevstate) => ({
+      ...prevstate,
+      ...signuperrors,
+    }));
+
+    console.log(
+      formisvalid,
+      signuperrors.usernameerrors,
+      signuperrors.emailerrors,
+      signuperrors.passworderrors
+    );
+    return formisvalid;
+  };
 
   // submit Login handler to send a request to the node backend
-  submitLogin = (e) => {
+  submitsignup = async (e) => {
     // prevent page from refresh
     e.preventDefault();
-    const { username, email, password } = this.state;
-    const data = {
-      username,
-      email,
-      password,
-    };
-    // set the with credentials to true
-    axios.defaults.withCredentials = true;
-    // make a post request with the user data
-    axios.post('http://localhost:3001/signup', data).then((response) => {
-      // console.log('Status Code : ', response.status);
-      if (response.status === 200) {
-        this.setState({
-          // authFlag: true,
+    const formisvalidated = this.isformvalid();
+    console.log(formisvalidated);
+    if (formisvalidated) {
+      const { username, email, password } = this.state;
+      const data = {
+        username,
+        email,
+        encryptpassword: await bcrypt.hash(password, saltRounds),
+      };
+      console.log(data);
+      // set the with credentials to true
+      axios.defaults.withCredentials = true;
+      // make a post request with the user data
+      axios
+        .post('http://localhost:3001/signup', data)
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (response.status === 200) {
+            console.log(response.data);
+            const redirectVar1 = <Redirect to="/dashboard" />;
+            this.setState({ redirecttohome: redirectVar1 });
+          } else {
+            this.setState({
+              redirecttohome: null,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err.response);
+          alert(err.response.data);
+          this.setState({
+            errorMessage: err.response.data,
+          });
         });
-      } else {
-        this.setState({
-          // authFlag: false,
-        });
-      }
-    });
+    }
   };
 
   render() {
+    let redirectVar = null;
+    if (cookie.load('cookie')) {
+      redirectVar = <Redirect to="/dashboard" />;
+    }
+    const { usernameerrors, emailerrors, passworderrors } = this.state;
+    const { redirecttohome } = this.state;
     return (
-      <div>
-        <div className="container">
-          <div className="login-form">
-            <div className="main-div">
-              <div className="panel">
-                <h2>Signup</h2>
-                <p>Please enter your name , email and password</p>
+      <form>
+        <div>
+          <div className="container">
+            {redirectVar}
+            {redirecttohome}
+            <div className="login-form">
+              <div className="main-div">
+                <div className="panel">
+                  <h2>Signup</h2>
+                  <p>Please enter your name , email and password</p>
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    onChange={this.usrchangeHandler}
+                    className="form-control"
+                    name="username"
+                    placeholder="Username"
+                    required
+                    formNoValidate
+                  />
+                  {usernameerrors && (
+                    <span className="errmsg" style={{ color: 'maroon' }}>
+                      {' '}
+                      {usernameerrors}{' '}
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    onChange={this.emailChangeHandler}
+                    className="form-control"
+                    name="email"
+                    placeholder="Email Address"
+                    required
+                    formNoValidate
+                  />
+                  {emailerrors && (
+                    <span className="errmsg" style={{ color: 'maroon' }}>
+                      {' '}
+                      {emailerrors}{' '}
+                    </span>
+                  )}
+                </div>
+                <div className="form-group">
+                  <input
+                    type="password"
+                    onChange={this.passwordChangeHandler}
+                    className="form-control"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    formNoValidate
+                  />
+                  {passworderrors && (
+                    <span className="errmsg" style={{ color: 'maroon' }}>
+                      {' '}
+                      {passworderrors}{' '}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={this.submitsignup}
+                  className="btn btn-primary"
+                  formNoValidate
+                >
+                  Sign Up
+                </button>
               </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  onChange={this.usrchangeHandler}
-                  className="form-control"
-                  name="username"
-                  placeholder="Username"
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  onChange={this.emailChangeHandler}
-                  className="form-control"
-                  name="email"
-                  placeholder="Email Address"
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="password"
-                  onChange={this.passwordChangeHandler}
-                  className="form-control"
-                  name="password"
-                  placeholder="Password"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={this.submitLogin}
-                className="btn btn-primary"
-              >
-                Sign Up
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     );
   }
 }

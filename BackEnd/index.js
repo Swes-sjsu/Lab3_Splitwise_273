@@ -7,6 +7,9 @@ var cookieParser = require('cookie-parser');
 var cors = require('cors');
 app.set('view engine', 'ejs');
 const mysql = require('mysql');
+const bcrypt = require( 'bcryptjs');
+
+const saltRounds = 10;
 
 //use cors to allow cross origin resource sharing
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
@@ -45,25 +48,59 @@ const dbconnection = mysql.createConnection({
 
 app.post('/signup',function(req,res){
     console.log("Inside Signup");  
+    console.log(req.body);
 const username =req.body.username;
 const email =req.body.email;
-const password =req.body.password;
-dbconnection.query("INSERT INTO users(users_name,email,password) VALUES (?,?,?) ",
-[username,email,password],(err,output)=> {
-    console.log(err);
-})
-    
+const password =req.body.encryptpassword;
+dbconnection.query("SELECT * FROM users WHERE email = ?",[email],(err,output,fields)=> {
+    if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+        if(output.length > 0 ){
+        res.status(401).send('Email already exists!!Please Login or use a different email ID');
+        }else {
+            dbconnection.query("INSERT INTO users(users_name,email,password) VALUES (?,?,?) ",[username,email,password],(err,ouput,fields)=>{
+                    if(err){
+                        console.log(err);
+                        res.status(400).send('Error!')
+                    }else {
+                        res.status(200).send('Registration succesful!')
+                    }
+        });
+    }
+}
+});
 });
 
 app.post('/login', function(req,res){
 
     console.log("Inside  Login");    
-    res.writeHead(200,{
-        'Content-Type' : 'application/json'
-    });
-    console.log("Books : ",JSON.stringify(books));
-    res.end(JSON.stringify(books));
-    
+    console.log(req.body);
+    const email =req.body.email;
+    const password =req.body.password;
+    dbconnection.query("SELECT * FROM users WHERE email = ? ",
+    [email],async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+        if(output.length > 0 ){
+            const passwordcompare = await bcrypt.compare(password,output[0].password)
+            console.log(passwordcompare)
+            if(passwordcompare){
+                res.status(200).send('Login Succesful!');
+            }
+            else{
+                res.status(401).send('Please enter valid password!');
+            }
+        }
+        else{
+            res.status(400).send('Email ID not found! Please Signup!');
+        }
+    }
+    })
+        
 })
 //start your server on port 3001
 app.listen(3001);

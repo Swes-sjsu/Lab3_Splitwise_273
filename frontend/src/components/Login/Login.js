@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
-// import cookie from 'react-cookies';
-// import { Redirect } from 'react-router';
+import cookie from 'react-cookies';
+import { Redirect } from 'react-router';
 
 // Define a Login Component
 class login extends Component {
@@ -12,12 +12,11 @@ class login extends Component {
     super(props);
     // maintain the state required for this component
     this.state = {
-      username: '',
+      email: '',
       password: '',
-      // authFlag: false,
     };
     // Bind the handlers to this class
-    this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
+    this.emailChangeHandler = this.emailChangeHandler.bind(this);
     this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
     this.submitLogin = this.submitLogin.bind(this);
   }
@@ -25,14 +24,15 @@ class login extends Component {
   // Call the Will Mount to set the auth Flag to false
   componentWillMount() {
     this.setState({
-      // authFlag: false,
+      // verifyauth: false,
+      redirecttohome: null,
     });
   }
 
   // username change handler to update state variable with the text entered by the user
-  usernameChangeHandler = (e) => {
+  emailChangeHandler = (e) => {
     this.setState({
-      username: e.target.value,
+      email: e.target.value,
     });
   };
 
@@ -44,34 +44,58 @@ class login extends Component {
   };
 
   // submit Login handler to send a request to the node backend
-  submitLogin = (e) => {
+  submitLogin = async (e) => {
     // prevent page from refresh
     e.preventDefault();
-    const { username, password } = this.state;
+    const { email, password } = this.state;
     const data = {
-      username,
+      email,
       password,
     };
     // set the with credentials to true
     axios.defaults.withCredentials = true;
     // make a post request with the user data
-    axios.post('http://localhost:3001/login', data).then((response) => {
-      // console.log('Status Code : ', response.status);
-      if (response.status === 200) {
+    axios
+      .post('http://localhost:3001/login', data)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log('response ', response.data);
+        if (response.status === 200) {
+          const redirectVar1 = <Redirect to="/dashboard" />;
+          this.setState({
+            redirecttohome: redirectVar1,
+            // verifyauth: true
+          });
+          // alert('status 200');
+        } else {
+          console.log(response.data);
+          alert(response.data);
+          this.setState({
+            // verifyauth: false,
+            redirecttohome: null,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        alert(err.response.data);
         this.setState({
-          // authFlag: true,
+          errorMessage: err.response.data,
         });
-      } else {
-        this.setState({
-          // authFlag: false,
-        });
-      }
-    });
+      });
   };
 
   render() {
+    let redirectVar = null;
+    if (cookie.load('cookie')) {
+      redirectVar = <Redirect to="/dashboard" />;
+    }
+    const { errorMessage } = this.state;
+    const { redirecttohome } = this.state;
     return (
       <div>
+        {redirectVar}
+        {redirecttohome}
         <div className="container">
           <div className="login-form">
             <div className="main-div">
@@ -86,6 +110,9 @@ class login extends Component {
                   className="form-control"
                   name="email"
                   placeholder="Email"
+                  onChange={this.emailChangeHandler}
+                  required
+                  formNoValidate
                 />
               </div>
               <div className="form-group">
@@ -94,11 +121,23 @@ class login extends Component {
                   className="form-control"
                   name="password"
                   placeholder="Password"
+                  onChange={this.passwordChangeHandler}
+                  required
+                  formNoValidate
                 />
               </div>
-              <button type="button" className="btn btn-primary">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={this.submitLogin}
+                formNoValidate
+              >
                 Login
               </button>
+              <p className="errmsg" style={{ color: 'maroon' }}>
+                {' '}
+                {errorMessage}{' '}
+              </p>
             </div>
           </div>
         </div>
