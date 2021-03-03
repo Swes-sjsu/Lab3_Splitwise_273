@@ -65,6 +65,12 @@ dbconnection.query("SELECT * FROM users WHERE email = ?",[email],(err,output,fie
                         console.log(err);
                         res.status(400).send('Error!')
                     }else {
+                        res.cookie('cookie_username',output[0].users_name,{maxAge: 900000, httpOnly: false, path : '/'});
+                        res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
+                        req.session.user = req.body.username;
+                        req.session.email = req.body.email;
+                        console.log(req.session.user)
+                        console.log(req.session.email)
                         res.status(200).send('Registration succesful!')
                     }
         });
@@ -88,7 +94,14 @@ app.post('/login', function(req,res){
         if(output.length > 0 ){
             const passwordcompare = await bcrypt.compare(password,output[0].password)
             console.log(passwordcompare)
+            console.log(output)
             if(passwordcompare){
+                res.cookie('cookie_username',output[0].users_name,{maxAge: 900000, httpOnly: false, path : '/'});
+                res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
+                console.log(output[0].users_name)
+                req.session.cookie.username = output[0].users_name;
+                req.session.cookie.email = email;
+                console.log(req.session.cookie.username,req.session.cookie.email )
                 res.status(200).send('Login Succesful!');
             }
             else{

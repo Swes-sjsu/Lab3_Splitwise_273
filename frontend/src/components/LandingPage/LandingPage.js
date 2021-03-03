@@ -35,24 +35,60 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
+import cookie from 'react-cookies';
+import { Redirect } from 'react-router';
 
 class landingPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    // this.handleLogout = this.handleLogout.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
+  handleLogout = () => {
+    cookie.remove('cookie', { path: '/' });
+  };
+
   render() {
+    // if Cookie is set render Logout Button
+    let navLogin = null;
+    if (cookie.load('cookie')) {
+      console.log('Able to read cookie');
+      navLogin = (
+        <ul className="nav navbar-nav navbar-right">
+          <li>
+            <Link to="/" onClick={this.handleLogout}>
+              <span className="glyphicon glyphicon-user" />
+              Logout
+            </Link>
+          </li>
+        </ul>
+      );
+    } else {
+      // Else display login button
+      console.log('Not Able to read cookie');
+      navLogin = (
+        <ul className="nav navbar-nav navbar-right">
+          <li>
+            <Link to="/login">
+              <span className="glyphicon glyphicon-log-in" /> Login
+            </Link>
+          </li>
+        </ul>
+      );
+    }
+    let redirectVar = null;
+    if (cookie.load('cookie')) {
+      redirectVar = <Redirect to="/dashboard" />;
+    }
     return (
       <div>
+        {redirectVar}
         <Navbar bg="primary" variant="dark">
           <Navbar.Brand href="#home">Splitwise</Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <Nav>
-              <Button variant="dark">
-                <Link to="/login">Login</Link>
-              </Button>
+              <Button variant="dark">{navLogin}</Button>
               <Button variant="dark">
                 <Link to="/signup">Sign Up</Link>
               </Button>
