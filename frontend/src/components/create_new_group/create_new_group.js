@@ -54,7 +54,7 @@ class createnewgroup extends Component {
   submitgroupcreate = async (e) => {
     // prevent page from refresh
     e.preventDefault();
-    const { groupname, groupmembers, username, email } = this.state;
+    const { groupname, groupmembers, username, email } = this.state; // set state
     const data = {
       groupname,
       groupmembers,
