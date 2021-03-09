@@ -3,9 +3,10 @@ import '../../App.css';
 import axios from 'axios';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
+import Navheader from '../navbar/navbar';
 
 // Define a Login Component
-class login extends Component {
+class Login extends Component {
   // call the constructor method
   constructor(props) {
     // Call the constrictor of Super class i.e The Component
@@ -27,6 +28,7 @@ class login extends Component {
       // verifyauth: false,
       redirecttohome: null,
     });
+    // sessionStorage.clear();
   }
 
   // username change handler to update state variable with the text entered by the user
@@ -61,17 +63,22 @@ class login extends Component {
         console.log('Status Code : ', response.status);
         console.log('response ', response.data);
         if (response.status === 200) {
+          console.log(response.data);
+          console.log(response.data.username);
+          const resuserid = response.data.user_id;
+          const resusername = response.data.username;
+          const resemail = response.data.email;
+          sessionStorage.setItem('userid', resuserid);
+          sessionStorage.setItem('username', resusername);
+          sessionStorage.setItem('useremail', resemail);
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({
             redirecttohome: redirectVar1,
-            // verifyauth: true
           });
-          // alert('status 200');
         } else {
           console.log(response.data);
           alert(response.data);
           this.setState({
-            // verifyauth: false,
             redirecttohome: null,
           });
         }
@@ -96,35 +103,42 @@ class login extends Component {
       <div>
         {redirectVar}
         {redirecttohome}
+        <Navheader />
         <div className="container">
           <div className="login-form">
             <div className="main-div">
               <div className="panel">
-                <h2>Login</h2>
-                <p>Please enter your email address and password</p>
-              </div>
-
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="email"
-                  placeholder="Email"
-                  onChange={this.emailChangeHandler}
-                  required
-                  formNoValidate
-                />
+                <h2>Welcome to Splitwise</h2>
               </div>
               <div className="form-group">
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  placeholder="Password"
-                  onChange={this.passwordChangeHandler}
-                  required
-                  formNoValidate
-                />
+                <label htmlFor="email">
+                  EMAIL ADDRESS
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="email"
+                    id="email"
+                    placeholder="Email"
+                    onChange={this.emailChangeHandler}
+                    required
+                    formNoValidate
+                  />
+                </label>
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">
+                  PASSSWORD
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="password"
+                    id="password"
+                    placeholder="Password"
+                    onChange={this.passwordChangeHandler}
+                    required
+                    formNoValidate
+                  />
+                </label>
               </div>
               <button
                 type="button"
@@ -146,4 +160,4 @@ class login extends Component {
   }
 }
 // export Login Component
-export default login;
+export default Login;

@@ -7,7 +7,7 @@ import { instanceOf } from 'prop-types';
 import { Redirect } from 'react-router';
 import { withCookies, Cookies } from 'react-cookie';
 
-class createnewgroup extends Component {
+class Createnewgroup extends Component {
   // eslint-disable-next-line react/static-property-placement
   static propTypes = {
     cookies: instanceOf(Cookies).isRequired,
@@ -52,7 +52,6 @@ class createnewgroup extends Component {
   };
 
   submitgroupcreate = async (e) => {
-    // prevent page from refresh
     e.preventDefault();
     const { groupname, groupmembers, username, email } = this.state; // set state
     const data = {
@@ -62,8 +61,6 @@ class createnewgroup extends Component {
       email,
     };
     console.log(data);
-    // set the with credentials to true
-    // make a post request with the user data
     axios
       .post('http://localhost:3001/createnewgroup', data)
       .then((response) => {
@@ -73,9 +70,7 @@ class createnewgroup extends Component {
           const redirectVar1 = <Redirect to="/group" />;
           this.setState({
             redirecttogroup: redirectVar1,
-            // verifyauth: true
           });
-          // alert('status 200');
         } else {
           console.log(response.data);
           alert(response.data);
@@ -191,7 +186,7 @@ class createnewgroup extends Component {
                           placeholder="Name"
                           className="name ui-autocomplete-input"
                           type="text"
-                          value=""
+                          // value=""
                           name="group[memberships_attributes][3][user_attributes][name]"
                           id="group_memberships_attributes_3_user_attributes_name"
                           onMouseLeave={this.groupmembersChangeHandler}
@@ -255,4 +250,4 @@ class createnewgroup extends Component {
     );
   }
 }
-export default withCookies(createnewgroup);
+export default withCookies(Createnewgroup);

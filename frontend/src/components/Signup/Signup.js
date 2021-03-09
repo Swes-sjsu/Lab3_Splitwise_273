@@ -7,13 +7,9 @@ import { Redirect } from 'react-router';
 
 const saltRounds = 10;
 
-// Define a Signup Component
-class signup extends Component {
-  // call the constructor method
+class Signup extends Component {
   constructor(props) {
-    // Call the constrictor of Super class i.e The Component
     super(props);
-    // maintain the state required for this component
     this.state = {
       username: '',
       email: '',
@@ -64,19 +60,23 @@ class signup extends Component {
 
     if (username.length === 0) {
       formisvalid = false;
-      signuperrors.usernameerrors = 'Username is required!';
+      signuperrors.usernameerrors = 'Username cannot be blank!';
       console.log(signuperrors.usernameerrors);
     }
 
     if (!emailpattern.test(email)) {
       formisvalid = false;
-      signuperrors.emailerrors = 'Email ID is not Valid!';
+      if (email.length === 0) {
+        signuperrors.emailerrors = 'Email address cannot be blank!';
+      } else {
+        signuperrors.emailerrors = 'Email ID is not Valid!';
+      }
       console.log(signuperrors.emailerrors);
     }
     if (!pwdpattern.test(password)) {
       formisvalid = false;
       signuperrors.passworderrors =
-        'Password is not Valid and must contain at least 8 characters with a numeric, special character , lower and upper case letters!';
+        'Password is not valid and must contain minimum 8 characters with a numeric, special character , lower and upper case letters!';
       console.log(signuperrors.passworderrors);
     }
     this.setState((prevstate) => ({
@@ -116,6 +116,13 @@ class signup extends Component {
           console.log('Status Code : ', response.status);
           if (response.status === 200) {
             console.log(response.data);
+            console.log(response.data.username);
+            const resuserid = response.data.user_id;
+            const resusername = response.data.username;
+            const resemail = response.data.email;
+            sessionStorage.setItem('userid', resuserid);
+            sessionStorage.setItem('username', resusername);
+            sessionStorage.setItem('useremail', resemail);
             const redirectVar1 = <Redirect to="/dashboard" />;
             this.setState({ redirecttohome: redirectVar1 });
           } else {
@@ -150,19 +157,22 @@ class signup extends Component {
             <div className="login-form">
               <div className="main-div">
                 <div className="panel">
-                  <h2>Signup</h2>
-                  <p>Please enter your name , email and password</p>
+                  <h2>INTRODUCE YOURSELF</h2>
                 </div>
                 <div className="form-group">
-                  <input
-                    type="text"
-                    onChange={this.usrchangeHandler}
-                    className="form-control"
-                    name="username"
-                    placeholder="Username"
-                    required
-                    formNoValidate
-                  />
+                  <label htmlFor="username">
+                    Hi there! My name is
+                    <input
+                      type="text"
+                      onChange={this.usrchangeHandler}
+                      className="form-control"
+                      name="username"
+                      placeholder="Username"
+                      required
+                      formNoValidate
+                    />
+                  </label>
+                  <br />
                   {usernameerrors && (
                     <span className="errmsg" style={{ color: 'maroon' }}>
                       {' '}
@@ -171,15 +181,19 @@ class signup extends Component {
                   )}
                 </div>
                 <div className="form-group">
-                  <input
-                    type="text"
-                    onChange={this.emailChangeHandler}
-                    className="form-control"
-                    name="email"
-                    placeholder="Email Address"
-                    required
-                    formNoValidate
-                  />
+                  <label htmlFor="username">
+                    Here’s my email address:
+                    <input
+                      type="text"
+                      onChange={this.emailChangeHandler}
+                      className="form-control"
+                      name="email"
+                      placeholder="Email Address"
+                      required
+                      formNoValidate
+                    />
+                  </label>
+                  <br />
                   {emailerrors && (
                     <span className="errmsg" style={{ color: 'maroon' }}>
                       {' '}
@@ -188,15 +202,19 @@ class signup extends Component {
                   )}
                 </div>
                 <div className="form-group">
-                  <input
-                    type="password"
-                    onChange={this.passwordChangeHandler}
-                    className="form-control"
-                    name="password"
-                    placeholder="Password"
-                    required
-                    formNoValidate
-                  />
+                  <label htmlFor="username">
+                    And here’s my password:
+                    <input
+                      type="password"
+                      onChange={this.passwordChangeHandler}
+                      className="form-control"
+                      name="password"
+                      placeholder="Password"
+                      required
+                      formNoValidate
+                    />
+                  </label>
+                  <br />
                   {passworderrors && (
                     <span className="errmsg" style={{ color: 'maroon' }}>
                       {' '}
@@ -221,4 +239,4 @@ class signup extends Component {
   }
 }
 // export Signup Component
-export default signup;
+export default Signup;

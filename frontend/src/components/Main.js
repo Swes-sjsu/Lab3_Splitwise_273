@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 // import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import login from './login/Login';
-import signup from './signup/Signup';
-import landingPage from './landingPage/LandingPage';
-import dashboard from './dashboard/dashboard';
-import createnewgroup from './create_new_group/create_new_group';
-// Create a Main Component
+import { Route, Switch } from 'react-router-dom';
+import Login from './login/Login';
+import Signup from './signup/Signup';
+import LandingPage from './landingPage/LandingPage';
+import Dashboard from './dashboard/dashboard';
+import Createnewgroup from './create_new_group/create_new_group';
+import Profilepage from './profilepage/profile_page';
+
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -16,13 +17,14 @@ class Main extends Component {
   render() {
     return (
       <div>
-        <Router>
-          <Route path="/" component={landingPage} />
-          <Route path="/signup" component={signup} />
-          <Route path="/login" component={login} />
-          <Route path="/dashboard" component={dashboard} />
-          <Route path="/createnewgroup" component={createnewgroup} />
-        </Router>
+        <Switch>
+          <Route exact path="/" component={LandingPage} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/login" component={Login} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/createnewgroup" component={Createnewgroup} />
+          <Route path="/profile" component={Profilepage} />
+        </Switch>
       </div>
     );
   }

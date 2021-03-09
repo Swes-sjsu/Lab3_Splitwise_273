@@ -52,6 +52,7 @@ app.post('/signup',function(req,res){
 const username =req.body.username;
 const email =req.body.email;
 const password =req.body.encryptpassword;
+var idusers1;
 dbconnection.query("SELECT * FROM users WHERE email = ?",[email],(err,output,fields)=> {
     if(err){
         console.log(err);
@@ -60,18 +61,21 @@ dbconnection.query("SELECT * FROM users WHERE email = ?",[email],(err,output,fie
         if(output.length > 0 ){
         res.status(401).send('Email already exists!!Please Login or use a different email ID');
         }else {
-            dbconnection.query("INSERT INTO users(users_name,email,password) VALUES (?,?,?) ",[username,email,password],(err,ouput,fields)=>{
+            dbconnection.query("INSERT INTO users(usersname,email,password) VALUES (?,?,?) ",[username,email,password],(err,ouput,fields)=>{
                     if(err){
                         console.log(err);
                         res.status(400).send('Error!')
                     }else {
-                        res.cookie('cookie_username',output[0].users_name,{maxAge: 900000, httpOnly: false, path : '/'});
+                        // res.cookie('cookie_username',output[0].usersname,{maxAge: 900000, httpOnly: false, path : '/'});
                         res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
-                        req.session.user = req.body.username;
-                        req.session.email = req.body.email;
+                        req.session.user = username;
+                        req.session.email = email;
                         console.log(req.session.user)
                         console.log(req.session.email)
-                        res.status(200).send('Registration succesful!')
+                        dbconnection.query("SELECT * FROM users WHERE email = ?",[email],(err,output,fields)=> {
+                            idusers1=ouput[0].idusers ;
+                        console.log(idusers1)                     })
+                        res.status(200).send({"username" : username, "user_id" : idusers1,"email" : email})
                     }
         });
     }
@@ -96,13 +100,14 @@ app.post('/login', function(req,res){
             console.log(passwordcompare)
             console.log(output)
             if(passwordcompare){
-                res.cookie('cookie_username',output[0].users_name,{maxAge: 900000, httpOnly: false, path : '/'});
+                // res.cookie('cookie_username',output[0].usersname,{maxAge: 900000, httpOnly: false, path : '/'});
                 res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
-                console.log(output[0].users_name)
-                req.session.cookie.username = output[0].users_name;
+                // sessionStorage.setItem('username',output[0].usersname)
+                console.log(output[0].usersname)
+                req.session.cookie.username = output[0].usersname;
                 req.session.cookie.email = email;
                 console.log(req.session.cookie.username,req.session.cookie.email )
-                res.status(200).send('Login Succesful!');
+                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email});
             }
             else{
                 res.status(401).send('Please enter valid password!');
@@ -115,6 +120,46 @@ app.post('/login', function(req,res){
     })
         
 })
+
+app.post('/updateprofile', function(req,res){
+
+    console.log("Inside  updateprofile");    
+    console.log(req.body);
+    const email =req.body.email;
+    const password =req.body.password;
+    dbconnection.query("SELECT * FROM users WHERE email = ? ",
+    [email],async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+        if(output.length > 0 ){
+            const passwordcompare = await bcrypt.compare(password,output[0].password)
+            console.log(passwordcompare)
+            console.log(output)
+            if(passwordcompare){
+                // res.cookie('cookie_username',output[0].usersname,{maxAge: 900000, httpOnly: false, path : '/'});
+                res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
+                // sessionStorage.setItem('username',output[0].usersname)
+                console.log(output[0].usersname)
+                req.session.cookie.username = output[0].usersname;
+                req.session.cookie.email = email;
+                console.log(req.session.cookie.username,req.session.cookie.email )
+                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email});
+            }
+            else{
+                res.status(401).send('Please enter valid password!');
+            }
+        }
+        else{
+            res.status(400).send('Email ID not found! Please Signup!');
+        }
+    }
+    })
+        
+})
+
+
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");

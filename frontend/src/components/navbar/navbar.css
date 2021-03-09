@@ -1,0 +1,67 @@
+.navbar-default {
+    background-color: #3ac3ab;
+    font-weight: bold;
+    color:#fff;
+}
+
+.login-default{
+    background-color: #50d4bc;
+    display: block;
+    font-weight: bold;
+    border:none;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 15px;
+    border: 1px solid rgb(187, 187, 187);
+    padding: 8px 24px;
+    margin-right: 10px;
+    font-family: 'Helvetica Neue';
+  }
+  .login-default:hover{
+    color: #3ac3ab;
+    background-color: #25a38c;
+    border-color: #3ac3ab;
+  }
+
+.Signup-default{
+    background-color: #fb7a00;
+    display: block;
+    font-weight: bold;
+    border:none;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 15px;
+    border: 1px solid rgb(187, 187, 187);
+    padding: 8px 20px;
+    margin-right: 10px;
+    font-family: 'Helvetica Neue';
+}
+.Signup-default:hover{
+    color: #fb7a00;
+    background-color: #fb6400;
+    border-color: #3ac3ab;
+  }
+  nav .navbar-nav li a{
+    color: white !important;
+    }
+
+ .Navbar-Brand {
+    color: #fff;
+}
+
+.sidebar {
+    width: 180px;
+    float: left;
+    margin-right:15px;
+}
+ 
