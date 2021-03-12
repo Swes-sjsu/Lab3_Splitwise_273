@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+// import ReactDOM from 'react-dom';
 import { Redirect } from 'react-router';
 import Button from 'react-bootstrap/Button';
-import { Form } from 'react-bootstrap';
+import { Form, Image } from 'react-bootstrap';
 import Navheader from '../navbar/navbar';
-import DefaultAvatar from '../../Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
+// import DefaultAvatar from '../../../public/Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
 /* import Nav from 'react-bootstrap/Nav';
 
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -17,6 +18,7 @@ import './profilepage.css';
 class Profilepage extends Component {
   constructor(props) {
     super(props);
+    this.profileform = React.createRef();
     this.state = {
       profilephoto: '',
       username: '',
@@ -27,6 +29,7 @@ class Profilepage extends Component {
       language: '',
       redirecttohome: null,
       userid: '',
+      updatedpic: false,
     };
 
     // Bind the handlers to this class
@@ -58,7 +61,7 @@ class Profilepage extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data[0].email);
+        console.log(response.data[0]);
         this.setState({
           email: response.data[0].email,
           profilephoto: response.data[0].profphoto,
@@ -93,6 +96,7 @@ class Profilepage extends Component {
   profilephtochangeHandler = (e) => {
     this.setState({
       profilephoto: e.target.files[0],
+      updatedpic: true,
     });
   };
 
@@ -116,10 +120,19 @@ class Profilepage extends Component {
 
   submitsave = (e) => {
     e.preventDefault();
-    const { profilephoto, userid } = this.state;
-    const formdata = new FormData(e.target);
+    const {
+      profilephoto,
+      userid,
+      defaultcurrency,
+      timezone,
+      language,
+    } = this.state;
+    const formdata = new FormData(this.profileform.current);
     formdata.append('profphoto', profilephoto);
     formdata.append('idusers', userid);
+    formdata.append('currencydef', defaultcurrency);
+    formdata.append('timezone', timezone);
+    formdata.append('language', language);
     console.log(formdata.entries);
     axios
       .post('http://localhost:3001/updateprofile', formdata)
@@ -127,15 +140,11 @@ class Profilepage extends Component {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
           console.log(response.data);
-          const { resuserid } = response.data.user_id;
-          const { resusername } = response.data.username;
-          const { resemail } = response.data.email;
-          sessionStorage.setItem('userid', resuserid);
-          sessionStorage.setItem('username', resusername);
-          sessionStorage.setItem('useremail', resemail);
+          sessionStorage.setItem('username', response.data.username);
+          sessionStorage.setItem('useremail', response.data.email);
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({ redirecttohome: redirectVar1 });
-          this.setState({ profilephoto: response.data.results.profphoto });
+          this.setState({ profilephoto: response.data.profphoto });
         } else {
           this.setState({
             redirecttohome: null,
@@ -155,7 +164,7 @@ class Profilepage extends Component {
 
   render() {
     const { redirecttohome } = this.state;
-    let profilepic;
+    let profilepic = '/Profile_photos/default_avatar.png';
     const {
       profilephoto,
       username,
@@ -164,28 +173,32 @@ class Profilepage extends Component {
       defaultcurrency,
       timezone,
       language,
+      updatedpic,
     } = this.state;
-    if (profilephoto) {
-      let imagestr = profilephoto;
-      imagestr = imagestr.replace('public/', '');
-      profilepic = `http://localhost:5000/${imagestr}`;
-    } else {
-      profilepic = DefaultAvatar;
+    if (updatedpic) {
+      const imagename = profilephoto.name;
+      profilepic = `/Profile_photos/${imagename}`;
+      console.log(profilephoto.name);
     }
+    // if (profilephoto) profilepic = DefaultAvatar;
     return (
       <div>
         <Navheader />
         <div>
           {redirecttohome}
           <h2> Your account </h2>
-
-          <Form className="form">
+          <Form ref={this.profileform} id="profileform" className="profileform">
             <Form.Control type="text" name="profileinput" />
             <div className="avatar-div">
-              <img src={profilepic} alt="profils pic" />
+              <Image src={profilepic} alt="profils pic" />
               <label htmlFor="profile_avatar">
                 Change your avatar
-                <input type="file" name="profile_avatar" id="profile_avatar" />
+                <input
+                  type="file"
+                  name="profile_avatar"
+                  id="profile_avatar"
+                  onChange={this.profilephtochangeHandler}
+                />
               </label>
             </div>
 
@@ -217,7 +230,7 @@ class Profilepage extends Component {
                   name="phonenumber"
                   id="phonenumber"
                   defaultValue={phonenumber}
-                  onChange={this.usrchangeHandler}
+                  onChange={this.phonenumberChangeHandler}
                 />
               </label>
             </div>
@@ -227,15 +240,16 @@ class Profilepage extends Component {
                 <Form.Label>Your default currency</Form.Label>
                 <Form.Control
                   as="select"
-                  defaultValue={defaultcurrency}
+                  value={defaultcurrency}
+                  placeholder={defaultcurrency}
                   onChange={this.defaultcurrencychangeHandler}
                 >
-                  <option>BHD (BD)</option>
-                  <option>CAD (C$)</option>
-                  <option>EUR (€)</option>
-                  <option>GBP (£)</option>
-                  <option>KWD (KWD)</option>
-                  <option>USD ($)</option>
+                  <option value="BHD (BD)">BHD (BD)</option>
+                  <option value="CAD (C$)">CAD (C$)</option>
+                  <option value="EUR (€)">EUR (€)</option>
+                  <option value="GBP (£)">GBP (£)</option>
+                  <option value="KWD (KWD)">KWD (KWD)</option>
+                  <option value="USD ($)">USD ($)</option>
                 </Form.Control>
               </Form.Group>
               <br />
@@ -243,7 +257,7 @@ class Profilepage extends Component {
                 <Form.Label>TimeZone</Form.Label>
                 <Form.Control
                   as="select"
-                  defaultValue={timezone}
+                  value={timezone}
                   onChange={this.timezonechangeHandler}
                 >
                   <option>(GMT -12:00) Eniwetok, Kwajalein</option>
@@ -302,7 +316,7 @@ class Profilepage extends Component {
                 <Form.Label>Language</Form.Label>
                 <Form.Control
                   as="select"
-                  defaultValue={language}
+                  value={language}
                   onChange={this.languagechangeHandler}
                 >
                   <option>English</option>

@@ -1,22 +1,14 @@
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
-// import { cookie } from 'react-cookies';
-import { instanceOf } from 'prop-types';
-// import Cookies from 'universal-cookie';
 import { Redirect } from 'react-router';
-import { withCookies, Cookies } from 'react-cookie';
+import Navheader from '../navbar/navbar';
+import DefaultAvatar from '../../Profile_photos/default_avatar.png';
+import '../navbar/navbar.css';
 
 class Createnewgroup extends Component {
-  // eslint-disable-next-line react/static-property-placement
-  static propTypes = {
-    cookies: instanceOf(Cookies).isRequired,
-  };
-
   constructor(props) {
-    // Call the constrictor of Super class i.e The Component
     super(props);
-    // maintain the state required for this component
     this.state = {
       groupname: '',
       groupmembers: [],
@@ -29,10 +21,9 @@ class Createnewgroup extends Component {
   }
 
   componentWillMount() {
-    const { cookies } = this.props;
     this.state = {
-      email: cookies.get('cookie'),
-      username: cookies.get('cookie_username'),
+      email: sessionStorage.getItem('useremail'),
+      username: sessionStorage.getItem('username'),
       redirecttogroup: null,
       groupname: '',
       groupmembers: [],
@@ -53,7 +44,7 @@ class Createnewgroup extends Component {
 
   submitgroupcreate = async (e) => {
     e.preventDefault();
-    const { groupname, groupmembers, username, email } = this.state; // set state
+    const { groupname, groupmembers, username, email } = this.state;
     const data = {
       groupname,
       groupmembers,
@@ -75,7 +66,6 @@ class Createnewgroup extends Component {
           console.log(response.data);
           alert(response.data);
           this.setState({
-            // verifyauth: false,
             redirecttogroup: null,
           });
         }
@@ -95,15 +85,19 @@ class Createnewgroup extends Component {
     const { redirecttogroup } = this.state;
     console.log(username, email);
     return (
-      <div className="content">
-        <h2>START A NEW GROUP</h2>
-        <form className="formgroup" id="new_group">
-          <div id="group_avatar">
-            <input type="file" name="group_avatar" id="group_avatar" />
-          </div>
-          <div style={{ 'font size': '24px' }}>
-            My group shall be called....
+      <div>
+        <Navheader />
+        <div id="group_avatar">
+          <img src={DefaultAvatar} alt="profils pic" />
+          <br />
+          <input type="file" name="group_avatar" id="group_avatar" />
+        </div>
+
+        <div className="createnewgroup">
+          <h2>START A NEW GROUP</h2>
+          <form className="formgroup" id="new_group">
             <div>
+              <h3>My group shall be called....</h3>
               <input
                 type="text"
                 name="group_name"
@@ -111,143 +105,105 @@ class Createnewgroup extends Component {
                 onChange={this.groupnameChangeHandler}
               />
             </div>
-          </div>
-          <div
-            className="group_members"
-            style={{ 'margin-top': '15px', position: 'relative' }}
-          >
-            <div style={{ 'min-height': '126px' }}>
-              <div id="users">
-                <h2 style={{ 'margin-bottom': '10px' }}>Group members</h2>
-                <div className="fields">
-                  <div className="group-member">
-                    <div className="fields">
-                      {username}(<em>{email}</em>)
-                    </div>
-                    <div className="fields">
-                      <div className="group-member editable">
-                        <input
-                          placeholder="Name"
-                          className="name ui-autocomplete-input"
-                          type="text"
-                          // value=""
-                          name="group[memberships_attributes][1][user_attributes][name]"
-                          id="group_memberships_attributes_1_user_attributes_name"
-                          onMouseLeave={this.groupmembersChangeHandler}
-                          // autoComplete="off"
-                        />
-                        <input
-                          placeholder="Email address (optional)"
-                          className="email"
-                          type="email"
-                          name="group[memberships_attributes][1][user_attributes][email]"
-                          id="group_memberships_attributes_1_user_attributes_email"
-                        />
-                        <input
-                          type="hidden"
-                          value="false"
-                          name="group[memberships_attributes][1][user_attributes][_destroy]"
-                          id="group_memberships_attributes_1_user_attributes__destroy"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="fields">
-                      <div className="group-member editable">
-                        <input
-                          placeholder="Name"
-                          className="name ui-autocomplete-input"
-                          type="text"
-                          // value=""
-                          name="group[memberships_attributes][2][user_attributes][name]"
-                          id="group_memberships_attributes_2_user_attributes_name"
-                          onMouseLeave={this.groupmembersChangeHandler}
-                          // autoComplete="off"
-                        />
-                        <input
-                          placeholder="Email address (optional)"
-                          className="email"
-                          type="email"
-                          name="group[memberships_attributes][2][user_attributes][email]"
-                          id="group_memberships_attributes_2_user_attributes_email"
-                        />
-                        <input
-                          type="hidden"
-                          value="false"
-                          name="group[memberships_attributes][2][user_attributes][_destroy]"
-                          id="group_memberships_attributes_2_user_attributes__destroy"
-                        />
-                      </div>
-                    </div>
+            <div className="group_members">
+              <div className="users">
+                <h2>Group members</h2>
+                <div className="group-member">
+                  <div className="grpnameemail">
+                    {username}(<em>{email}</em>)
+                  </div>
+                  <div className="grpnameemail">
+                    <input
+                      placeholder="Name"
+                      className="name ui-autocomplete-input"
+                      type="text"
+                      // value=""
+                      name="group_members_name_1"
+                      id="group_members_name_1"
+                      onMouseLeave={this.groupmembersChangeHandler}
+                      // autoComplete="off"
+                    />
+                    <input
+                      placeholder="Email address (optional)"
+                      className="email"
+                      type="email"
+                      name="group_members_email_1"
+                      id="group_members_email_1"
+                    />
+                  </div>
 
-                    <div className="fields">
-                      <div className="group-member editable">
-                        <input
-                          placeholder="Name"
-                          className="name ui-autocomplete-input"
-                          type="text"
-                          // value=""
-                          name="group[memberships_attributes][3][user_attributes][name]"
-                          id="group_memberships_attributes_3_user_attributes_name"
-                          onMouseLeave={this.groupmembersChangeHandler}
-                          // autoComplete="off"
-                        />
-                        <input
-                          placeholder="Email address (optional)"
-                          className="email"
-                          type="email"
-                          name="group[memberships_attributes][3][user_attributes][email]"
-                          id="group_memberships_attributes_3_user_attributes_email"
-                        />
-                        <input
-                          type="hidden"
-                          value="false"
-                          name="group[memberships_attributes][3][user_attributes][_destroy]"
-                          id="group_memberships_attributes_3_user_attributes__destroy"
-                        />
-                      </div>
-                    </div>
+                  <div className="grpnameemail">
+                    <input
+                      placeholder="Name"
+                      className="name ui-autocomplete-input"
+                      type="text"
+                      // value=""
+                      name="group_members_name_2"
+                      id="group_members_name_2"
+                      onMouseLeave={this.groupmembersChangeHandler}
+                      // autoComplete="off"
+                    />
+                    <input
+                      placeholder="Email address (optional)"
+                      className="email"
+                      type="email"
+                      name="group_members_email_2"
+                      id="group_members_email_2"
+                    />
+                  </div>
+
+                  <div className="grpnameemail">
+                    <input
+                      placeholder="Name"
+                      className="name ui-autocomplete-input"
+                      type="text"
+                      // value=""
+                      name="group_members_name_3"
+                      id="group_members_name_3"
+                      onMouseLeave={this.groupmembersChangeHandler}
+                      // autoComplete="off"
+                    />
+                    <input
+                      placeholder="Email address (optional)"
+                      className="email"
+                      type="email"
+                      name="group_members_email_3"
+                      id="group_members_email_3"
+                    />
                   </div>
                 </div>
               </div>
-              <div id="invite_link_container">
-                <h2 style={{ 'margin-bottom': '10px', 'font-size': '15px' }}>
-                  Invite group members by link
-                </h2>
 
-                <div
-                  style={{
-                    'font-size': '12px',
-                    'line-height': '16px',
-                    color: '#999',
-                    margin: '-2px 0 12px',
-                  }}
-                >
+              <div id="invite_link_container">
+                <h2>Invite group members by link</h2>
+
+                <div className="invitelink">
                   Send this link to your friends, and when they click it,they
                   will automatically be added to this group.
-                  <div style={{ height: '10px' }} />
+                  <div />
+                </div>
+                <div className="save">
+                  <button
+                    type="button"
+                    className="Signup-default"
+                    onClick={this.submitgroupcreate}
+                    formNoValidate
+                  >
+                    Save
+                  </button>
+                  <p className="errmsg" style={{ color: 'maroon' }}>
+                    {' '}
+                    {errorMessage}{' '}
+                  </p>
+                  {redirecttogroup}
                 </div>
               </div>
             </div>
-          </div>
-          <div className="save">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={this.submitgroupcreate}
-              formNoValidate
-            >
-              Save
-            </button>
-            <p className="errmsg" style={{ color: 'maroon' }}>
-              {' '}
-              {errorMessage}{' '}
-            </p>
-            {redirecttogroup}
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }
 }
-export default withCookies(Createnewgroup);
+export default Createnewgroup;

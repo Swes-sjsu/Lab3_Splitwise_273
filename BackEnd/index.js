@@ -49,7 +49,7 @@ const dbconnection = mysql.createConnection({
 
 var filestorage = multer.diskStorage({
     destination: function(req, file, results){
-    results(null,'../frontend/src/Profile_photos/')},
+    results(null,'../frontend/public/Profile_photos/')},
     filename: function(req, file, results){
         results(null,Date.now()+file.originalname)}
 })
@@ -83,21 +83,18 @@ dbconnection.query("SELECT * FROM users WHERE email = ?",[email], (err,output,fi
         if(output.length > 0 ){
         res.status(401).send('Email already exists!!Please Login or use a different email ID');
         }else {
-            dbconnection.query("INSERT INTO users(usersname,email,password) VALUES (?,?,?) ",[username,email,password], (err,ouput,fields)=>{
+            dbconnection.query("INSERT INTO users(usersname,email,password) VALUES (?,?,?) ",[username,email,password], (err,output,fields)=>{
                     if(err){
                         console.log(err);
                         res.status(400).send('Error!')
                     }else {
-                        // res.cookie('cookie_username',output[0].usersname,{maxAge: 900000, httpOnly: false, path : '/'});
                         res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
                         req.session.user = username;
                         req.session.email = email;
                         console.log(req.session.user)
                         console.log(req.session.email)
-                        dbconnection.query("SELECT idusers FROM users WHERE email = ?",[email],(err,output,fields)=> {
-                            idusers1=ouput[0] ;
-                        console.log(idusers1)                     
-                    })
+                            idusers1=output.insertId;
+                        console.log(idusers1)
                         res.status(200).send({"username" : username, "user_id" : idusers1,"email" : email})
                     }
         });
@@ -163,20 +160,23 @@ app.get('/getuserdetails/:id', function(req,res){
         
 })
 
-app.post('/updateprofile',updatepic.single('profilephoto'), function(req,res){
+app.post('/updateprofile',updatepic.single('profile_avatar'), function(req,res){
 
     console.log("Inside  updateprofile");    
     console.log(req.body);
-    const userid =req.body.userid;
+    const userid =(req.body.idusers);
     const username =req.body.username;
     const email =req.body.email;
     const phonenumber =req.body.phonenumber;
-    const defaultcurrency =req.body.defaultcurrency;
+    const defaultcurrency =req.body.currencydef;
     const timezone =req.body.timezone;
-    const profilephoto =req.body.profilephoto;
+    const profilephoto =req.file.originalname;
     const language =req.body.language;
-    dbconnection.query("UPDATE users SET usersname = ?, email = ?, usersphone = ?, currencydef = ?, timezone = ?, profphoto = ?, language = ? where idusers = ? ",
-    [username,email,phonenumber,defaultcurrency,timezone,profilephoto,language,userid],async(err,output,fields)=> {
+    console.log(username,email,phonenumber,defaultcurrency,timezone,profilephoto,language,userid);
+    sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+"', profphoto = '"+profilephoto+
+    "' , language = '"+language+"' WHERE idusers = "+userid;
+    console.log(sqlquery)
+    dbconnection.query(sqlquery,(err,output,fields)=> {
         if(err){
         console.log(err);
         res.status(400).send('Error!')
@@ -184,13 +184,16 @@ app.post('/updateprofile',updatepic.single('profilephoto'), function(req,res){
                 // console.log(output[0].usersname)
                 req.session.cookie.username = username;
                 req.session.cookie.email = email;
-                res.status(200).send({"username" : username,"user_id" : userid,"email" : email, "profilephoto":profilephoto});
+                res.status(200).send({"username" : username,"email" : email, "profilephoto":profilephoto});
             }
     })
         
 })
 
-
+app.post('/creategroup',function(req,res){
+    console.log("Inside creategroup");  
+    console.log(req.body);
+});
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");
