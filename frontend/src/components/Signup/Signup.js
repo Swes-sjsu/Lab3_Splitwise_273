@@ -123,6 +123,7 @@ class Signup extends Component {
             sessionStorage.setItem('userid', resuserid);
             sessionStorage.setItem('username', resusername);
             sessionStorage.setItem('useremail', resemail);
+            sessionStorage.setItem('profilepic', null);
             const redirectVar1 = <Redirect to="/dashboard" />;
             this.setState({ redirecttohome: redirectVar1 });
           } else {

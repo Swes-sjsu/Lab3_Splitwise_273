@@ -68,9 +68,11 @@ class Login extends Component {
           const resuserid = response.data.user_id;
           const resusername = response.data.username;
           const resemail = response.data.email;
+          const resprofpic = response.data.profilepic;
           sessionStorage.setItem('userid', resuserid);
           sessionStorage.setItem('username', resusername);
           sessionStorage.setItem('useremail', resemail);
+          sessionStorage.setItem('profilepic', resprofpic);
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({
             redirecttohome: redirectVar1,

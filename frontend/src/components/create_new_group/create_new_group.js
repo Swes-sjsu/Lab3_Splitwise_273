@@ -3,7 +3,7 @@ import '../../App.css';
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import Navheader from '../navbar/navbar';
-import DefaultAvatar from '../../Profile_photos/default_avatar.png';
+import DefaultAvatar from '../../Profile_photos_1/default_avatar.png';
 import '../navbar/navbar.css';
 
 class Createnewgroup extends Component {

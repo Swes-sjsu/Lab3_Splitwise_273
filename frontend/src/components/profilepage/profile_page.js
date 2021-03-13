@@ -4,13 +4,11 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import Button from 'react-bootstrap/Button';
 import { Form, Image } from 'react-bootstrap';
+import FormData from 'form-data';
+// import fs from 'fs';
 import Navheader from '../navbar/navbar';
-// import DefaultAvatar from '../../../public/Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
-/* import Nav from 'react-bootstrap/Nav';
 
-import Dropdown from 'react-bootstrap/Dropdown';
-import { Link } from 'react-router-dom';
-import cookie from 'react-cookies'; */
+// import DefaultAvatar from '../../../public/Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
 
 import '../navbar/navbar.css';
 import './profilepage.css';
@@ -20,7 +18,7 @@ class Profilepage extends Component {
     super(props);
     this.profileform = React.createRef();
     this.state = {
-      profilephoto: '',
+      profilephoto: null,
       username: '',
       email: '',
       phonenumber: '',
@@ -98,6 +96,8 @@ class Profilepage extends Component {
       profilephoto: e.target.files[0],
       updatedpic: true,
     });
+    console.log(e.target.files[0]);
+    console.log(e.target.files[0].name);
   };
 
   defaultcurrencychangeHandler = (e) => {
@@ -126,25 +126,56 @@ class Profilepage extends Component {
       defaultcurrency,
       timezone,
       language,
+      updatedpic,
     } = this.state;
     const formdata = new FormData(this.profileform.current);
-    formdata.append('profphoto', profilephoto);
+    if (updatedpic) {
+      // const stream = fs.createReadStream(profilephoto.name);
+      formdata.append('profile_avatar', profilephoto, profilephoto.name);
+    }
     formdata.append('idusers', userid);
     formdata.append('currencydef', defaultcurrency);
     formdata.append('timezone', timezone);
     formdata.append('language', language);
-    console.log(formdata.entries);
+    // const formheaders = formdata.getHeaders();
+    console.log(formdata);
+    /* 
     axios
-      .post('http://localhost:3001/updateprofile', formdata)
+      .post('http://localhost:3001/updateprofile', formdata, {
+        headers: {
+          ...formheaders,
+        },
+      })
+      
+      axios({
+      method: 'post',
+      url: 'http://localhost:3001/updateprofile',
+      data: formdata,
+      headers: { 'content-type': 'multipart/form-data' }, 
+    }) 
+    // 
+    fetch('http://localhost:3001/updateprofile', {
+      method: 'post',
+      data: formdata,
+    }) */
+    axios({
+      method: 'post',
+      url: 'http://localhost:3001/updateprofile',
+      data: formdata,
+      headers: {
+        // eslint-disable-next-line no-underscore-dangle
+        'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
+      },
+    })
       .then((response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
           console.log(response.data);
           sessionStorage.setItem('username', response.data.username);
           sessionStorage.setItem('useremail', response.data.email);
+          sessionStorage.setItem('profilepic', response.data.profilephoto);
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({ redirecttohome: redirectVar1 });
-          this.setState({ profilephoto: response.data.profphoto });
         } else {
           this.setState({
             redirecttohome: null,
@@ -166,19 +197,19 @@ class Profilepage extends Component {
     const { redirecttohome } = this.state;
     let profilepic = '/Profile_photos/default_avatar.png';
     const {
-      profilephoto,
       username,
       email,
       phonenumber,
       defaultcurrency,
       timezone,
       language,
-      updatedpic,
     } = this.state;
-    if (updatedpic) {
-      const imagename = profilephoto.name;
+
+    const imagename = sessionStorage.getItem('profilepic');
+    console.log(imagename);
+    if (imagename !== 'null') {
       profilepic = `/Profile_photos/${imagename}`;
-      console.log(profilephoto.name);
+      console.log(profilepic);
     }
     // if (profilephoto) profilepic = DefaultAvatar;
     return (
@@ -187,21 +218,20 @@ class Profilepage extends Component {
         <div>
           {redirecttohome}
           <h2> Your account </h2>
-          <Form ref={this.profileform} id="profileform" className="profileform">
-            <Form.Control type="text" name="profileinput" />
-            <div className="avatar-div">
-              <Image src={profilepic} alt="profils pic" />
-              <label htmlFor="profile_avatar">
-                Change your avatar
-                <input
-                  type="file"
-                  name="profile_avatar"
-                  id="profile_avatar"
-                  onChange={this.profilephtochangeHandler}
-                />
-              </label>
-            </div>
 
+          <div className="avatar-div">
+            <Image src={profilepic} className="avatar" alt="profils pic" />
+            <label htmlFor="profile_avatar">
+              Change your avatar
+              <input
+                type="file"
+                name="profile_avatar"
+                id="profile_avatar"
+                onChange={this.profilephtochangeHandler}
+              />
+            </label>
+          </div>
+          <Form ref={this.profileform} id="profileform" className="profileform">
             <div className="basic_div">
               <label htmlFor="username">
                 Your name

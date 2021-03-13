@@ -48,17 +48,17 @@ const dbconnection = mysql.createConnection({
 })
 
 var filestorage = multer.diskStorage({
-    destination: function(req, file, results){
-    results(null,'../frontend/public/Profile_photos/')},
-    filename: function(req, file, results){
-        results(null,Date.now()+file.originalname)}
+    destination: function(req, file, cb){
+    cb(null,'../frontend/public/Profile_photos/')},
+    filename: function(req, file, cb){
+        cb(null,Date.now()+file.originalname)}
 })
 
-const filetypes=(req, file, results)=>{
+const filetypes=(req, file, cb)=>{
     if(file.mimetype ==='image/jpeg' || file.mimetype ==='image/jpg' || file.mimetype ==='image/png'){
-        results(null,true);
+        cb(null,true);
     }else{
-        results(null, false);
+        cb(null, false);
     }
  
    }
@@ -127,7 +127,7 @@ app.post('/login', function(req,res){
                 req.session.cookie.username = output[0].usersname;
                 req.session.cookie.email = email;
                 console.log(req.session.cookie.username,req.session.cookie.email )
-                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email});
+                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email,"profilepic" : output[0].profphoto});
             }
             else{
                 res.status(401).send('Please enter valid password!');
@@ -160,7 +160,7 @@ app.get('/getuserdetails/:id', function(req,res){
         
 })
 
-app.post('/updateprofile',updatepic.single('profile_avatar'), function(req,res){
+app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res){
 
     console.log("Inside  updateprofile");    
     console.log(req.body);
@@ -170,11 +170,13 @@ app.post('/updateprofile',updatepic.single('profile_avatar'), function(req,res){
     const phonenumber =req.body.phonenumber;
     const defaultcurrency =req.body.currencydef;
     const timezone =req.body.timezone;
-    const profilephoto =req.file.originalname;
+    const profilephoto =req.file.filename;
     const language =req.body.language;
-    console.log(username,email,phonenumber,defaultcurrency,timezone,profilephoto,language,userid);
-    sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+"', profphoto = '"+profilephoto+
-    "' , language = '"+language+"' WHERE idusers = "+userid;
+    const mimetype = req.file.mimetype; 
+    console.log(username,email,phonenumber,defaultcurrency,timezone,profilephoto,language,userid,mimetype);
+    
+    sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
+    "', profphoto = '"+profilephoto+"' , language = '"+language+"' WHERE idusers = "+userid;
     console.log(sqlquery)
     dbconnection.query(sqlquery,(err,output,fields)=> {
         if(err){
