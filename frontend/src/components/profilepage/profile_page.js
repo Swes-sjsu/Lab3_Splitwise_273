@@ -130,6 +130,9 @@ class Profilepage extends Component {
     if (updatedpic) {
       // const stream = fs.createReadStream(profilephoto.name);
       formdata.append('profile_avatar', profilephoto, profilephoto.name);
+    } else {
+      const imagename = sessionStorage.getItem('profilepic');
+      formdata.append('profile_avatar', imagename);
     }
     formdata.append('idusers', userid);
     formdata.append('currencydef', defaultcurrency);

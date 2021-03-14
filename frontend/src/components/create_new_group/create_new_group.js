@@ -118,10 +118,14 @@ class Createnewgroup extends Component {
 
   removegroupmember = (id) => {
     const { groupmembers } = this.state;
-    const updatedList = [...groupmembers];
+    /* const updatedList = [...groupmembers];
     updatedList.splice(id, 1);
+    console.log(updatedList);
     this.setState({
       groupmembers: updatedList,
+    }); */
+    this.setState({
+      groupmembers: groupmembers.filter((s) => s !== id),
     });
   };
 
@@ -134,8 +138,20 @@ class Createnewgroup extends Component {
       userid,
       grouphoto,
       updatedpic,
+      groupmembers,
     } = this.state;
-    console.log(groupname);
+    const gplist = [];
+    if (groupname === '') {
+      alert('Please enter a group name');
+    }
+    for (let i = 0; i < groupmembers.length; i += 1) {
+      if (groupmembers[i].gmusername === '' || groupmembers[i].gmemail === '') {
+        alert('Please fill the username and email id');
+      } else {
+        gplist.push(groupmembers[i].gmemail);
+      }
+    }
+    console.log(gplist);
     const formdata = new FormData(this.groupform.current);
     if (updatedpic) {
       formdata.append('group_avatar', grouphoto, grouphoto.name);
@@ -143,7 +159,7 @@ class Createnewgroup extends Component {
     formdata.append('idusers', userid);
     formdata.append('groupcreatedby', username);
     formdata.append('groupcreatedbyemail', email);
-    console.log(formdata);
+    formdata.append('groupcreatedbyemail[]', gplist);
     axios({
       method: 'post',
       url: 'http://localhost:3001/createnewgroup',
@@ -210,6 +226,7 @@ class Createnewgroup extends Component {
                 name="group_name"
                 id="group_name"
                 onChange={this.groupnameChangeHandler}
+                required
               />
             </div>
             <div className="group_members">
@@ -232,9 +249,10 @@ class Createnewgroup extends Component {
                           this.groupmembersnameChangeHandler(id, e)
                         }
                         // autoComplete="off"
+                        required
                       />
                       <input
-                        placeholder="Email address (optional)"
+                        placeholder="Email address "
                         className="email"
                         type="email"
                         value={groupmember.gmemail}
@@ -243,11 +261,12 @@ class Createnewgroup extends Component {
                         onChange={(e) =>
                           this.groupmembersemailChangeHandler(id, e)
                         }
+                        required
                       />
                       <button
                         type="button"
                         name="removegm"
-                        onClick={this.removegroupmember}
+                        onClick={() => this.removegroupmember(groupmember)}
                         className="removegm"
                       >
                         X

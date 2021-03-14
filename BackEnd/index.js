@@ -180,13 +180,25 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res)
     const phonenumber =req.body.phonenumber;
     const defaultcurrency =req.body.currencydef;
     const timezone =req.body.timezone;
-    const profilephoto =req.file.filename;
     const language =req.body.language;
-    const mimetype = req.file.mimetype; 
-    console.log(username,email,phonenumber,defaultcurrency,timezone,profilephoto,language,userid,mimetype);
-    
-    sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
+    let profilephoto;
+    console.log(username,email,phonenumber,defaultcurrency,timezone,language,userid);
+    if(!req.file){ 
+        sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
+    "' , language = '"+language+"' WHERE idusers = "+userid;
+     profilephoto =req.body.profile_avatar;
+     } else {
+        profilephoto =req.file.filename;
+        const mimetype = req.file.mimetype; 
+        console.log(profilephoto, mimetype);
+        sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
     "', profphoto = '"+profilephoto+"' , language = '"+language+"' WHERE idusers = "+userid;
+
+     }
+    //sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
+    //"', profphoto = '"+profilephoto+"' , language = '"+language+"' WHERE idusers = "+userid;
+
+
     console.log(sqlquery)
     dbconnection.query(sqlquery,(err,output,fields)=> {
         if(err){
@@ -222,9 +234,10 @@ app.get('/getuseroptions/:id', function(req,res){
         
 })
 
-app.post('/creategroup',grpupdatepic.single("group_avatar"),function(req,res){
+app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res){
     console.log("Inside creategroup");  
     console.log(req.body);
+    console.log(req.body.length)
     
 });
 //start your server on port 3001
