@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-// import ReactDOM from 'react-dom';
 import { Redirect } from 'react-router';
 import Button from 'react-bootstrap/Button';
 import { Form, Image } from 'react-bootstrap';
 import FormData from 'form-data';
-// import fs from 'fs';
 import Navheader from '../navbar/navbar';
 
 // import DefaultAvatar from '../../../public/Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
@@ -220,7 +218,7 @@ class Profilepage extends Component {
           <h2> Your account </h2>
 
           <div className="avatar-div">
-            <Image src={profilepic} className="avatar" alt="profils pic" />
+            <Image src={profilepic} className="avatar" alt="profile pic" />
             <label htmlFor="profile_avatar">
               Change your avatar
               <input

@@ -1,34 +1,66 @@
 import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
+import { Form, Image } from 'react-bootstrap';
 import { Redirect } from 'react-router';
 import Navheader from '../navbar/navbar';
-import DefaultAvatar from '../../Profile_photos_1/default_avatar.png';
 import '../navbar/navbar.css';
-
+// import TextField from '@material-ui/core/TextField';
+// import Autocomplete from '@material-ui/lab/Autocomplete';
 class Createnewgroup extends Component {
   constructor(props) {
     super(props);
+    this.groupform = React.createRef();
     this.state = {
       groupname: '',
-      groupmembers: [],
+      groupmembers: [{ gmusername: '', gmemail: '' }],
+      userid: '',
+      grouphoto: null,
+      updatedpic: false,
     };
-
     // Bind the handlers to this class
     this.groupnameChangeHandler = this.groupnameChangeHandler.bind(this);
-    this.groupmembersChangeHandler = this.groupmembersChangeHandler.bind(this);
+    this.groupmembersnameChangeHandler = this.groupmembersnameChangeHandler.bind(
+      this
+    );
+    this.groupmembersemailChangeHandler = this.groupmembersemailChangeHandler.bind(
+      this
+    );
+    this.groupphtochangeHandler = this.groupphtochangeHandler.bind(this);
+    this.addgroupmember = this.addgroupmember.bind(this);
+    this.removegroupmember = this.removegroupmember.bind(this);
     this.submitgroupcreate = this.submitgroupcreate.bind(this);
   }
 
   componentWillMount() {
-    this.state = {
+    const userid1 = sessionStorage.getItem('userid');
+    this.setState({
+      userid: userid1,
       email: sessionStorage.getItem('useremail'),
       username: sessionStorage.getItem('username'),
       redirecttogroup: null,
-      groupname: '',
-      groupmembers: [],
-    };
+    });
+    this.getuseroptions(userid1);
   }
+
+  getuseroptions = (userid) => {
+    axios
+      .get(`http://localhost:3001/getuseroptions/${userid}`, {
+        headers: {
+          'content-type': 'application/json',
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  usrchangeHandler = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
+  };
 
   groupnameChangeHandler = (e) => {
     this.setState({
@@ -36,24 +68,91 @@ class Createnewgroup extends Component {
     });
   };
 
-  groupmembersChangeHandler = (e) => {
+  groupmembersnameChangeHandler = (id, e) => {
+    //  const { groupmembers } = this.state;
+    // eslint-disable-next-line react/destructuring-assignment
+    // const updatedList = [...this.state.groupmembers];
+    // const gmusername1= {...updatedList[id], {updatedList[id].gmusername: e.target.value}};
+    const { groupmembers } = this.state;
+    const updatedList = [...groupmembers];
+    updatedList[id].gmusername = e.target.value;
+    console.log(updatedList);
+    this.setState(updatedList);
+    /* const newgroupmembers = groupmembers.map((groupmember, gmid) => {
+      if (id !== gmid) return groupmember;
+      return [...groupmember, e.target.value];
+    });
+    this.setState({
+      groupmembers: newgroupmembers,
+    });
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log(groupmembers); */
+  };
+
+  groupmembersemailChangeHandler = (id, e) => {
+    const { groupmembers } = this.state;
+    const updatedList = [...groupmembers];
+    // const gmusername1= {...updatedList[id], {updatedList[id].gmusername: e.target.value}};
+    updatedList[id].gmemail = e.target.value;
+    console.log(updatedList);
+    this.setState(updatedList);
+  };
+
+  groupphtochangeHandler = (e) => {
+    this.setState({
+      grouphoto: e.target.files[0],
+      updatedpic: true,
+    });
+    console.log(e.target.files[0]);
+    console.log(e.target.files[0].name);
+  };
+
+  addgroupmember = () => {
     this.setState((prevstate) => ({
-      groupmembers: [...prevstate.groupmembers, e.target.value],
+      groupmembers: [
+        ...prevstate.groupmembers,
+        { gmusername: '', gmemail: '' },
+      ],
     }));
+  };
+
+  removegroupmember = (id) => {
+    const { groupmembers } = this.state;
+    const updatedList = [...groupmembers];
+    updatedList.splice(id, 1);
+    this.setState({
+      groupmembers: updatedList,
+    });
   };
 
   submitgroupcreate = async (e) => {
     e.preventDefault();
-    const { groupname, groupmembers, username, email } = this.state;
-    const data = {
+    const {
       groupname,
-      groupmembers,
       username,
       email,
-    };
-    console.log(data);
-    axios
-      .post('http://localhost:3001/createnewgroup', data)
+      userid,
+      grouphoto,
+      updatedpic,
+    } = this.state;
+    console.log(groupname);
+    const formdata = new FormData(this.groupform.current);
+    if (updatedpic) {
+      formdata.append('group_avatar', grouphoto, grouphoto.name);
+    }
+    formdata.append('idusers', userid);
+    formdata.append('groupcreatedby', username);
+    formdata.append('groupcreatedbyemail', email);
+    console.log(formdata);
+    axios({
+      method: 'post',
+      url: 'http://localhost:3001/createnewgroup',
+      data: formdata,
+      headers: {
+        // eslint-disable-next-line no-underscore-dangle
+        'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
+      },
+    })
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log('response ', response.data);
@@ -81,21 +180,29 @@ class Createnewgroup extends Component {
 
   render() {
     const { email, username } = this.state;
+    const { groupmembers } = this.state;
     const { errorMessage } = this.state;
     const { redirecttogroup } = this.state;
     console.log(username, email);
+    const grouppic = '/Group_photos/default_avatar.png';
     return (
       <div>
         <Navheader />
         <div id="group_avatar">
-          <img src={DefaultAvatar} alt="profils pic" />
-          <br />
-          <input type="file" name="group_avatar" id="group_avatar" />
+          <Image src={grouppic} className="avatar" alt="group pic" />
+          <label htmlFor="group_avatar">
+            Change your group avatar
+            <input
+              type="file"
+              name="group_avatar"
+              id="group_avatar"
+              onChange={this.groupphtochangeHandler}
+            />
+          </label>
         </div>
-
-        <div className="createnewgroup">
-          <h2>START A NEW GROUP</h2>
-          <form className="formgroup" id="new_group">
+        <Form ref={this.groupform} id="groupform" className="groupform">
+          <div className="createnewgroup">
+            <h2>START A NEW GROUP</h2>
             <div>
               <h3>My group shall be called....</h3>
               <input
@@ -105,7 +212,6 @@ class Createnewgroup extends Component {
                 onChange={this.groupnameChangeHandler}
               />
             </div>
-
             <div className="group_members">
               <div className="users">
                 <h2>Group members</h2>
@@ -113,71 +219,52 @@ class Createnewgroup extends Component {
                   <div className="grpnameemail">
                     {username}(<em>{email}</em>)
                   </div>
-                  <div className="grpnameemail">
-                    <input
-                      placeholder="Name"
-                      className="name ui-autocomplete-input"
-                      type="text"
-                      // value=""
-                      name="group_members_name_1"
-                      id="group_members_name_1"
-                      onMouseLeave={this.groupmembersChangeHandler}
-                      // autoComplete="off"
-                    />
-                    <input
-                      placeholder="Email address (optional)"
-                      className="email"
-                      type="email"
-                      name="group_members_email_1"
-                      id="group_members_email_1"
-                    />
-                  </div>
-
-                  <div className="grpnameemail">
-                    <input
-                      placeholder="Name"
-                      className="name ui-autocomplete-input"
-                      type="text"
-                      // value=""
-                      name="group_members_name_2"
-                      id="group_members_name_2"
-                      onMouseLeave={this.groupmembersChangeHandler}
-                      // autoComplete="off"
-                    />
-                    <input
-                      placeholder="Email address (optional)"
-                      className="email"
-                      type="email"
-                      name="group_members_email_2"
-                      id="group_members_email_2"
-                    />
-                  </div>
-
-                  <div className="grpnameemail">
-                    <input
-                      placeholder="Name"
-                      className="name ui-autocomplete-input"
-                      type="text"
-                      // value=""
-                      name="group_members_name_3"
-                      id="group_members_name_3"
-                      onMouseLeave={this.groupmembersChangeHandler}
-                      // autoComplete="off"
-                    />
-                    <input
-                      placeholder="Email address (optional)"
-                      className="email"
-                      type="email"
-                      name="group_members_email_3"
-                      id="group_members_email_3"
-                    />
-                  </div>
+                  {groupmembers.map((groupmember, id) => (
+                    <div className="grpnameemail">
+                      <input
+                        placeholder="Name"
+                        className="name ui-autocomplete-input"
+                        type="text"
+                        value={groupmember.gmusersname}
+                        name={`group_members_${id + 1}_username`}
+                        id={`group_members_${id + 1}_username`}
+                        onChange={(e) =>
+                          this.groupmembersnameChangeHandler(id, e)
+                        }
+                        // autoComplete="off"
+                      />
+                      <input
+                        placeholder="Email address (optional)"
+                        className="email"
+                        type="email"
+                        value={groupmember.gmemail}
+                        name={`group_members_${id + 1}_email`}
+                        id={`group_members_${id + 1}_email`}
+                        onChange={(e) =>
+                          this.groupmembersemailChangeHandler(id, e)
+                        }
+                      />
+                      <button
+                        type="button"
+                        name="removegm"
+                        onClick={this.removegroupmember}
+                        className="removegm"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={this.addgroupmember}
+                    className="addgm"
+                  >
+                    + Add Person
+                  </button>
                 </div>
               </div>
-
               <div id="invite_link_container">
                 <h2>Invite group members by link</h2>
-
                 <div className="invitelink">
                   Send this link to your friends, and when they click it,they
                   will automatically be added to this group.
@@ -200,8 +287,8 @@ class Createnewgroup extends Component {
                 </div>
               </div>
             </div>
-          </form>
-        </div>
+          </div>
+        </Form>
       </div>
     );
   }

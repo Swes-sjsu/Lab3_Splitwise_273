@@ -62,9 +62,19 @@ const filetypes=(req, file, cb)=>{
     }
  
    }
-
    var updatepic = multer({
        storage: filestorage,
+       fileFilter: filetypes
+   });
+
+   var grpfilestorage = multer.diskStorage({
+    destination: function(req, file, cb){
+    cb(null,'../frontend/public/Profile_photos/')},
+    filename: function(req, file, cb){
+        cb(null,Date.now()+file.originalname)}
+})
+   var grpupdatepic = multer({
+       storage: grpfilestorage,
        fileFilter: filetypes
    });
 
@@ -192,9 +202,30 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res)
         
 })
 
-app.post('/creategroup',function(req,res){
+
+app.get('/getuseroptions/:id', function(req,res){
+
+    console.log("Inside  getuseroptions");    
+    console.log(req.body);
+    const userid =req.params.id;
+    console.log(userid)
+    dbconnection.query("SELECT idusers,usersname,email FROM users where idusers != ? ",
+    [userid],async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send(output);
+            }
+    })
+        
+})
+
+app.post('/creategroup',grpupdatepic.single("group_avatar"),function(req,res){
     console.log("Inside creategroup");  
     console.log(req.body);
+    
 });
 //start your server on port 3001
 app.listen(3001);
