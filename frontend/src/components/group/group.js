@@ -46,7 +46,7 @@ class Groupdetails extends Component {
               <ul className="grouppage-button">
                 <li>
                   <Button className="login-default">
-                    <Link to="/addbill">Add Expense</Link>
+                    <Link to="/addbill">Add an Expense</Link>
                   </Button>{' '}
                   <Button className="Signup-default">
                     <Link to="/signup">Leave Group</Link>

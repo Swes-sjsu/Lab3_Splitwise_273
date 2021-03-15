@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Select from 'react-select';
 import '../../App.css';
 import axios from 'axios';
 import { Form, Image } from 'react-bootstrap';
@@ -12,6 +13,7 @@ class Createnewgroup extends Component {
     super(props);
     this.groupform = React.createRef();
     this.state = {
+      selectUsername: [],
       groupname: '',
       groupmembers: [{ gmusername: '', gmemail: '' }],
       userid: '',
@@ -20,12 +22,7 @@ class Createnewgroup extends Component {
     };
     // Bind the handlers to this class
     this.groupnameChangeHandler = this.groupnameChangeHandler.bind(this);
-    this.groupmembersnameChangeHandler = this.groupmembersnameChangeHandler.bind(
-      this
-    );
-    this.groupmembersemailChangeHandler = this.groupmembersemailChangeHandler.bind(
-      this
-    );
+    this.groupmembersChangeHandler = this.groupmembersChangeHandler.bind(this);
     this.groupphtochangeHandler = this.groupphtochangeHandler.bind(this);
     this.addgroupmember = this.addgroupmember.bind(this);
     this.removegroupmember = this.removegroupmember.bind(this);
@@ -51,7 +48,14 @@ class Createnewgroup extends Component {
         },
       })
       .then((response) => {
+        const { data } = response;
+        const usernametext = data.map((txt) => ({
+          value: txt.email,
+          label: `${txt.usersname}(${txt.email})`,
+        }));
+        console.log(usernametext);
         console.log(response.data);
+        this.setState({ selectUsername: usernametext });
       })
       .catch((err) => console.log(err));
   };
@@ -62,14 +66,14 @@ class Createnewgroup extends Component {
     });
   };
 
-  groupmembersnameChangeHandler = (id, e) => {
+  groupmembersChangeHandler = (id, e) => {
     //  const { groupmembers } = this.state;
     // eslint-disable-next-line react/destructuring-assignment
     // const updatedList = [...this.state.groupmembers];
     // const gmusername1= {...updatedList[id], {updatedList[id].gmusername: e.target.value}};
     const { groupmembers } = this.state;
     const updatedList = [...groupmembers];
-    updatedList[id].gmusername = e.target.value;
+    updatedList[id].gmemail = e.value;
     console.log(updatedList);
     this.setState(updatedList);
     /* const newgroupmembers = groupmembers.map((groupmember, gmid) => {
@@ -81,15 +85,6 @@ class Createnewgroup extends Component {
     });
     // eslint-disable-next-line react/destructuring-assignment
     console.log(groupmembers); */
-  };
-
-  groupmembersemailChangeHandler = (id, e) => {
-    const { groupmembers } = this.state;
-    const updatedList = [...groupmembers];
-    // const gmusername1= {...updatedList[id], {updatedList[id].gmusername: e.target.value}};
-    updatedList[id].gmemail = e.target.value;
-    console.log(updatedList);
-    this.setState(updatedList);
   };
 
   groupphtochangeHandler = (e) => {
@@ -139,8 +134,8 @@ class Createnewgroup extends Component {
       alert('Please enter a group name');
     }
     for (let i = 0; i < groupmembers.length; i += 1) {
-      if (groupmembers[i].gmusername === '' || groupmembers[i].gmemail === '') {
-        alert('Please fill the username and email id');
+      if (groupmembers[i].gmemail === '') {
+        alert('Please fill the username or email id');
       } else {
         gplist.push(groupmembers[i].gmemail);
       }
@@ -200,6 +195,7 @@ class Createnewgroup extends Component {
     const { groupmembers } = this.state;
     const { errorMessage } = this.state;
     const { redirecttogroup } = this.state;
+    const { selectUsername } = this.state;
     console.log(username, email);
     const grouppic = '/Group_photos/default_avatar.png';
     return (
@@ -240,29 +236,16 @@ class Createnewgroup extends Component {
                   </div>
                   {groupmembers.map((groupmember, id) => (
                     <div className="grpnameemail">
-                      <input
+                      <Select
+                        options={selectUsername}
                         placeholder="Name"
                         className="name ui-autocomplete-input"
                         type="text"
-                        value={groupmember.gmusersname}
+                        // value={groupmember.gmusersname}
                         name={`group_members_${id + 1}_username`}
                         id={`group_members_${id + 1}_username`}
-                        onChange={(e) =>
-                          this.groupmembersnameChangeHandler(id, e)
-                        }
+                        onChange={(e) => this.groupmembersChangeHandler(id, e)}
                         // autoComplete="off"
-                        required
-                      />
-                      <input
-                        placeholder="Email address "
-                        className="email"
-                        type="email"
-                        value={groupmember.gmemail}
-                        name={`group_members_${id + 1}_email`}
-                        id={`group_members_${id + 1}_email`}
-                        onChange={(e) =>
-                          this.groupmembersemailChangeHandler(id, e)
-                        }
                         required
                       />
                       <button

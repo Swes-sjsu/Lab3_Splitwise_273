@@ -245,11 +245,12 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
     const grpname=req.body.group_name;
     const groupcreatedbyemail =req.body.groupcreatedbyemail;
     const grpmemadded ={type:"gpemails", gpemails:  req.body.gpmememails};
+    console.log(grpmemadded);
     var stringgpmemadded = JSON.stringify(req.body.gpmememails);
-     var replacebraces = stringgpmemadded.replace(/[\[\]\"]/g,'')
+     var replacebraces = stringgpmemadded.replace(/[\[\]\'\"]/g,'')
     var gpmems = replacebraces.split(",");
     let groupphoto;
-    console.log(groupcreatedbyemail,userid,grpmemadded,grpname,typeof(gpmems));
+    console.log(groupcreatedbyemail,userid,grpmemadded,grpname,gpmems);
     if(!req.file){ 
         insertgrpsqlquery = "INSERT INTO spgroups(gpname) VALUES ('"+grpname +"')"
     groupphoto =req.body.group_avatar;
@@ -295,10 +296,11 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
                                     }
                                     else{
                                         console.log(output1);
-                                        res.status(200).send("Group created successfuly");
+                                        
                                     }    
                                 })
                         })
+                        res.status(200).send("Group created successfuly");
                     }
             })
     }
