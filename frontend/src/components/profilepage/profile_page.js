@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
+import cookie from 'react-cookies';
 import Button from 'react-bootstrap/Button';
 import { Form, Image } from 'react-bootstrap';
 import FormData from 'form-data';
@@ -195,6 +196,10 @@ class Profilepage extends Component {
   };
 
   render() {
+    let redirectVar = null;
+    if (!cookie.load('cookie')) {
+      redirectVar = <Redirect to="/" />;
+    }
     const { redirecttohome } = this.state;
     let profilepic = '/Profile_photos/default_avatar.png';
     const {
@@ -215,6 +220,7 @@ class Profilepage extends Component {
     // if (profilephoto) profilepic = DefaultAvatar;
     return (
       <div>
+        {redirectVar}
         <Navheader />
         <div>
           {redirecttohome}

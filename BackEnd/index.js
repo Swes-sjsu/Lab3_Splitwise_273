@@ -44,9 +44,13 @@ const dbconnection = mysql.createConnection({
     user:"admin",
     password:"Swetha1234",
     ssl: true,
-    database: "splitwise"
+    database: "splitwise",
+    multipleStatements: true
 })
-
+const date = new Date();
+const timeElapsed = Date.now();
+const today = new Date(timeElapsed);
+console.log(today.toISOString());
 var filestorage = multer.diskStorage({
     destination: function(req, file, cb){
     cb(null,'../frontend/public/Profile_photos/')},
@@ -237,9 +241,131 @@ app.get('/getuseroptions/:id', function(req,res){
 app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res){
     console.log("Inside creategroup");  
     console.log(req.body);
-    console.log(req.body.length)
-    
+    const userid =(req.body.idusers);
+    const grpname=req.body.group_name;
+    const groupcreatedbyemail =req.body.groupcreatedbyemail;
+    const grpmemadded ={type:"gpemails", gpemails:  req.body.gpmememails};
+    var stringgpmemadded = JSON.stringify(req.body.gpmememails);
+     var replacebraces = stringgpmemadded.replace(/[\[\]\"]/g,'')
+    var gpmems = replacebraces.split(",");
+    let groupphoto;
+    console.log(groupcreatedbyemail,userid,grpmemadded,grpname,typeof(gpmems));
+    if(!req.file){ 
+        insertgrpsqlquery = "INSERT INTO spgroups(gpname) VALUES ('"+grpname +"')"
+    groupphoto =req.body.group_avatar;
+     } else {
+        groupphoto =req.file.filename;
+        const mimetype = req.file.mimetype; 
+        console.log(groupphoto, mimetype);
+        insertgrpsqlquery = "INSERT INTO spgroups(gpname,photo) VALUES ('"+grpname +"', '"+groupphoto+"')"
+     }
+    console.log(insertgrpsqlquery)
+    dbconnection.query(insertgrpsqlquery,(err,output)=> {
+        if(err){
+            if(err.code === "ER_DUP_ENTRY") {
+                console.log("groupname is not unique")
+                res.status(410).send('Groupname is not unique!')
+            }else{
+        console.log(err);
+        res.status(400).send('Error!')}
+    }else {
+                
+               console.log(output);
+               const groupid1=output.insertId;
+               console.log(groupid1);
+               const insertusergroups = "INSERT INTO usersgroups(userid,groupid,invitedaccepted,invitedby) values (?,?,?,?)"
+               dbconnection.query(insertusergroups,[userid,groupid1,1,groupcreatedbyemail],(err,output1) => {
+                   console.log(insertusergroups);
+                if(err){
+                        console.log("Error")
+                        res.status(400).send('Error!')
+                    }
+                    else{
+                        var gpmemsarray = Object.keys(gpmems)
+                        gpmemsarray.forEach((gpmember) => {
+                            var gpemail = gpmems[gpmember]
+                                //const gpemail=gpmember;
+                                console.log(gpemail);
+                                insertgpmembers="INSERT INTO usersgroups(userid,groupid,invitedaccepted,invitedby) VALUES ((SELECT idusers FROM users where email='"+gpemail+"'), '"+groupid1+"', 0 ,' "+groupcreatedbyemail+"')"
+                                console.log(insertgpmembers);
+                                dbconnection.query(insertgpmembers,(err,output1) => {
+                                    if(err){
+                                        console.log("Error")
+                                        res.status(400).send('Error!')
+                                    }
+                                    else{
+                                        console.log(output1);
+                                        res.status(200).send("Group created successfuly");
+                                    }    
+                                })
+                        })
+                    }
+            })
+    }
+    })
 });
+
+app.get('/getuserpgroups/:id', function(req,res){
+
+    console.log("Inside  getusergroups");    
+    console.log(req.body);
+    const userid =req.params.id;
+    console.log(userid)
+    sqlquery="SELECT gp.gpname FROM usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers where ug.invitedaccepted=1 and ug.userid="+userid;
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send(output);
+            }
+    })
+        
+})
+
+app.get('/getpgroupinvites/:id', function(req,res){
+
+    console.log("Inside  getpgroupinvites");    
+    console.log(req.body);
+    const userid =req.params.id;
+    console.log(userid)
+    sqlquery="SELECT gp.gpname FROM usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers where ug.invitedaccepted=0 and ug.userid="+userid;
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send(output);
+            }
+    })
+        
+})
+
+app.post('/acceptinvitation',function(req,res){
+    console.log("Inside  acceptinvitaion");    
+    console.log(req.body);
+    const userid =req.body.userid;
+    const grpname= req.body.currentgrp;
+    const accepted= req.body.accepted;
+    console.log(userid, grpname,accepted)
+    if(accepted == 'true'){
+    sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
+    }else {
+        sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=0 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
+    }
+    console.log(sqlquery);
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send(output);
+            }
+    })
+})
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");

@@ -27,6 +27,11 @@ class Navheader extends Component {
       isloggedin = (
         <ul className="nav navbar-nav navbar-right">
           <li>
+            <Button className="login-default">
+              <Link to="/dashboard"> Home </Link>
+            </Button>
+          </li>
+          <li>
             <Dropdown>
               {sessionStorage.getItem('username')}
               <Dropdown.Toggle />

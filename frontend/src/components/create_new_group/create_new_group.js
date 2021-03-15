@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import '../../App.css';
 import axios from 'axios';
 import { Form, Image } from 'react-bootstrap';
+import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import Navheader from '../navbar/navbar';
 import '../navbar/navbar.css';
-// import TextField from '@material-ui/core/TextField';
-// import Autocomplete from '@material-ui/lab/Autocomplete';
+
 class Createnewgroup extends Component {
   constructor(props) {
     super(props);
@@ -54,12 +54,6 @@ class Createnewgroup extends Component {
         console.log(response.data);
       })
       .catch((err) => console.log(err));
-  };
-
-  usrchangeHandler = (e) => {
-    this.setState({
-      username: e.target.value,
-    });
   };
 
   groupnameChangeHandler = (e) => {
@@ -155,11 +149,14 @@ class Createnewgroup extends Component {
     const formdata = new FormData(this.groupform.current);
     if (updatedpic) {
       formdata.append('group_avatar', grouphoto, grouphoto.name);
+    } else {
+      const imagename = '';
+      formdata.append('group_avatar', imagename);
     }
     formdata.append('idusers', userid);
     formdata.append('groupcreatedby', username);
     formdata.append('groupcreatedbyemail', email);
-    formdata.append('groupcreatedbyemail[]', gplist);
+    formdata.append('gpmememails[]', gplist);
     axios({
       method: 'post',
       url: 'http://localhost:3001/createnewgroup',
@@ -195,6 +192,10 @@ class Createnewgroup extends Component {
   };
 
   render() {
+    let redirectVar = null;
+    if (!cookie.load('cookie')) {
+      redirectVar = <Redirect to="/" />;
+    }
     const { email, username } = this.state;
     const { groupmembers } = this.state;
     const { errorMessage } = this.state;
@@ -203,6 +204,7 @@ class Createnewgroup extends Component {
     const grouppic = '/Group_photos/default_avatar.png';
     return (
       <div>
+        {redirectVar}
         <Navheader />
         <div id="group_avatar">
           <Image src={grouppic} className="avatar" alt="group pic" />

@@ -1,51 +1,316 @@
-/* import React, { Component } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
-// import ReactDOM from 'react-dom';
 import { Redirect } from 'react-router';
+import cookie from 'react-cookies';
 import Button from 'react-bootstrap/Button';
-import { Form } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { isEmpty } from 'lodash';
+// import { Form } from 'react-bootstrap';
+// import { Link } from 'react-router-dom';
+import Select from 'react-select';
 import Navheader from '../navbar/navbar';
-import DefaultAvatar from '../../Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
-/* import Nav from 'react-bootstrap/Nav';
+import Sidebarcomp from '../navbar/sidebar';
+import '../navbar/navbar.css';
+import './my_groups.css';
 
-import Dropdown from 'react-bootstrap/Dropdown';
-import { Link } from 'react-router-dom';
-import cookie from 'react-cookies'; */
+class Mygroups extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userid: '',
+      groupslist: [],
+      invitelist: [],
+      popup: false,
+      gpselectoptions: [],
+      selectedvalue: {},
+    };
 
-/* import '../navbar/navbar.css';
+    // Bind the handlers to this class
+    this.acceptinvitation = this.acceptinvitation.bind(this);
+    this.denyinvitation = this.denyinvitation.bind(this);
+    this.gpselectoptionshandler = this.gpselectoptionshandler.bind(this);
+    this.gotogrouppage = this.gotogrouppage.bind(this);
+    this.showHandler = this.showHandler.bind(this);
+    this.closeHandler = this.closeHandler.bind(this);
+  }
 
-class Mygroups extends {
-    constructor(props) {
-        super(props);
-        this.state = {
-          profilephoto: '',
-          username: '',
-          email: '',
-          phonenumber: '',
-          defaultcurrency: '',
-          timezone: '',
-          language: '',
-          redirecttohome: null,
-          userid: '',
-        };
-    
-        // Bind the handlers to this class
-        this.usrchangeHandler = this.usrchangeHandler.bind(this);
-        this.emailChangeHandler = this.emailChangeHandler.bind(this);
-        this.phonenumberChangeHandler = this.phonenumberChangeHandler.bind(this);
-        this.profilephtochangeHandler = this.profilephtochangeHandler.bind(this);
-        this.defaultcurrencychangeHandler = this.defaultcurrencychangeHandler.bind(
-          this
-        );
-        this.timezonechangeHandler = this.timezonechangeHandler.bind(this);
-        this.languagechangeHandler = this.languagechangeHandler.bind(this);
-        this.submitsave = this.submitsave.bind(this);
-      }
+  componentWillMount() {
+    const userid1 = sessionStorage.getItem('userid');
+    const getuserpgroups = this.getuserpgroups(userid1);
+    const getpgroupinvites = this.getpgroupinvites(userid1);
+    this.setState({
+      userid: userid1,
+      groupslist: getuserpgroups,
+      invitelist: getpgroupinvites,
+    });
+  }
 
-    render(){
-        return{
+  showHandler = () => {
+    this.setState({ popup: true });
+  };
 
+  closeHandler = () => {
+    this.setState({ popup: false });
+  };
+
+  getuserpgroups = (userid) => {
+    axios
+      .get(`http://localhost:3001/getuserpgroups/${userid}`, {
+        headers: {
+          'content-type': 'application/json',
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        console.log(typeof response.data);
+        const newaar = response.data.map((el) => el.gpname);
+        console.log(newaar);
+        const { data } = response;
+        const arrayforselect = data.map((el) => ({
+          value: el.gpname,
+          label: el.gpname,
+        }));
+        console.log(arrayforselect);
+        this.setState({
+          groupslist: newaar,
+          gpselectoptions: arrayforselect,
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  getpgroupinvites = (userid) => {
+    axios
+      .get(`http://localhost:3001/getpgroupinvites/${userid}`, {
+        headers: {
+          'content-type': 'application/json',
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        console.log(typeof response.data);
+        const newaar = response.data.map((el) => el.gpname);
+        console.log(newaar);
+        this.setState({
+          invitelist: newaar,
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  acceptinvitation = (groupname, e) => {
+    e.preventDefault();
+    console.log(e.target.value);
+    const accepted = 'true';
+    this.setState({ popup: false });
+    const { popup, userid } = this.state;
+    const currentgrp = groupname;
+    const data = {
+      accepted,
+      currentgrp,
+      userid,
+    };
+    console.log(data, popup);
+    axios
+      .post('http://localhost:3001/acceptinvitation', data)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log('response ', response.data);
+        if (response.status === 200) {
+          console.log(response.data);
+          this.getuserpgroups(userid);
+          this.getpgroupinvites(userid);
+        } else {
+          console.log(response.data);
+          alert(response.data);
         }
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        alert(err.response.data);
+      });
+  };
+
+  denyinvitation = (groupname, e) => {
+    e.preventDefault();
+    console.log(e.target.value);
+    const accepted = 'false';
+    this.setState({ popup: false });
+    const { invitelist, popup, userid } = this.state;
+    const currentgrp = groupname;
+    const data = {
+      accepted,
+      currentgrp,
+      userid,
+    };
+    console.log(data, accepted, popup);
+    console.log(invitelist);
+    axios
+      .post('http://localhost:3001/acceptinvitation', data)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log('response ', response.data);
+        if (response.status === 200) {
+          console.log(response.data);
+          this.getuserpgroups(userid);
+          this.getpgroupinvites(userid);
+        } else {
+          console.log(response.data);
+          alert(response.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        alert(err.response.data);
+      });
+  };
+
+  gotogrouppage = (groupname, e) => {
+    e.preventDefault();
+    sessionStorage.setItem('groupname', groupname);
+    const redirectVar1 = <Redirect to="/group" />;
+    this.setState({ redirecttopage: redirectVar1 });
+  };
+
+  gpselectoptionshandler = (e) => {
+    // const { selectvalue } = this.state;
+    const newarr = e.value;
+    console.log(e.value);
+    this.setState({ selectedvalue: newarr });
+  };
+
+  render() {
+    let redirectVar = null;
+    if (!cookie.load('cookie')) {
+      redirectVar = <Redirect to="/" />;
     }
+    const { redirecttopage } = this.state;
+    const { groupslist, gpselectoptions } = this.state;
+    const { invitelist } = this.state;
+    const { popup, selectedvalue } = this.state;
+
+    console.log(groupslist, invitelist, selectedvalue);
+    let checkifinvitesnull = false;
+    let checkifgroupsnull = false;
+    if (isEmpty(invitelist)) {
+      checkifinvitesnull = true;
+    }
+    if (isEmpty(groupslist)) {
+      checkifgroupsnull = true;
+    }
+    console.log(checkifinvitesnull, checkifgroupsnull);
+    return (
+      <div>
+        {redirectVar}
+        <Navheader />
+        <div className="mygroups-flex">
+          <div>
+            <Sidebarcomp />
+          </div>
+
+          <div className="mygroups-box">
+            <section className="mygroups-heading">
+              <h1>My Groups Summary</h1>
+            </section>
+
+            <section className="mygroups-left-sec">
+              <div className="mygroups-left-section-block">
+                <div className="title">Invitation pending List</div>
+              </div>
+              <div>
+                {checkifinvitesnull ? (
+                  <h2>No Invites Pending!</h2>
+                ) : (
+                  <div>
+                    {' '}
+                    {invitelist.map((groupname) => (
+                      <ul className="mygroups-button">
+                        <li>
+                          <Button
+                            className="myinvites-default"
+                            onClick={this.showHandler}
+                          >
+                            {groupname}
+                          </Button>
+
+                          <Modal show={popup} onHide={this.closeHandler}>
+                            <Modal.Header closeButton>
+                              <Modal.Title>Group Invitation</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                              Do you wish to accept the invitaion to join the
+                              group or reject the invitation?
+                            </Modal.Body>
+                            <Modal.Footer>
+                              <Button
+                                className="login-default"
+                                onClick={(e) =>
+                                  this.acceptinvitation(groupname, e)
+                                }
+                              >
+                                √ Accept
+                              </Button>
+                              <Button
+                                className="Signup-default"
+                                onClick={(e) =>
+                                  this.denyinvitation(groupname, e)
+                                }
+                              >
+                                x Reject
+                              </Button>
+                            </Modal.Footer>
+                          </Modal>
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section className="mygroups-center-sec">
+              <div className="mygroups-center-section-block">
+                <div className="title">My Groups List</div>
+              </div>
+              {checkifgroupsnull ? (
+                <h2>No groups to display!</h2>
+              ) : (
+                <div>
+                  {' '}
+                  {groupslist.map((groupname) => (
+                    <ul className="mygroups-left">
+                      <li>
+                        <Button
+                          className="mygroups-default"
+                          onClick={(e) => this.gotogrouppage(groupname, e)}
+                        >
+                          {groupname}
+                        </Button>
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+
+          <div className="mygroups-right" />
+          <Select
+            options={gpselectoptions}
+            placeholder="GroupName"
+            className="div-select"
+            onChange={(e) => this.gpselectoptionshandler(e)}
+          />
+          <Button
+            className="mygroups-default"
+            onClick={(e) => this.gotogrouppage(selectedvalue, e)}
+          >
+            GO
+          </Button>
+        </div>
+        {redirecttopage}
+      </div>
+    );
+  }
 }
-export default Mygroups; */
+export default Mygroups;

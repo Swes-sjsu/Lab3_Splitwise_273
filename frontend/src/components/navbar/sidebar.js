@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 import Dropdown from 'react-bootstrap/Dropdown';
-// import sidebar from 'react-bootstrap-sidebar';
 import './navbar.css';
 
 class Sidebarcomp extends Component {
@@ -28,7 +27,7 @@ class Sidebarcomp extends Component {
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link" to="/my_groups">
+                <NavLink className="nav-link" to="/mygroups">
                   <p>My Groups</p>
                 </NavLink>
               </li>
@@ -41,9 +40,6 @@ class Sidebarcomp extends Component {
                 <Dropdown.Menu>
                   <Dropdown.Item>
                     <Link to="/createnewgroup">+ Add group</Link>
-                  </Dropdown.Item>
-                  <Dropdown.Item>
-                    <Link to="/groups"> Groups</Link>
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
