@@ -25,7 +25,7 @@ class Sidebarcomp extends Component {
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link" to="/recent_activity">
+                <NavLink className="nav-link" to="/recentactivity">
                   <p>Recent Acitivity</p>
                 </NavLink>
               </li>

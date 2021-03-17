@@ -243,6 +243,14 @@ class Dashboard extends Component {
       totalpayeeuser,
       totalpayeruser
     );
+    let checkifyouowenull = false;
+    if (isEmpty(totalpayeeuser)) {
+      checkifyouowenull = true;
+    }
+    let checkifyouowednull = false;
+    if (isEmpty(totalpayeruser)) {
+      checkifyouowednull = true;
+    }
     return (
       <div>
         {redirectVar}
@@ -320,86 +328,75 @@ class Dashboard extends Component {
               </div>
               <div className="transactions-owe">
                 you owe test
-                {totalpayeeuser.map((expense2) => (
-                  <ul className="group-expenses">
-                    <li>
-                      <p>
-                        <span>
-                          {' '}
-                          You Owe {expense2.formatindiamt2} to {expense2.payer2}
-                          {payeebalances.map((expense) => (
-                            <ul className="group-expenses">
-                              <li>
-                                <p>
-                                  <span>
-                                    {' '}
-                                    You Owe {expense.formatindiamt} to{' '}
-                                    {expense.payer} for {expense.grpname}{' '}
-                                  </span>
-                                </p>
-                              </li>
-                            </ul>
-                          ))}
-                        </span>
-                      </p>
-                    </li>
-                  </ul>
-                ))}
-                {payeebalances.map((expense) => (
-                  <ul className="group-expenses">
-                    <li>
-                      <p>
-                        <span>
-                          {' '}
-                          You Owe {expense.formatindiamt} to {expense.payer} for{' '}
-                          {expense.grpname}{' '}
-                        </span>
-                      </p>
-                    </li>
-                  </ul>
-                ))}
+                {checkifyouowenull ? (
+                  <h2>YOU OWE NOTHING</h2>
+                ) : (
+                  <div>
+                    {' '}
+                    {totalpayeeuser.map((expense2) => (
+                      <ul className="group-expenses">
+                        <li>
+                          <p>
+                            <span>
+                              {' '}
+                              You Owe {expense2.formatindiamt2} to{' '}
+                              {expense2.payer2}
+                              {payeebalances.map((expense) => (
+                                <ul className="group-expenses">
+                                  <li>
+                                    <p>
+                                      <span>
+                                        {' '}
+                                        You Owe {expense.formatindiamt} to{' '}
+                                        {expense.payer} for {expense.grpname}{' '}
+                                      </span>
+                                    </p>
+                                  </li>
+                                </ul>
+                              ))}
+                            </span>
+                          </p>
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="transactions-owed">
-                you are owed test totalpayeruser
-                {totalpayeruser.map((expense3) => (
-                  <ul className="group-expenses">
-                    <li>
-                      <p>
-                        <span>
-                          {' '}
-                          {expense3.payee3} owes you {expense3.formatindiamt3}
-                          {payerbalances.map((expense) => (
-                            <ul className="group-expenses">
-                              <li>
-                                <p>
-                                  <span>
-                                    {' '}
-                                    {expense.payee1} owes you{' '}
-                                    {expense.formatindiamt1} for{' '}
-                                    {expense.grpname1}{' '}
-                                  </span>
-                                </p>
-                              </li>
-                            </ul>
-                          ))}
-                        </span>
-                      </p>
-                    </li>
-                  </ul>
-                ))}
-                {payerbalances.map((expense) => (
-                  <ul className="group-expenses">
-                    <li>
-                      <p>
-                        <span>
-                          {' '}
-                          {expense.payee1} owes you {expense.formatindiamt1} for{' '}
-                          {expense.grpname1}{' '}
-                        </span>
-                      </p>
-                    </li>
-                  </ul>
-                ))}
+                you are owed test
+                {checkifyouowednull ? (
+                  <h2>YOU ARE OWED NOTHING</h2>
+                ) : (
+                  <div>
+                    {' '}
+                    {totalpayeeuser.map((expense2) => (
+                      <ul className="group-expenses">
+                        <li>
+                          <p>
+                            <span>
+                              {' '}
+                              You Owe {expense2.formatindiamt2} to{' '}
+                              {expense2.payer2}
+                              {payeebalances.map((expense) => (
+                                <ul className="group-expenses">
+                                  <li>
+                                    <p>
+                                      <span>
+                                        {' '}
+                                        You Owe {expense.formatindiamt} to{' '}
+                                        {expense.payer} for {expense.grpname}{' '}
+                                      </span>
+                                    </p>
+                                  </li>
+                                </ul>
+                              ))}
+                            </span>
+                          </p>
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
               </div>
             </section>
           </div>
