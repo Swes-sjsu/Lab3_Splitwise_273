@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import numeral from 'numeral';
 // import { Row, Col, Container, Jumbotron } from 'react-bootstrap';
+import { isEmpty } from 'lodash';
 import Navheader from '../navbar/navbar';
 import Sidebarcomp from '../navbar/sidebar';
 import '../navbar/navbar.css';
@@ -19,6 +20,10 @@ class Dashboard extends Component {
       useremail: '',
       totalbalance: [],
       totalsummary: [],
+      payeebalances: [],
+      payerbalances: [],
+      totalpayeeuser: [],
+      totalpayeruser: [],
     };
   }
 
@@ -45,6 +50,7 @@ class Dashboard extends Component {
         console.log(typeof response.data);
         console.log(response.data[1]);
         const data = response.data[1];
+        const username = sessionStorage.getItem('username');
         const defaultcurr = sessionStorage.getItem('defaultcurrency');
         console.log(defaultcurr);
         const regExp = /\(([^)]+)\)/;
@@ -59,23 +65,156 @@ class Dashboard extends Component {
         this.setState({
           totalsummary: arraytotalsummary,
         });
-        /* const { data } = response;
-        const defaultcurr = sessionStorage.getItem('defaultcurrency');
-        console.log(defaultcurr);
-        const regExp = /\(([^)]+)\)/;
-        const getvalue = regExp.exec(defaultcurr);
-        const symbolvalue = getvalue[1];
-        const arrayofactivities = data.map((el) => ({
-          value: el.id,
-          expdate: el.tdate,
-          descp: el.tdescription,
-          paid: el.usersname,
-          amnt: symbolvalue + numeral(el.tamount).format('0,0.00'),
+
+        const data1 = response.data[0];
+        const arrayindisummaries = data1.map((el) => ({
+          payername: el.payer_username,
+          payeename: el.payee_username,
+          balance: el.balance,
+          grpname: el.gpname,
         }));
-        console.log(arrayofactivities);
+        console.log(arraytotalsummary);
         this.setState({
-          activties: arrayofactivities,
-        }); */
+          totalsummary: arraytotalsummary,
+        });
+
+        console.log(arrayindisummaries);
+
+        const payeearr = [];
+        const payeegrouparr = [];
+        const payeebalancearr = [];
+        const payerarr = [];
+
+        const payeepaysarr = [];
+        const payeepaysbalancearr = [];
+        const payergetsarr = [];
+        const payergrouparr = [];
+
+        const totalpayeename = [];
+        const totalpayername = [];
+        const totalamaount = [];
+
+        const totalpayeename1 = [];
+        const totalpayername1 = [];
+        const totalamaount1 = [];
+
+        let x;
+        let balancetotal = 0;
+        let balancetotal2 = 0;
+
+        for (let i = 0; i < arrayindisummaries.length; i += 1) {
+          x = -1;
+          if (
+            username === arrayindisummaries[i].payeename &&
+            arrayindisummaries[i].balance !== 0
+          ) {
+            payeearr.push(username);
+            payeegrouparr.push(arrayindisummaries[i].grpname);
+            payeebalancearr.push(arrayindisummaries[i].balance);
+            payerarr.push(arrayindisummaries[i].payername);
+            if (!isEmpty(totalpayername)) {
+              x = totalpayername.findIndex(
+                (el) => el === arrayindisummaries[i].payername
+              );
+            }
+            if (x > -1) {
+              balancetotal = totalamaount[x] + arrayindisummaries[i].balance;
+              totalamaount.push(balancetotal);
+              totalpayername.push(arrayindisummaries[i].payername);
+              totalpayeename.push(username);
+              console.log(totalamaount);
+              console.log(totalpayername);
+              console.log(totalpayeename);
+            } else {
+              totalpayername.push(arrayindisummaries[i].payername);
+              totalamaount.push(arrayindisummaries[i].balance);
+              totalpayeename.push(username);
+            }
+            console.log(x, totalpayername);
+          } else if (
+            username === arrayindisummaries[i].payername &&
+            arrayindisummaries[i].balance !== 0
+          ) {
+            payeepaysbalancearr.push(arrayindisummaries[i].balance);
+            payeepaysarr.push(arrayindisummaries[i].payeename);
+            payergrouparr.push(arrayindisummaries[i].grpname);
+            payergetsarr.push(username);
+            // x = -1;
+            if (!isEmpty(totalpayeename1)) {
+              x = totalpayeename1.findIndex(
+                (el) => el === arrayindisummaries[i].payeename
+              );
+            }
+            if (x > -1) {
+              balancetotal2 = totalamaount1[x] + arrayindisummaries[i].balance;
+              totalamaount1.push(balancetotal2);
+              totalpayeename1.push(arrayindisummaries[i].payeename);
+              totalpayername1.push(username);
+              console.log(totalamaount1);
+              console.log(totalpayername1);
+              console.log(totalpayeename1);
+            } else {
+              totalpayeename1.push(arrayindisummaries[i].payeename);
+              totalamaount1.push(arrayindisummaries[i].balance);
+              totalpayername1.push(username);
+              // console.log();
+            }
+          }
+        }
+
+        const payeearray = Object.keys(payeearr);
+        const arrayofindipayee = payeearray.map((indx) => ({
+          payee: payeearr[indx],
+          grpname: payeegrouparr[indx],
+          indiamt: payeebalancearr[indx],
+          formatindiamt:
+            symbolvalue + numeral(payeebalancearr[indx]).format('0,0.00'),
+          payer: payerarr[indx],
+        }));
+        console.log(arrayofindipayee);
+        this.setState({
+          payeebalances: [...arrayofindipayee],
+        });
+
+        const payerarray = Object.keys(payergetsarr);
+        const arrayofindipayer = payerarray.map((indx) => ({
+          payee1: payeepaysarr[indx],
+          grpname1: payergrouparr[indx],
+          indiamt1: payeepaysbalancearr[indx],
+          formatindiamt1:
+            symbolvalue + numeral(payeepaysbalancearr[indx]).format('0,0.00'),
+          payer1: payergetsarr[indx],
+        }));
+        console.log(arrayofindipayer);
+        this.setState({
+          payerbalances: [...arrayofindipayer],
+        });
+
+        const payeetotalblnc = Object.keys(totalpayeename);
+        const arrayofpayeetotalblnc = payeetotalblnc.map((indx) => ({
+          payee2: totalpayeename[indx],
+          indiamt2: totalamaount[indx],
+          formatindiamt2:
+            symbolvalue + numeral(totalamaount[indx]).format('0,0.00'),
+          payer2: totalpayername[indx],
+        }));
+        console.log(arrayofpayeetotalblnc);
+        this.setState({
+          totalpayeeuser: [...arrayofpayeetotalblnc],
+        });
+
+        const payertotalblnc = Object.keys(totalpayeename1);
+        const arrayofpayertotalblnc = payertotalblnc.map((indx) => ({
+          payee3: totalpayeename1[indx],
+          indiamt3: totalamaount1[indx],
+          formatindiamt3:
+            symbolvalue + numeral(totalamaount1[indx]).format('0,0.00'),
+          payer3: totalpayername1[indx],
+        }));
+        console.log(arrayofpayertotalblnc);
+        this.setState({
+          totalpayeruser: [...arrayofpayertotalblnc],
+        });
       })
       .catch((err) => console.log(err));
   };
@@ -85,9 +224,25 @@ class Dashboard extends Component {
     if (!cookie.load('cookie')) {
       redirectVar = <Redirect to="/" />;
     }
-    const { totalbalance, totalsummary } = this.state;
+    const {
+      totalbalance,
+      totalsummary,
+      payeebalances,
+      payerbalances,
+      totalpayeeuser,
+      totalpayeruser,
+    } = this.state;
     const { userid, useremail } = this.state;
-    console.log(totalbalance, userid, useremail, totalsummary);
+    console.log(
+      totalbalance,
+      userid,
+      useremail,
+      totalsummary,
+      payeebalances,
+      payerbalances,
+      totalpayeeuser,
+      totalpayeruser
+    );
     return (
       <div>
         {redirectVar}
@@ -163,9 +318,89 @@ class Dashboard extends Component {
                 <div>You Owe</div>
                 <div>You are owed</div>
               </div>
-              <div className="transactions-owe">you owe test</div>
-
-              <div className="transactions-owed">you are owed test</div>
+              <div className="transactions-owe">
+                you owe test
+                {totalpayeeuser.map((expense2) => (
+                  <ul className="group-expenses">
+                    <li>
+                      <p>
+                        <span>
+                          {' '}
+                          You Owe {expense2.formatindiamt2} to {expense2.payer2}
+                          {payeebalances.map((expense) => (
+                            <ul className="group-expenses">
+                              <li>
+                                <p>
+                                  <span>
+                                    {' '}
+                                    You Owe {expense.formatindiamt} to{' '}
+                                    {expense.payer} for {expense.grpname}{' '}
+                                  </span>
+                                </p>
+                              </li>
+                            </ul>
+                          ))}
+                        </span>
+                      </p>
+                    </li>
+                  </ul>
+                ))}
+                {payeebalances.map((expense) => (
+                  <ul className="group-expenses">
+                    <li>
+                      <p>
+                        <span>
+                          {' '}
+                          You Owe {expense.formatindiamt} to {expense.payer} for{' '}
+                          {expense.grpname}{' '}
+                        </span>
+                      </p>
+                    </li>
+                  </ul>
+                ))}
+              </div>
+              <div className="transactions-owed">
+                you are owed test totalpayeruser
+                {totalpayeruser.map((expense3) => (
+                  <ul className="group-expenses">
+                    <li>
+                      <p>
+                        <span>
+                          {' '}
+                          {expense3.payee3} owes you {expense3.formatindiamt3}
+                          {payerbalances.map((expense) => (
+                            <ul className="group-expenses">
+                              <li>
+                                <p>
+                                  <span>
+                                    {' '}
+                                    {expense.payee1} owes you{' '}
+                                    {expense.formatindiamt1} for{' '}
+                                    {expense.grpname1}{' '}
+                                  </span>
+                                </p>
+                              </li>
+                            </ul>
+                          ))}
+                        </span>
+                      </p>
+                    </li>
+                  </ul>
+                ))}
+                {payerbalances.map((expense) => (
+                  <ul className="group-expenses">
+                    <li>
+                      <p>
+                        <span>
+                          {' '}
+                          {expense.payee1} owes you {expense.formatindiamt1} for{' '}
+                          {expense.grpname1}{' '}
+                        </span>
+                      </p>
+                    </li>
+                  </ul>
+                ))}
+              </div>
             </section>
           </div>
 
