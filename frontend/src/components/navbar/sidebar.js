@@ -17,6 +17,9 @@ class Sidebarcomp extends Component {
           <div className="sidebar-wrapper">
             <ul className="nav">
               <li className="nav-item">
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/dashboard" />
+                </li>
                 <NavLink className="nav-link" to="/dashboard">
                   <p>Dashboard</p>
                 </NavLink>

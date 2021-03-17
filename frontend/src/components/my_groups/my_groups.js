@@ -205,10 +205,7 @@ class Mygroups extends Component {
         {redirectVar}
         <Navheader />
         <div className="mygroups-flex">
-          <div>
-            <Sidebarcomp />
-          </div>
-
+          <Sidebarcomp />
           <div className="mygroups-box">
             <section className="mygroups-heading">
               <h1>My Groups Summary</h1>

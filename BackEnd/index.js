@@ -537,6 +537,52 @@ app.post('/leavegroup',function(req,res){
 })
 
 
+app.get('/gettotalbalances/:userid', function(req,res){
+
+    console.log("Inside  getgrpexpenses");    
+    console.log(req.body);
+    const userid =req.params.userid;
+    console.log(userid)
+    sqlquery="SELECT sb.payer,  u.usersname as payer_username, sb.payee, u1.usersname as payee_username,sb.balance, sb.groupid, gp.gpname FROM balancetbl sb JOIN spgroups gp JOIN users u JOIN users u1 ON sb.groupid=gp.groupid and sb.payer=u.email and sb.payee= u1.email where payee_invite=1 and payer_invite=1 and u.idusers="+
+    userid+" or u1.idusers="+userid+
+    " ORDER BY sb.groupid ; SELECT @youareowed := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payer where payee_invite=1 and payer_invite=1 and u.idusers="+
+    userid+")  AS You_are_owed, @youowe := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payee where payee_invite=1 and payer_invite=1 and u.idusers="+
+    userid+")  AS You_owe,(@youareowed - @youowe)  AS Total_balance;";
+
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output); 
+                res.status(200).send(output)
+
+                /* getsummary="SELECT sb.payer,  u.usersname as payer_username, sb.payee, u1.usersname as payee_username,sb.balance, sb.groupid, gp.gpname FROM balancetbl sb JOIN spgroups gp JOIN users u JOIN users u1 ON sb.groupid=gp.groupid and sb.payer=u.email and sb.payee= u1.email where payee_invite=1 and payer_invite=1 and u.idusers="+
+                userid+" or u1.idusers="+userid+" ORDER BY sb.groupid ; SELECT @youareowed := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payer where payee_invite=1 and payer_invite=1 and u.idusers="+userid+")  AS You_are_owed, @youowe := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payee where payee_invite=1 and payer_invite=1 and u.idusers="+userid+")  AS You_owe,(@youareowed - @youowe)  AS Total_balance;";
+                dbconnection.query(getsummary,(err,output1) => {
+                    if(err){
+                        console.log("Error")
+                        res.status(400).send('Error!')
+                    }
+                    else{
+                        console.log(output1.length);
+                        console.log(output1);
+                        res.status(200).send(output1)
+                    }    
+                })*/ 
+                // for (let i = 0; i <noofmem;i++){
+                    // for (let j = 0; j < noofmem; j++){
+                        // insertgpmembers="INSERT INTO balancetbl(payer,payee,balance,groupid,payee_invite) VALUES ('"+gpmems[i]+"', '"+gpmems[j]+"', 0 ,'"+groupid1+"',0)";
+                                    
+                //}
+                //}
+
+                //res.status(200).send(output);
+            }
+    })
+        
+})
+
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");
