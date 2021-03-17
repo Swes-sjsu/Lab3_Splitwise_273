@@ -165,6 +165,7 @@ class Createnewgroup extends Component {
         console.log('Status Code : ', response.status);
         console.log('response ', response.data);
         if (response.status === 200) {
+          sessionStorage.setItem('groupname', response.data);
           const redirectVar1 = <Redirect to="/group" />;
           this.setState({
             redirecttogroup: redirectVar1,

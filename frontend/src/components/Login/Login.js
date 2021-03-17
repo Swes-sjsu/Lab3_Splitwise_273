@@ -69,10 +69,14 @@ class Login extends Component {
           const resusername = response.data.username;
           const resemail = response.data.email;
           const resprofpic = response.data.profilepic;
+          const rescurrency = response.data.currencydef;
+          // const restz = response.data.TZ;
           sessionStorage.setItem('userid', resuserid);
           sessionStorage.setItem('username', resusername);
           sessionStorage.setItem('useremail', resemail);
           sessionStorage.setItem('profilepic', resprofpic);
+          sessionStorage.setItem('defaultcurrency', rescurrency);
+          // sessionStorage.setItem('timezone', restz);
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({
             redirecttohome: redirectVar1,

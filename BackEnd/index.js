@@ -141,7 +141,7 @@ app.post('/login', function(req,res){
                 req.session.cookie.username = output[0].usersname;
                 req.session.cookie.email = email;
                 console.log(req.session.cookie.username,req.session.cookie.email )
-                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email,"profilepic" : output[0].profphoto});
+                res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email,"profilepic" : output[0].profphoto,"currencydef": output[0].currencydef, "TZ":output[0].timezone});
             }
             else{
                 res.status(401).send('Please enter valid password!');
@@ -287,7 +287,7 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
                             var gpemail = gpmems[gpmember]
                                 //const gpemail=gpmember;
                                 console.log(gpemail);
-                                insertgpmembers="INSERT INTO usersgroups(userid,groupid,invitedaccepted,invitedby) VALUES ((SELECT idusers FROM users where email='"+gpemail+"'), '"+groupid1+"', 0 ,' "+groupcreatedbyemail+"')"
+                                insertgpmembers="INSERT INTO usersgroups(userid,groupid,invitedaccepted,invitedby) VALUES ((SELECT idusers FROM users where email='"+gpemail+"'), '"+groupid1+"', 0 ,'"+groupcreatedbyemail+"')"
                                 console.log(insertgpmembers);
                                 dbconnection.query(insertgpmembers,(err,output1) => {
                                     if(err){
@@ -296,13 +296,43 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
                                     }
                                     else{
                                         console.log(output1);
-                                        
                                     }    
                                 })
                         })
-                        res.status(200).send("Group created successfuly");
                     }
+                    gpmems.unshift(groupcreatedbyemail);
+                    console.log(gpmems);
+                    for (let i = 0; i <gpmems.length;i++){
+                        for (let j = 0; j < gpmems.length; j++){
+                            if(gpmems[i]!==gpmems[j]){
+                            insertgpmembers="INSERT INTO balancetbl(payer,payee,balance,groupid,payee_invite) VALUES ('"+gpmems[i]+"', '"+gpmems[j]+"', 0 ,'"+groupid1+"',0)";
+                                        dbconnection.query(insertgpmembers,(err,output2) => {
+                                            if(err){
+                                                console.log("Error")
+                                                res.status(400).send('Error!')
+                                            }
+                                            else{
+                                                console.log(output2);
+                                                
+                                            }    
+                                        })
+                        }
+                    }
+                    }
+                    updateinviteforowner="UPDATE balancetbl SET payee_invite=1 where payee = '"+groupcreatedbyemail+"' and groupid ="+groupid1;
+                                        dbconnection.query(updateinviteforowner,(err,output2) => {
+                                            if(err){
+                                                console.log("Error")
+                                                res.status(400).send('Error!')
+                                            }
+                                            else{
+                                                console.log(output2);
+                                                
+                                            }    
+                                        })
+
             })
+        res.status(200).send(grpname);
     }
     })
 });
@@ -349,14 +379,10 @@ app.post('/acceptinvitation',function(req,res){
     console.log("Inside  acceptinvitaion");    
     console.log(req.body);
     const userid =req.body.userid;
+    const useremail = req.body.useremail;
     const grpname= req.body.currentgrp;
-    const accepted= req.body.accepted;
-    console.log(userid, grpname,accepted)
-    if(accepted == 'true'){
-    sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
-    }else {
-        sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=0 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
-    }
+    console.log(userid, grpname,useremail)
+    sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"'and gp1.gpname='"+grpname+"'";
     console.log(sqlquery);
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -368,6 +394,149 @@ app.post('/acceptinvitation',function(req,res){
             }
     })
 })
+
+app.post('/denyinvitation',function(req,res){
+    console.log("Inside  denyinvitation");    
+    console.log(req.body);
+    const userid =req.body.userid;
+    const useremail = req.body.useremail;
+    const grpname= req.body.currentgrp;
+    console.log(userid, grpname,useremail)
+        sqlquery="DELETE ug,sb FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid where ug.userid= "+userid+" and gp.gpname='"+grpname+"' and ug.invitedaccepted=0 and sb.payee_invite=0 and sb.payee='"+useremail+"'and gp1.gpname='"+grpname+"'";
+    console.log(sqlquery);
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                sqlquery1= "DELETE sb FROM balancetbl as sb INNER JOIN spgroups as gp INNER JOIN users as u ON sb.groupid=gp.groupid and sb.payer=u.email where sb.payer='"+useremail+"' and gp.gpname='"+grpname+"'";
+                dbconnection.query(sqlquery1,async(err,output,fields)=> {
+                    if(err){
+                    console.log(err);
+                    res.status(400).send('Error!')
+                }else {
+                            console.log(output)
+                        }
+                })
+                res.status(200).send("removed succesfully");
+            }
+    })
+})
+
+
+app.get('/getgrpexpenses/:gpname', function(req,res){
+
+    console.log("Inside  getgrpexpenses");    
+    console.log(req.body);
+    const gpname =req.params.gpname;
+    console.log(gpname)
+    sqlquery="SELECT t.id,t.tdate,t.tdescription,u.usersname,tamount,u.currencydef FROM transaction t JOIN spgroups as gp JOIN users as u ON t.groupid=gp.groupid and t.payed_by=u.email WHERE gp.gpname ='"+gpname+"' ORDER BY t.tdate desc";
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send(output);
+            }
+    })
+        
+})
+
+app.get('/getsummaryexpenses/:gpname', function(req,res){
+
+    console.log("Inside  getgrpexpenses");    
+    console.log(req.body);
+    const gpname =req.params.gpname;
+    console.log(gpname)
+    sqlquery="SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+gpname+"' and ug.invitedaccepted=1";
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                const noofmem=output;
+                console.log(noofmem)
+
+                getsummary="SELECT sb.id,u.usersname as payer_name, u1.usersname as payee_name,sb.payer, sb.payee, sb.balance from balancetbl sb INNER JOIN spgroups as gp INNER JOIN users as u INNER JOIN users as u1 ON sb.groupid = gp.groupid and sb.payer=u.email and sb.payee=u1.email where gp.gpname = '"+gpname+"' and payee_invite=1";
+                dbconnection.query(getsummary,(err,output1) => {
+                    if(err){
+                        console.log("Error")
+                        res.status(400).send('Error!')
+                    }
+                    else{
+                        console.log(output1.length);
+                        console.log(output1);
+                        console.log(output1[0]);
+                        res.status(200).send(output1)
+                    }    
+                })
+                // for (let i = 0; i <noofmem;i++){
+                    // for (let j = 0; j < noofmem; j++){
+                        // insertgpmembers="INSERT INTO balancetbl(payer,payee,balance,groupid,payee_invite) VALUES ('"+gpmems[i]+"', '"+gpmems[j]+"', 0 ,'"+groupid1+"',0)";
+                                    
+                //}
+                //}
+
+                //res.status(200).send(output);
+            }
+    })
+        
+})
+
+app.post('/addabill',function(req,res){
+    console.log("Inside  addbill");    
+    console.log(req.body);
+    const useremail =req.body.useremail;
+    const grpname= req.body.grpname;
+    const descript = req.body.descript;
+    const amt = req.body.amountvalue;
+    console.log(useremail, grpname,descript,amt)
+    sqlquery="INSERT INTO transaction (payed_by,groupid,tamount,tdescription) values ('"+useremail+"' , (SELECT groupid FROM spgroups where gpname='"+grpname+"'), "+amt+", '"+descript+"')";
+    console.log(sqlquery);
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                //res.status(200).send(output);
+                sqlquery1="UPDATE balancetbl sb JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON sb.groupid=gp.groupid and sb.payee=u.email SET balance=balance+("+amt+"/(SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+grpname+"' and ug.invitedaccepted=1)) where sb.payer = '"+useremail+"' and gp.gpname= '"+grpname+"' and payee_invite=1";
+                console.log(sqlquery1);
+                dbconnection.query(sqlquery1,async(err,output,fields)=> {
+                    if(err){
+                    console.log(err);
+                    res.status(400).send('Error!')
+                }else {
+                            console.log(output)
+                            res.status(200).send("added succesfully!");
+                        }
+                })
+            }
+    })
+})
+
+app.post('/leavegroup',function(req,res){
+    console.log("Inside  leavegroup");    
+    console.log(req.body);
+    const useremail =req.body.useremail;
+    const grpname= req.body.grpname;
+    console.log(userid, grpname)
+    sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
+    console.log(sqlquery);
+    dbconnection.query(sqlquery1,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output)
+                res.status(200).send("Left Group Succesfully!!");
+            }
+    })
+})
+
+
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");

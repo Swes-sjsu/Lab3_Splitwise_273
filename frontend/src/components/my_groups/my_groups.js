@@ -6,11 +6,12 @@ import Button from 'react-bootstrap/Button';
 import { Modal } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
 // import { Form } from 'react-bootstrap';
-// import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import Navheader from '../navbar/navbar';
 import Sidebarcomp from '../navbar/sidebar';
 import '../navbar/navbar.css';
+import '../dashboard/dashboard.css';
 import './my_groups.css';
 
 class Mygroups extends Component {
@@ -18,6 +19,7 @@ class Mygroups extends Component {
     super(props);
     this.state = {
       userid: '',
+      useremail: '',
       groupslist: [],
       invitelist: [],
       popup: false,
@@ -36,10 +38,12 @@ class Mygroups extends Component {
 
   componentWillMount() {
     const userid1 = sessionStorage.getItem('userid');
+    const useremail1 = sessionStorage.getItem('useremail');
     const getuserpgroups = this.getuserpgroups(userid1);
     const getpgroupinvites = this.getpgroupinvites(userid1);
     this.setState({
       userid: userid1,
+      useremail: useremail1,
       groupslist: getuserpgroups,
       invitelist: getpgroupinvites,
     });
@@ -101,14 +105,13 @@ class Mygroups extends Component {
   acceptinvitation = (groupname, e) => {
     e.preventDefault();
     console.log(e.target.value);
-    const accepted = 'true';
     this.setState({ popup: false });
-    const { popup, userid } = this.state;
+    const { popup, userid, useremail } = this.state;
     const currentgrp = groupname;
     const data = {
-      accepted,
       currentgrp,
       userid,
+      useremail,
     };
     console.log(data, popup);
     axios
@@ -134,19 +137,17 @@ class Mygroups extends Component {
   denyinvitation = (groupname, e) => {
     e.preventDefault();
     console.log(e.target.value);
-    const accepted = 'false';
     this.setState({ popup: false });
-    const { invitelist, popup, userid } = this.state;
+    const { popup, userid, useremail } = this.state;
     const currentgrp = groupname;
     const data = {
-      accepted,
       currentgrp,
       userid,
+      useremail,
     };
-    console.log(data, accepted, popup);
-    console.log(invitelist);
+    console.log(data, popup);
     axios
-      .post('http://localhost:3001/acceptinvitation', data)
+      .post('http://localhost:3001/denyinvitation', data)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log('response ', response.data);
@@ -211,6 +212,13 @@ class Mygroups extends Component {
           <div className="mygroups-box">
             <section className="mygroups-heading">
               <h1>My Groups Summary</h1>
+              <ul className="button-right">
+                <li>
+                  <Button className="Signup-default">
+                    <Link to="/createnewgroup">Create Group</Link>
+                  </Button>
+                </li>
+              </ul>
             </section>
 
             <section className="mygroups-left-sec">
@@ -278,7 +286,7 @@ class Mygroups extends Component {
                 <div>
                   {' '}
                   {groupslist.map((groupname) => (
-                    <ul className="mygroups-left">
+                    <ul className="mygroups-button">
                       <li>
                         <Button
                           className="mygroups-default"
@@ -294,11 +302,13 @@ class Mygroups extends Component {
             </section>
           </div>
 
-          <div className="mygroups-right" />
+          <div className="mygroups-right" style={{ width: '100px' }} />
           <Select
             options={gpselectoptions}
             placeholder="GroupName"
             className="div-select"
+            menuPlacement="auto"
+            menuPosition="fixed"
             onChange={(e) => this.gpselectoptionshandler(e)}
           />
           <Button

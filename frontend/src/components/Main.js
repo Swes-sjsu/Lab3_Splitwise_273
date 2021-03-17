@@ -9,6 +9,7 @@ import Createnewgroup from './create_new_group/create_new_group';
 import Profilepage from './profilepage/profile_page';
 import Mygroups from './my_groups/my_groups';
 import Groupdetails from './group/group';
+import Recentactivity from './recent_activity/Reactactivity';
 
 class Main extends Component {
   constructor(props) {
@@ -28,6 +29,7 @@ class Main extends Component {
           <Route path="/profile" component={Profilepage} />
           <Route path="/mygroups" component={Mygroups} />
           <Route path="/group" component={Groupdetails} />
+          <Route path="/recentactivity" component={Recentactivity} />
         </Switch>
       </div>
     );

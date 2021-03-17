@@ -15,6 +15,7 @@
     "concurrently": "^6.0.0",
     "form-data": "^4.0.0",
     "lodash": "^4.17.21",
+    "numeral": "^2.0.6",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-autocomplete": "^1.8.1",

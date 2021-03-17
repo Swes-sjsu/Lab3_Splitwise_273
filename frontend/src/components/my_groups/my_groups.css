@@ -4,7 +4,7 @@
     border-left: 1px solid rgb(177, 177, 177);
     border-right: 1px solid rgb(177, 177, 177);
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    width: 1080px;
+    width: 900px;
     height:900px;
   }
   .mygroups-heading {
@@ -20,14 +20,16 @@
     margin-bottom: 20px;
   }
 
-  .mygroups-center-sec {
+  .mygroups-left-sec {
+    float:left;
     background: rgb(238, 238, 238);
     border-bottom: 1px solid rgb(214, 214, 214);
     color: rgb(153, 153, 153);
     text-align: center;
+    width: 450px;
+    height:900px;
   }
-
-  .mygroups-center-section-block {
+  .mygroups-left-section-block {
     font-size: 15px;
     display: inline-block;
     width: 350px;
@@ -37,14 +39,26 @@
     color: rgb(74, 75, 75);
   
   }
-  
-  .mygroups-block-border {
-    border-left: 1px solid rgb(196, 196, 196);
-    border-right: 1px solid rgb(196, 196, 196);
+  .mygroups-center-sec {
+    background: rgb(238, 238, 238);
+    border-bottom: 1px solid rgb(214, 214, 214);
+    color: rgb(153, 153, 153);
+    text-align: center;
+    height:900px;
   }
 
+  .mygroups-center-section-block {
+    font-size: 15px;
+    display: inline-block;
+    width: 350px;
+    text-align: center;
+    padding: 10px;
+    line-height: 900px;
+    color: rgb(74, 75, 75);
+  
+  }
+  
   .mygroups-button{
-    float:right;
     padding-top: 15px;
     margin-right: 10px;
     color: white;
@@ -54,3 +68,7 @@
     color: white !important;
     }
   
+  .mygroups-block-border {
+    border-left: 1px solid rgb(196, 196, 196);
+    border-right: 1px solid rgb(196, 196, 196);
+  }
