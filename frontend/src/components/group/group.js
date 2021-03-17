@@ -212,6 +212,7 @@ class Groupdetails extends Component {
         if (response.status === 200) {
           console.log(response.data);
           this.getgrpexpenses(grpname);
+          this.getsummaryexpenses(grpname);
         } else {
           console.log(response.data);
           alert(response.data);

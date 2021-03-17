@@ -319,7 +319,7 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
                         }
                     }
                     }
-                    updateinviteforowner="UPDATE balancetbl SET payee_invite=1 where payee = '"+groupcreatedbyemail+"' and groupid ="+groupid1;
+                    updateinviteforowner="UPDATE balancetbl JOIN balancetbl as sb JOIN balancetbl as sb1 SET sb.payer_invite=1, sb1.payee_invite=1 where sb.payer = '"+groupcreatedbyemail+"' and sb.groupid ="+groupid1+" and sb1.payee = '"+groupcreatedbyemail+"' and sb1.groupid ="+groupid1;
                                         dbconnection.query(updateinviteforowner,(err,output2) => {
                                             if(err){
                                                 console.log("Error")
@@ -382,7 +382,7 @@ app.post('/acceptinvitation',function(req,res){
     const useremail = req.body.useremail;
     const grpname= req.body.currentgrp;
     console.log(userid, grpname,useremail)
-    sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"'and gp1.gpname='"+grpname+"'";
+    sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN balancetbl as sb1 JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1, sb1.payer_invite=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"' and gp1.gpname='"+grpname+"' and sb1.payer='"+useremail+"'";
     console.log(sqlquery);
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -459,7 +459,7 @@ app.get('/getsummaryexpenses/:gpname', function(req,res){
                 const noofmem=output;
                 console.log(noofmem)
 
-                getsummary="SELECT sb.id,u.usersname as payer_name, u1.usersname as payee_name,sb.payer, sb.payee, sb.balance from balancetbl sb INNER JOIN spgroups as gp INNER JOIN users as u INNER JOIN users as u1 ON sb.groupid = gp.groupid and sb.payer=u.email and sb.payee=u1.email where gp.gpname = '"+gpname+"' and payee_invite=1";
+                getsummary="SELECT sb.id,u.usersname as payer_name, u1.usersname as payee_name,sb.payer, sb.payee, sb.balance from balancetbl sb INNER JOIN spgroups as gp INNER JOIN users as u INNER JOIN users as u1 ON sb.groupid = gp.groupid and sb.payer=u.email and sb.payee=u1.email where gp.gpname = '"+gpname+"' and payee_invite=1 and payer_invite=1";
                 dbconnection.query(getsummary,(err,output1) => {
                     if(err){
                         console.log("Error")
@@ -502,7 +502,7 @@ app.post('/addabill',function(req,res){
     }else {
                 console.log(output)
                 //res.status(200).send(output);
-                sqlquery1="UPDATE balancetbl sb JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON sb.groupid=gp.groupid and sb.payee=u.email SET balance=balance+("+amt+"/(SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+grpname+"' and ug.invitedaccepted=1)) where sb.payer = '"+useremail+"' and gp.gpname= '"+grpname+"' and payee_invite=1";
+                sqlquery1="UPDATE balancetbl sb JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON sb.groupid=gp.groupid and sb.payee=u.email SET balance=balance+("+amt+"/(SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+grpname+"' and ug.invitedaccepted=1)) where sb.payer = '"+useremail+"' and gp.gpname= '"+grpname+"' and payee_invite=1 and payer_invite=1";
                 console.log(sqlquery1);
                 dbconnection.query(sqlquery1,async(err,output,fields)=> {
                     if(err){
