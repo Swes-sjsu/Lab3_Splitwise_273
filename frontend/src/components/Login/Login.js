@@ -4,6 +4,7 @@ import axios from 'axios';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import Navheader from '../navbar/navbar';
+import '../navbar/navbar.css';
 
 // Define a Login Component
 class Login extends Component {
@@ -114,7 +115,7 @@ class Login extends Component {
           <div className="login-form">
             <div className="main-div">
               <div className="panel">
-                <h2>Welcome to Splitwise</h2>
+                <h2>WELCOME TO SPLITWISE!</h2>
               </div>
               <div className="form-group">
                 <label htmlFor="email">
@@ -148,7 +149,7 @@ class Login extends Component {
               </div>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="login-default "
                 onClick={this.submitLogin}
                 formNoValidate
               >

@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
 import cookie from 'react-cookies';
+// import { Image } from 'react-bootstrap';
 import './navbar.css';
 // #fb7a00
 
@@ -24,19 +25,30 @@ class Navheader extends Component {
     let isloggedin = null;
     if (cookie.load('cookie')) {
       console.log('Able to read cookie');
+      let profilepic = '/Profile_photos/default_avatar.png';
+      const imagename = sessionStorage.getItem('profilepic');
+      console.log(imagename);
+      if (imagename !== 'null') {
+        profilepic = `/Profile_photos/${imagename}`;
+        console.log(profilepic);
+      }
       isloggedin = (
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <Button className="login-default">
+            <Button className="Home-default" variant="default">
               <Link to="/dashboard"> Home </Link>
             </Button>
           </li>
           <li>
-            <Dropdown>
+            <Navbar.Brand classname="Navbar-Brand" variant="light" href="/">
+              <img src={profilepic} className="avatar" alt="profile pic" />
+            </Navbar.Brand>
+
+            <Dropdown id="nav-dropdown" default>
               {sessionStorage.getItem('username')}
-              <Dropdown.Toggle />
+              <Dropdown.Toggle variant="default" />
               <Dropdown.Menu>
-                <Dropdown.Item active>
+                <Dropdown.Item>
                   <Link to="/" onClick={this.handleLogout}>
                     Logout
                   </Link>
@@ -65,8 +77,13 @@ class Navheader extends Component {
     return (
       <div>
         <Navbar className="navbar-default">
-          <Navbar.Brand classname="Navbar-Brand" variant="dark" href="#home">
-            Splitwise
+          <Navbar.Brand classname="Navbar-Brand" variant="light" href="/">
+            <img
+              src="/Group_Photos/Splitwiseicon.png"
+              className="icon"
+              alt="icon"
+            />
+            <span className="NavItem">Splitwise</span>
           </Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <Nav>{isloggedin}</Nav>

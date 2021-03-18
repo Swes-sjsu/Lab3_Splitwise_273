@@ -3,7 +3,33 @@
     font-weight: bold;
     color:#fff;
 }
+.icon{
+  display: flex;
+  max-width: 80px ;
+  max-height: 60px;
+}
 
+.avatar{
+  display: flex;
+  max-width: 60px ;
+  max-height: 60px;
+  margin-right: 5px;
+    float: left;
+    background: 50% 50% no-repeat; /* 50% 50% centers image in div */
+    background-size: auto 100%; /* Interchange this value depending on prefering width vs. height */
+    width: 20px;
+    height: 20px;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+.navbar-brand img {
+  padding: 7px 14px;
+}
+.navItem {
+  color: white;
+}
 .login-default{
     background-color: #50d4bc;
     display: block;
@@ -64,4 +90,123 @@
     float: left;
     margin-right:15px;
 }
- 
+
+.Home-default {
+  background-color: #3ac3ab;
+    color:#fff;
+    border:none;
+}
+
+.Dropdown.Item {
+  background-color: #3ac3ab;
+  color:rgb(0, 0, 0);
+  border:none;
+}
+
+div.dropdown-menu.show {
+  background-color: #3ac3ab;
+  font-size: 17px;
+  display: block;
+  font-weight: bold;
+  color:rgb(0, 0, 0) !important;
+
+}
+
+div.dropdown-menu.show:hover{
+    color: #fb7a00;
+    background-color: #3ac3ab;
+    border-color: #3ac3ab;
+}
+.main-div {
+  background: rgb(238, 238, 238);
+  border-bottom: 1px solid rgb(214, 214, 214);
+  color: rgb(90, 90, 90);
+  text-align: center;
+  height: 800px;
+  display: block;
+  font-style: italic;
+}
+
+.main-div h2 {
+  font-weight: 850;
+  font-style: normal;
+  font-variant: initial;
+  color: rgb(49, 48, 48);
+
+}
+
+.main-div h3 {
+  font-weight: 500;
+  font-style: normal;
+  font-variant: initial;
+  color: rgb(78, 77, 77);
+
+}
+
+.sidebar-wrapper {
+  background: rgb(221, 221, 221);
+  height: 800px;
+  font-size: 17px;
+  }
+
+  .nav-link {
+    font-family: "Verdana";
+    color: rgb(253, 253, 253);
+    }
+    .navItem {
+      color: white;
+      }
+    .nav-item1 {
+      font-family: "Verdana";
+      color: rgb(0, 0, 0) !important;
+      }
+
+      .nav-link1 {
+        font-family: "Verdana";
+        color: rgb(2, 2, 2);
+        }
+
+        .nav-link2 {
+          font-family: "Verdana";
+          color: rgb(2, 2, 2);
+          float: right;
+          }
+          
+          .nav nav-item1:after {
+            content: "";
+            display: block;
+            height: 1px;
+            width: 40%;
+            margin: px;
+            background: rgb(0, 0, 0);
+}
+
+.navlist ul {
+  padding: 15px;
+  font-family: 'Helvetica Neue';
+  font-size: 17px;
+  vertical-align: bottom;
+
+}
+
+.navlist li {
+  padding-top: 20px;
+  padding: 10px;
+  list-style: none;
+  font-family: 'Helvetica Neue';
+  font-size: 15px;
+  vertical-align: bottom;
+  margin-left: 2px;
+
+}
+
+.nav-link2 {
+  font-family: "Verdana";
+  color: rgb(2, 2, 2);
+  float: right;
+  padding: 10px;
+  list-style: none;
+  color: #999;
+  font-family: 'Helvetica Neue';
+  font-size: 15px;
+  }

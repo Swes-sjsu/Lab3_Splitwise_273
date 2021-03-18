@@ -4,6 +4,8 @@ import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
+import Navheader from '../navbar/navbar';
+import '../navbar/navbar.css';
 
 const saltRounds = 10;
 
@@ -152,13 +154,19 @@ class Signup extends Component {
     return (
       <form>
         <div>
+          <Navheader />
           <div className="container">
             {redirectVar}
             {redirecttohome}
-            <div className="login-form">
+            <div className="signup-form">
               <div className="main-div">
                 <div className="panel">
-                  <h2>INTRODUCE YOURSELF</h2>
+                  <h2>Welcome to Splitwise!</h2>
+                  <br />
+                  <br />
+                  <h3>INTRODUCE YOURSELF</h3>
+                  <br />
+                  <br />
                 </div>
                 <div className="form-group">
                   <label htmlFor="username">
@@ -226,7 +234,7 @@ class Signup extends Component {
                 <button
                   type="button"
                   onClick={this.submitsignup}
-                  className="btn btn-primary"
+                  className="Signup-default"
                   formNoValidate
                 >
                   Sign Up

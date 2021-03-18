@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
-import Dropdown from 'react-bootstrap/Dropdown';
 import './navbar.css';
 
 class Sidebarcomp extends Component {
@@ -15,39 +14,32 @@ class Sidebarcomp extends Component {
       <div className="sidebar">
         <Nav className="flex-column">
           <div className="sidebar-wrapper">
-            <ul className="nav">
+            <ul className="navlist">
               <li className="nav-item">
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/dashboard" />
+                <li className="nav-item1">
+                  <NavLink className="nav-link1" to="/dashboard" />
                 </li>
-                <NavLink className="nav-link" to="/dashboard">
+                <NavLink className="nav-link1" to="/dashboard">
                   <p>Dashboard</p>
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/recentactivity">
+              <li className="nav-item1">
+                <NavLink className="nav-link1" to="/recentactivity">
                   <p>Recent Acitivity</p>
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/mygroups">
-                  <p>My Groups</p>
+              <li className="nav-item1">
+                <NavLink className="nav-link1" to="/mygroups">
+                  <p> My Groups</p>
                 </NavLink>
               </li>
-              <Dropdown>
-                <Dropdown.Toggle
-                  split
-                  variant="primary"
-                  id="dropdown-custom-2"
-                />
-                <Dropdown.Menu>
-                  <Dropdown.Item>
-                    <Link to="/createnewgroup">+ Add group</Link>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/profile">
+              <li>
+                <NavLink to="/createnewgroup" className="nav-link2">
+                  <p> + Add </p>
+                </NavLink>
+              </li>
+              <li className="nav-item1">
+                <NavLink className="nav-link1" to="/profile">
                   <p>My Profile</p>
                 </NavLink>
               </li>

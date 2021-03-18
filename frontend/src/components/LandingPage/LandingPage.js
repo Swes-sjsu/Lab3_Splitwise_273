@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Image } from 'react-bootstrap';
 import Navheader from '../navbar/navbar';
 
 class LandingPage extends Component {
@@ -11,7 +12,14 @@ class LandingPage extends Component {
     return (
       <div>
         <Navheader />
-        <p>This is landing LandingPage</p>
+        <div className="landing">
+          <Image
+            classname="landingpic"
+            src="/Group_Photos/blog-cover-image.png"
+            alt="landing page"
+            fluid
+          />
+        </div>
       </div>
     );
   }
