@@ -17,6 +17,7 @@ class Groupdetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userid: '',
       useremail: '',
       grpname: '',
       popup: false,
@@ -39,11 +40,13 @@ class Groupdetails extends Component {
   }
 
   componentWillMount() {
+    const userid1 = sessionStorage.getItem('userid');
     const useremail1 = sessionStorage.getItem('useremail');
     const grpname1 = sessionStorage.getItem('groupname');
     const activities1 = this.getgrpexpenses(grpname1);
     const individuals1 = this.getsummaryexpenses(grpname1);
     this.setState({
+      userid: userid1,
       useremail: useremail1,
       grpname: grpname1,
       activties: activities1,
@@ -227,8 +230,9 @@ class Groupdetails extends Component {
   leavegrouphandler = (e) => {
     e.preventDefault();
     this.setState({ popup: false });
-    const { useremail, grpname } = this.state;
+    const { useremail, grpname, userid } = this.state;
     const leavegrp = {
+      userid,
       useremail,
       grpname,
     };

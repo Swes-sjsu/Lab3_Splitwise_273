@@ -369,22 +369,23 @@ class Dashboard extends Component {
                 ) : (
                   <div>
                     {' '}
-                    {totalpayeeuser.map((expense2) => (
+                    {totalpayeruser.map((expense3) => (
                       <ul className="group-expenses">
                         <li>
                           <p>
                             <span>
                               {' '}
-                              You Owe {expense2.formatindiamt2} to{' '}
-                              {expense2.payer2}
-                              {payeebalances.map((expense) => (
+                              {expense3.payee3} owes you{' '}
+                              {expense3.formatindiamt3}
+                              {payerbalances.map((expense1) => (
                                 <ul className="group-expenses">
                                   <li>
                                     <p>
                                       <span>
                                         {' '}
-                                        You Owe {expense.formatindiamt} to{' '}
-                                        {expense.payer} for {expense.grpname}{' '}
+                                        {expense1.payee1} owes you{' '}
+                                        {expense1.formatindiamt1} for{' '}
+                                        {expense1.grpname1}{' '}
                                       </span>
                                     </p>
                                   </li>

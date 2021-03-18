@@ -520,12 +520,14 @@ app.post('/addabill',function(req,res){
 app.post('/leavegroup',function(req,res){
     console.log("Inside  leavegroup");    
     console.log(req.body);
+    const userid = req.body.userid;
     const useremail =req.body.useremail;
     const grpname= req.body.grpname;
     console.log(userid, grpname)
-    sqlquery="UPDATE usersgroups JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers set ug.invitedaccepted=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"'";
+    sqlquery="DELETE ug,sb,sb1 FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN balancetbl as sb1 INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN spgroups as gp2 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid  and sb1.groupid=gp2.groupid where ug.userid= "+userid+" and gp.gpname='"+
+    grpname+"' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='"+useremail+"' and sb1.payer='"+useremail+"' and gp1.gpname='"+grpname+"'";
     console.log(sqlquery);
-    dbconnection.query(sqlquery1,async(err,output,fields)=> {
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
         console.log(err);
         res.status(400).send('Error!')
