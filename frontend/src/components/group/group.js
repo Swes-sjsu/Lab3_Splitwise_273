@@ -110,12 +110,9 @@ class Groupdetails extends Component {
           payeename: el.payee_name,
           balance: el.balance,
           formatedbalance: symbolvalue + numeral(el.balance).format('0,0.00'),
+          // settled: el.settled,
         }));
-        console.log(arrayofindividuals.length);
-        console.log(typeof arrayofindividuals);
-        console.log(arrayofindividuals);
-        // let totalbalance;
-        // const payeearr = [];
+
         let x;
         const payeeperson = [];
         const payeebalance = [];
@@ -130,25 +127,15 @@ class Groupdetails extends Component {
             );
           }
 
-          console.log(x);
           if (x === -1) {
             console.log('inside if x=-1');
             payeeperson.push(arrayofindividuals[i].payee);
             payeename.push(arrayofindividuals[i].payeename);
             payeebalance.push(arrayofindividuals[i].balance);
-            console.log(payeeperson);
-            console.log(payeebalance);
           } else {
-            console.log('inside if x > -1');
             payeebalance[x] += arrayofindividuals[i].balance;
-            console.log(payeebalance[x]);
           }
         }
-        console.log(payeebalance, payeeperson);
-        const pbln = payeebalance.length;
-        const ppln = payeeperson.length;
-        console.log(ppln, pbln);
-        // if (pbln === ppln) {
         const pp = Object.keys(payeeperson);
         const arrayofsummaries = pp.map((indx) => ({
           payee: payeename[indx],
@@ -160,7 +147,7 @@ class Groupdetails extends Component {
         this.setState({
           summaries: [...arrayofsummaries],
         });
-        // }
+
         this.setState({
           individuals: arrayofindividuals,
         });
@@ -177,7 +164,19 @@ class Groupdetails extends Component {
   };
 
   showHandler1 = () => {
-    this.setState({ popup1: true });
+    const { summaries } = this.state;
+    const currentusrname = sessionStorage.getItem('username');
+    console.log(summaries.length);
+    for (let i = 0; i < summaries.length; i += 1) {
+      if (
+        currentusrname === summaries[i].payee &&
+        summaries[i].totalamt === 0
+      ) {
+        this.setState({ popup1: true });
+        return;
+      }
+    }
+    alert('Please Clear all the debts to leave the group!');
   };
 
   closeHandler1 = () => {

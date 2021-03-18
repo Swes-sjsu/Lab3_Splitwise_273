@@ -5,8 +5,10 @@ import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import numeral from 'numeral';
+import { Modal, Form } from 'react-bootstrap';
 // import { Row, Col, Container, Jumbotron } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
+import Select from 'react-select';
 import Navheader from '../navbar/navbar';
 import Sidebarcomp from '../navbar/sidebar';
 import '../navbar/navbar.css';
@@ -18,25 +20,71 @@ class Dashboard extends Component {
     this.state = {
       userid: '',
       useremail: '',
-      totalbalance: [],
+      popup: false,
+      settleupwith: {},
       totalsummary: [],
       payeebalances: [],
       payerbalances: [],
       totalpayeeuser: [],
       totalpayeruser: [],
+      settleuplist: [],
     };
+    this.settleuphandler = this.settleuphandler.bind(this);
+    this.settleupchnagehandler = this.settleupchnagehandler.bind(this);
   }
 
   componentWillMount() {
     const userid1 = sessionStorage.getItem('userid');
     const useremail1 = sessionStorage.getItem('useremail');
-    const balances1 = this.gettotalbalances(userid1);
+    this.gettotalbalances(userid1);
     this.setState({
       userid: userid1,
       useremail: useremail1,
-      totalbalance: balances1,
     });
   }
+
+  showHandler = () => {
+    this.setState({ popup: true });
+  };
+
+  closeHandler = () => {
+    this.setState({ popup: false, settleuplist: [] });
+  };
+
+  settleupchnagehandler = (e) => {
+    const newarr = e.value;
+    console.log(e.value);
+    this.setState({ settleupwith: newarr });
+  };
+
+  settleuphandler = (settleupwith1, e) => {
+    e.preventDefault();
+    this.setState({ popup: false, settleuplist: [], settleupwith: '' });
+    const { settleupwith, userid, useremail } = this.state;
+    console.log(settleupwith);
+    const data = {
+      settleupwith,
+      userid,
+      useremail,
+    };
+    axios
+      .post('http://localhost:3001/settleup', data)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log('response ', response.data);
+        if (response.status === 200) {
+          console.log(response.data);
+          this.gettotalbalances(userid);
+        } else {
+          console.log(response.data);
+          alert(response.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        alert(err.response.data);
+      });
+  };
 
   gettotalbalances = (userid) => {
     axios
@@ -46,13 +94,11 @@ class Dashboard extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data);
-        console.log(typeof response.data);
-        console.log(response.data[1]);
         const data = response.data[1];
         const username = sessionStorage.getItem('username');
+        const useremail = sessionStorage.getItem('useremail');
         const defaultcurr = sessionStorage.getItem('defaultcurrency');
-        console.log(defaultcurr);
+        console.log(defaultcurr, useremail);
         const regExp = /\(([^)]+)\)/;
         const getvalue = regExp.exec(defaultcurr);
         const symbolvalue = getvalue[1];
@@ -61,6 +107,7 @@ class Dashboard extends Component {
           youowe: symbolvalue + numeral(el.You_owe).format('0,0.00'),
           youareowed: symbolvalue + numeral(el.You_are_owed).format('0,0.00'),
         }));
+        // Total Summary details
         console.log(arraytotalsummary);
         this.setState({
           totalsummary: arraytotalsummary,
@@ -69,7 +116,9 @@ class Dashboard extends Component {
         const data1 = response.data[0];
         const arrayindisummaries = data1.map((el) => ({
           payername: el.payer_username,
+          payeremail: el.payer,
           payeename: el.payee_username,
+          payeeemail: el.payee,
           balance: el.balance,
           grpname: el.gpname,
         }));
@@ -80,27 +129,35 @@ class Dashboard extends Component {
 
         console.log(arrayindisummaries);
 
+        // payee details for the logged in user
         const payeearr = [];
         const payeegrouparr = [];
         const payeebalancearr = [];
         const payerarr = [];
 
+        // payer details for the logged in user
         const payeepaysarr = [];
         const payeepaysbalancearr = [];
         const payergetsarr = [];
         const payergrouparr = [];
 
+        // total payee for the logged in user
         const totalpayeename = [];
         const totalpayername = [];
         const totalamaount = [];
 
+        // total payer for the logged in user
         const totalpayeename1 = [];
         const totalpayername1 = [];
         const totalamaount1 = [];
 
+        const settleupemaillist = [];
+        const settleupnamelist = [];
+
         let x;
-        let balancetotal = 0;
-        let balancetotal2 = 0;
+        let y;
+        // let balancetotal = 0;
+        // const balancetotal2 = 0;
 
         for (let i = 0; i < arrayindisummaries.length; i += 1) {
           x = -1;
@@ -118,10 +175,10 @@ class Dashboard extends Component {
               );
             }
             if (x > -1) {
-              balancetotal = totalamaount[x] + arrayindisummaries[i].balance;
-              totalamaount.push(balancetotal);
-              totalpayername.push(arrayindisummaries[i].payername);
-              totalpayeename.push(username);
+              totalamaount[x] += arrayindisummaries[i].balance;
+              // totalamaount.push(balancetotal);
+              // totalpayername.push(arrayindisummaries[i].payername);
+              // totalpayeename.push(username);
               console.log(totalamaount);
               console.log(totalpayername);
               console.log(totalpayeename);
@@ -146,10 +203,10 @@ class Dashboard extends Component {
               );
             }
             if (x > -1) {
-              balancetotal2 = totalamaount1[x] + arrayindisummaries[i].balance;
-              totalamaount1.push(balancetotal2);
-              totalpayeename1.push(arrayindisummaries[i].payeename);
-              totalpayername1.push(username);
+              totalamaount1[x] += arrayindisummaries[i].balance;
+              // totalamaount1.push(balancetotal2);
+              // totalpayeename1.push(arrayindisummaries[i].payeename);
+              // totalpayername1.push(username);
               console.log(totalamaount1);
               console.log(totalpayername1);
               console.log(totalpayeename1);
@@ -215,6 +272,60 @@ class Dashboard extends Component {
         this.setState({
           totalpayeruser: [...arrayofpayertotalblnc],
         });
+
+        // list of users for settle up
+        for (let j = 0; j < arrayindisummaries.length; j += 1) {
+          y = -1;
+          if (
+            useremail !== arrayindisummaries[j].payeeemail &&
+            arrayindisummaries[j].balance !== 0
+          ) {
+            if (!isEmpty(settleupemaillist)) {
+              y = settleupemaillist.findIndex(
+                (el) => el === arrayindisummaries[j].payeeemail
+              );
+            }
+            /* if (y > -1) {
+              settleupemaillist.push(arrayindisummaries[j].payeeemail);
+            } else {
+              settleupnamelist.push(arrayindisummaries[j].payeename);
+              settleupemaillist.push(arrayindisummaries[j].payeeemail);
+            } */
+            if (y === -1) {
+              settleupnamelist.push(arrayindisummaries[j].payeename);
+              settleupemaillist.push(arrayindisummaries[j].payeeemail);
+            }
+          } else if (
+            JSON.stringify(useremail) !==
+              JSON.stringify(arrayindisummaries[j].payeremail) &&
+            arrayindisummaries[j].balance !== 0
+          ) {
+            if (!isEmpty(settleupemaillist)) {
+              y = settleupemaillist.findIndex(
+                (el) => el === arrayindisummaries[j].payeremail
+              );
+            }
+            /* if (y > -1) {
+              settleupemaillist.push(arrayindisummaries[j].payeremail);
+            } else {
+              settleupnamelist.push(arrayindisummaries[j].payername);
+              settleupemaillist.push(arrayindisummaries[j].payeremail);
+            } */
+            if (y === -1) {
+              settleupnamelist.push(arrayindisummaries[j].payername);
+              settleupemaillist.push(arrayindisummaries[j].payeremail);
+            }
+          }
+        }
+        const setteluplist = Object.keys(settleupemaillist);
+        const arrayforselect = setteluplist.map((indx) => ({
+          value: settleupemaillist[indx],
+          label: settleupnamelist[indx],
+        }));
+        console.log(arrayforselect);
+        this.setState({
+          settleuplist: [...arrayforselect],
+        });
       })
       .catch((err) => console.log(err));
   };
@@ -225,24 +336,18 @@ class Dashboard extends Component {
       redirectVar = <Redirect to="/" />;
     }
     const {
-      totalbalance,
       totalsummary,
       payeebalances,
       payerbalances,
       totalpayeeuser,
       totalpayeruser,
-    } = this.state;
-    const { userid, useremail } = this.state;
-    console.log(
-      totalbalance,
+      popup,
+      settleuplist,
+      settleupwith,
       userid,
       useremail,
-      totalsummary,
-      payeebalances,
-      payerbalances,
-      totalpayeeuser,
-      totalpayeruser
-    );
+    } = this.state;
+    console.log(userid, useremail);
     let checkifyouowenull = false;
     if (isEmpty(totalpayeeuser)) {
       checkifyouowenull = true;
@@ -270,9 +375,47 @@ class Dashboard extends Component {
                     <Button className="Signup-default">
                       <Link to="/addbill">Add Bill</Link>
                     </Button>{' '}
-                    <Button className="login-default">
-                      <Link to="/signup">Settle Up</Link>
+                    <Button
+                      className="login-default"
+                      onClick={this.showHandler}
+                    >
+                      {' '}
+                      Settle Up{' '}
                     </Button>
+                    <Modal show={popup} onHide={this.closeHandler}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Settle Up</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <Form.Group>
+                          <Form.Label>
+                            Whom do you want to settle up with:{' '}
+                          </Form.Label>
+                          <Select
+                            options={settleuplist}
+                            placeholder="Username"
+                            className="div-select"
+                            menuPlacement="auto"
+                            menuPosition="fixed"
+                            onChange={(e) => this.settleupchnagehandler(e)}
+                          />
+                        </Form.Group>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button
+                          className="mygroups-default"
+                          onClick={(e) => this.settleuphandler(settleupwith, e)}
+                        >
+                          √ GO
+                        </Button>
+                        <Button
+                          className="Signup-default"
+                          onClick={this.closeHandler}
+                        >
+                          Cancel
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </li>
                 </ul>
               </section>
@@ -282,11 +425,9 @@ class Dashboard extends Component {
                   <div className="title">Total Balance</div>
                   {totalsummary.map((expense) => (
                     <ul className="group-expenses">
-                      <li>
-                        <p>
-                          <span> {expense.totalblc}</span>
-                        </p>
-                      </li>
+                      <p>
+                        <span>{expense.totalblc}</span>
+                      </p>
                     </ul>
                   ))}
                 </div>
@@ -296,11 +437,9 @@ class Dashboard extends Component {
                     <div className="title">You Owe</div>
                     {totalsummary.map((expense) => (
                       <ul className="group-expenses">
-                        <li>
-                          <p>
-                            <span> {expense.youowe}</span>
-                          </p>
-                        </li>
+                        <p>
+                          <span>{expense.youowe}</span>
+                        </p>
                       </ul>
                     ))}
                   </div>
@@ -310,11 +449,9 @@ class Dashboard extends Component {
                   <div className="title">You Are Owed</div>
                   {totalsummary.map((expense) => (
                     <ul className="group-expenses">
-                      <li>
-                        <p>
-                          <span> {expense.youareowed}</span>
-                        </p>
-                      </li>
+                      <p>
+                        <span>{expense.youareowed}</span>
+                      </p>
                     </ul>
                   ))}
                 </div>
@@ -343,15 +480,24 @@ class Dashboard extends Component {
                               {expense2.payer2}
                               {payeebalances.map((expense) => (
                                 <ul className="group-expenses">
-                                  <li>
-                                    <p>
-                                      <span>
-                                        {' '}
-                                        You Owe {expense.formatindiamt} to{' '}
-                                        {expense.payer} for {expense.grpname}{' '}
-                                      </span>
-                                    </p>
-                                  </li>
+                                  <p>
+                                    {(() => {
+                                      if (expense2.payer2 === expense.payer) {
+                                        return (
+                                          <div>
+                                            <span>
+                                              {' '}
+                                              You Owe {
+                                                expense.formatindiamt
+                                              } to {expense.payer} for{' '}
+                                              {expense.grpname}{' '}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
+                                      return <p> </p>;
+                                    })()}
+                                  </p>
                                 </ul>
                               ))}
                             </span>

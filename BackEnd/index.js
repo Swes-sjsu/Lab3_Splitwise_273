@@ -382,7 +382,8 @@ app.post('/acceptinvitation',function(req,res){
     const useremail = req.body.useremail;
     const grpname= req.body.currentgrp;
     console.log(userid, grpname,useremail)
-    sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN balancetbl as sb1 JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1, sb1.payer_invite=1 where ug.userid="+userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"' and gp1.gpname='"+grpname+"' and sb1.payer='"+useremail+"'";
+    sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN balancetbl as sb1 JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1, sb1.payer_invite=1 where ug.userid="+
+    userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"' and gp1.gpname='"+grpname+"' and sb1.payer='"+useremail+"';";
     console.log(sqlquery);
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -410,7 +411,8 @@ app.post('/denyinvitation',function(req,res){
         res.status(400).send('Error!')
     }else {
                 console.log(output)
-                sqlquery1= "DELETE sb FROM balancetbl as sb INNER JOIN spgroups as gp INNER JOIN users as u ON sb.groupid=gp.groupid and sb.payer=u.email where sb.payer='"+useremail+"' and gp.gpname='"+grpname+"'";
+                sqlquery1= "DELETE sb FROM balancetbl as sb INNER JOIN spgroups as gp INNER JOIN users as u ON sb.groupid=gp.groupid and sb.payer=u.email where sb.payer='"+useremail+"' and gp.gpname='"+
+                grpname+"';";
                 dbconnection.query(sqlquery1,async(err,output,fields)=> {
                     if(err){
                     console.log(err);
@@ -459,7 +461,7 @@ app.get('/getsummaryexpenses/:gpname', function(req,res){
                 const noofmem=output;
                 console.log(noofmem)
 
-                getsummary="SELECT sb.id,u.usersname as payer_name, u1.usersname as payee_name,sb.payer, sb.payee, sb.balance from balancetbl sb INNER JOIN spgroups as gp INNER JOIN users as u INNER JOIN users as u1 ON sb.groupid = gp.groupid and sb.payer=u.email and sb.payee=u1.email where gp.gpname = '"+gpname+"' and payee_invite=1 and payer_invite=1";
+                getsummary="SELECT sb.id,u.usersname as payer_name, u1.usersname as payee_name,sb.payer, sb.payee, sb.balance, sb.settled from balancetbl sb INNER JOIN spgroups as gp INNER JOIN users as u INNER JOIN users as u1 ON sb.groupid = gp.groupid and sb.payer=u.email and sb.payee=u1.email where gp.gpname = '"+gpname+"' and payee_invite=1 and payer_invite=1";
                 dbconnection.query(getsummary,(err,output1) => {
                     if(err){
                         console.log("Error")
@@ -502,7 +504,7 @@ app.post('/addabill',function(req,res){
     }else {
                 console.log(output)
                 //res.status(200).send(output);
-                sqlquery1="UPDATE balancetbl sb JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON sb.groupid=gp.groupid and sb.payee=u.email SET balance=balance+("+amt+"/(SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+grpname+"' and ug.invitedaccepted=1)) where sb.payer = '"+useremail+"' and gp.gpname= '"+grpname+"' and payee_invite=1 and payer_invite=1";
+                sqlquery1="UPDATE balancetbl sb JOIN usersgroups as ug JOIN spgroups as gp JOIN users as u ON sb.groupid=gp.groupid and sb.payee=u.email SET balance=balance+("+amt+"/(SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='"+grpname+"' and ug.invitedaccepted=1)), settled=1  where sb.payer = '"+useremail+"' and gp.gpname= '"+grpname+"' and payee_invite=1 and payer_invite=1";
                 console.log(sqlquery1);
                 dbconnection.query(sqlquery1,async(err,output,fields)=> {
                     if(err){
@@ -525,7 +527,8 @@ app.post('/leavegroup',function(req,res){
     const grpname= req.body.grpname;
     console.log(userid, grpname)
     sqlquery="DELETE ug,sb,sb1 FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN balancetbl as sb1 INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN spgroups as gp2 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid  and sb1.groupid=gp2.groupid where ug.userid= "+userid+" and gp.gpname='"+
-    grpname+"' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='"+useremail+"' and sb1.payer='"+useremail+"' and gp1.gpname='"+grpname+"'";
+    grpname+"' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='"+useremail+"' and sb1.payer='"+useremail+"' and gp1.gpname='"+
+    grpname+"'; ";
     console.log(sqlquery);
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -569,7 +572,8 @@ app.get('/getrecentacitvities/:userid', function(req,res){
     console.log(req.body);
     const userid =req.params.userid;
     console.log(userid)
-    sqlquery="Select t.payed_by, u1.usersname, t.groupid,gp.gpname,  t.tamount, t.tdate, t.tdescription from transaction t INNER JOIN spgroups gp  INNER JOIN users u   INNER JOIN users u1  INNER JOIN usersgroups ug ON t.groupid= ug.groupid and ug.groupid= gp.groupid and ug.invitedaccepted=1 and u.idusers=ug.userid and u1.email=t.payed_by where u.idusers="+userid+" ORDER BY tdate desc ";
+    sqlquery="Select t.payed_by, u1.usersname, t.groupid,gp.gpname,  t.tamount, t.tdate, t.tdescription from transaction t INNER JOIN spgroups gp  INNER JOIN users u   INNER JOIN users u1  INNER JOIN usersgroups ug ON t.groupid= ug.groupid and ug.groupid= gp.groupid and ug.invitedaccepted=1 and u.idusers=ug.userid and u1.email=t.payed_by where u.idusers="+
+    userid+" ORDER BY tdate desc;";
 
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -582,6 +586,29 @@ app.get('/getrecentacitvities/:userid', function(req,res){
     })
         
 })
+
+app.post('/settleup', function(req,res){
+    console.log("Inside  settleup");    
+    console.log(req.body);
+    const userid =req.body.userid;
+    const settledupemail=req.body.settleupwith;
+    const currentuseremail = req.body.useremail;
+    console.log(userid)
+    sqlquery="UPDATE balancetbl SET balance=0, settled=2 where ((payer='"+currentuseremail+"' and payee='"+settledupemail+"') or (payer='"+settledupemail+"' and payee='"+currentuseremail+
+    "')); "; 
+    console.log(sqlquery)
+    dbconnection.query(sqlquery,async(err,output,fields)=> {
+        if(err){
+        console.log(err);
+        res.status(400).send('Error!')
+    }else {
+                console.log(output); 
+                res.status(200).send("settled up succesfuklly!");
+            }
+    })
+        
+})
+
 
 //start your server on port 3001
 app.listen(3001);
