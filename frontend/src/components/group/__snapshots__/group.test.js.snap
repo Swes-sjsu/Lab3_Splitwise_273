@@ -69,7 +69,7 @@ Array [
       </nav>
     </div>
     <div
-      className="dashboard-flex"
+      className="grouppage-flex"
     >
       <div>
         <div
@@ -171,119 +171,76 @@ Array [
           </div>
         </div>
       </div>
-      <div
-        className="dashboard-box"
+    </div>
+    <div
+      className="grouppage-box"
+    >
+      <section
+        className="grouppage-heading-buttons"
       >
         <section
-          className="dashboard-heading-buttons"
+          className="grouppage-heading"
         >
-          <section
-            className="dashboard-heading"
+          <h1>
+            Group Name 
+          </h1>
+          <ul
+            className="grouppage-button"
           >
-            <h1
-              data-testid="Dashboard"
-            >
-              Dashboard
-            </h1>
-            <ul
-              className="button-right"
-            >
-              <li>
-                <button
-                  className="Signup-default btn btn-primary"
-                  disabled={false}
-                  type="button"
-                >
-                  <a
-                    href="/addbill"
-                    onClick={[Function]}
-                  >
-                    Add Bill
-                  </a>
-                </button>
-                 
-                <button
-                  className="login-default btn btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                   
-                  Settle Up
-                   
-                </button>
-              </li>
-            </ul>
-          </section>
-          <section
-            className="dashboard-center-sec"
-          >
-            <div
-              className="dashboard-center-section-block"
-            >
-              <div
-                className="title"
+            <li>
+              <button
+                className="login-default btn btn-primary"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
               >
-                Total Balance
-              </div>
-            </div>
-            <div
-              className="dashboard-center-section-block"
-            >
-              <div
-                className="dashboard-block-border"
+                Add an Expense
+              </button>
+               
+              <button
+                className="Signup-default btn btn-primary"
+                data-testid="leavegroup"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
               >
-                <div
-                  className="title"
-                >
-                  You Owe
-                </div>
-              </div>
-            </div>
-            <div
-              className="dashboard-center-section-block"
-            >
-              <div
-                className="title"
-              >
-                You Are Owed
-              </div>
-            </div>
-          </section>
+                Leave Group
+              </button>
+            </li>
+          </ul>
         </section>
         <section
-          className="transcations-sec"
+          className="grouppage-center-sec"
         >
           <div
-            className="tranactions-heading"
-          >
-            <div>
-              You Owe
-            </div>
-            <div>
-              You are owed
-            </div>
-          </div>
+            className="grouppage-center-section-block"
+          />
           <div
-            className="transactions-owe"
+            className="grouppage-center-section-block"
           >
-            <h2>
-              YOU OWE NOTHING
-            </h2>
-          </div>
-          <div
-            className="transactions-owed"
-          >
-            <h2>
-              YOU ARE OWED NOTHING
-            </h2>
+            <br />
+            <div
+              className="grouppage-block-border"
+            >
+              <h2>
+                No transactions to display!
+              </h2>
+            </div>
           </div>
         </section>
-      </div>
-      <div
-        className="dashboard-right"
-      />
+      </section>
     </div>
+    <div
+      className="grouppage-right"
+    />
+    <div
+      className="title"
+    >
+       
+    </div>
+    <h5>
+      NONE HAVE ACCEPTED THE INVITES TO THE GROUP!
+    </h5>
   </div>,
   " ",
 ]

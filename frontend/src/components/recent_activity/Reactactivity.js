@@ -223,11 +223,6 @@ class Recentactivity extends Component {
           ...arrayofrecentactivitiesdata1,
           ...arrayofrecentactivitiesdata2,
         ];
-        // mergedata1anddata2 = [...data1, ...data2];
-        /* Array.prototype.push.apply(
-  arrayofrecentactivitiesdata1,
-  arrayofrecentactivitiesdata2
-); */
         console.log(
           new Date(arrayofrecentactivitiesdata1[0].date1).toLocaleTimeString(),
           new Date(arrayofrecentactivitiesdata1[0].date1).toLocaleString()

@@ -355,6 +355,7 @@ class Groupdetails extends Component {
                   </Modal>
                   <Button
                     className="Signup-default"
+                    data-testid="leavegroup"
                     onClick={this.showHandler1}
                   >
                     Leave Group

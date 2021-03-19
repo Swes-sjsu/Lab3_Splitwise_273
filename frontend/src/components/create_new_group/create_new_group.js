@@ -330,6 +330,7 @@ class Createnewgroup extends Component {
                       </div>
                       <div className="savebtn">
                         <button
+                          data-testid="Create"
                           type="button"
                           className="Signup-default"
                           onClick={this.submitgroupcreate}

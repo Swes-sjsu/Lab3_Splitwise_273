@@ -148,6 +148,7 @@ class Login extends Component {
                 </label>
               </div>
               <button
+                data-testid="login"
                 type="submit"
                 className="login-default "
                 onClick={this.submitLogin}

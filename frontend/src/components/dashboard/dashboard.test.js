@@ -21,7 +21,7 @@ it('renders', async () => {
   expect(component.toJSON()).toMatchSnapshot();
 });
 
-test('Check for header', async () => {
+test('Check for dashboard header', async () => {
   const { getByTestId } = render(
     <MemoryRouter>
       <Dashboard>

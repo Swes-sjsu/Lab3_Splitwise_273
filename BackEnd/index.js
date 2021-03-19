@@ -120,27 +120,27 @@ dbconnection.query("SELECT * FROM users WHERE email = ?",[email], (err,output,fi
 app.post('/login', function(req,res){
 
     console.log("Inside  Login");    
-    console.log(req.body);
+    //console.log(req.body);
     const email =req.body.email;
     const password =req.body.password;
     dbconnection.query("SELECT * FROM users WHERE email = ? ",
     [email],async(err,output,fields)=> {
         if(err){
-        console.log(err);
+        //console.log(err);
         res.status(400).send('Error!')
     }else {
         if(output.length > 0 ){
             const passwordcompare = await bcrypt.compare(password,output[0].password)
-            console.log(passwordcompare)
-            console.log(output)
+            //console.log(passwordcompare)
+            //console.log(output)
             if(passwordcompare){
                 // res.cookie('cookie_username',output[0].usersname,{maxAge: 900000, httpOnly: false, path : '/'});
                 res.cookie('cookie',email,{maxAge: 900000, httpOnly: false, path : '/'});
                 // sessionStorage.setItem('username',output[0].usersname)
-                console.log(output[0].usersname)
+                //console.log(output[0].usersname)
                 req.session.cookie.username = output[0].usersname;
                 req.session.cookie.email = email;
-                console.log(req.session.cookie.username,req.session.cookie.email )
+                //console.log(req.session.cookie.username,req.session.cookie.email )
                 res.status(200).send({"username" : output[0].usersname,"user_id" : output[0].idusers,"email" : output[0].email,"profilepic" : output[0].profphoto,"currencydef": output[0].currencydef, "TZ":output[0].timezone});
             }
             else{
@@ -158,16 +158,16 @@ app.post('/login', function(req,res){
 app.get('/getuserdetails/:id', function(req,res){
 
     console.log("Inside  getuserprofile");    
-    console.log(req.body);
+    //console.log(req.body);
     const userid =req.params.id;
     console.log(userid)
     dbconnection.query("SELECT * FROM users where idusers = ? ",
     [userid],async(err,output,fields)=> {
         if(err){
-        console.log(err);
+        //console.log(err);
         res.status(400).send('Error!')
     }else {
-                console.log(output)
+                //console.log(output)
                 res.status(200).send(output);
             }
     })
@@ -177,7 +177,7 @@ app.get('/getuserdetails/:id', function(req,res){
 app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res){
 
     console.log("Inside  updateprofile");    
-    console.log(req.body);
+    // console.log(req.body);
     const userid =(req.body.idusers);
     const username =req.body.username;
     const email =req.body.email;
@@ -186,7 +186,7 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res)
     const timezone =req.body.timezone;
     const language =req.body.language;
     let profilephoto;
-    console.log(username,email,phonenumber,defaultcurrency,timezone,language,userid);
+    //console.log(username,email,phonenumber,defaultcurrency,timezone,language,userid);
     if(!req.file){ 
         sqlquery = "UPDATE users SET usersname = '"+username +"' , email = '"+email+"' , usersphone = '"+phonenumber+"' , currencydef = '"+defaultcurrency+"' , timezone = '"+timezone+
     "' , language = '"+language+"' WHERE idusers = "+userid;
@@ -203,10 +203,10 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res)
     //"', profphoto = '"+profilephoto+"' , language = '"+language+"' WHERE idusers = "+userid;
 
 
-    console.log(sqlquery)
+    //console.log(sqlquery)
     dbconnection.query(sqlquery,(err,output,fields)=> {
         if(err){
-        console.log(err);
+       // console.log(err);
         res.status(400).send('Error!')
     }else {
                 // console.log(output[0].usersname)
@@ -346,10 +346,10 @@ app.get('/getuserpgroups/:id', function(req,res){
     sqlquery="SELECT gp.gpname FROM usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers where ug.invitedaccepted=1 and ug.userid="+userid;
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
-        console.log(err);
+        //console.log(err);
         res.status(400).send('Error!')
     }else {
-                console.log(output)
+                //console.log(output)
                 res.status(200).send(output);
             }
     })
@@ -359,16 +359,16 @@ app.get('/getuserpgroups/:id', function(req,res){
 app.get('/getpgroupinvites/:id', function(req,res){
 
     console.log("Inside  getpgroupinvites");    
-    console.log(req.body);
+    //console.log(req.body);
     const userid =req.params.id;
-    console.log(userid)
+    //console.log(userid)
     sqlquery="SELECT gp.gpname FROM usersgroups as ug JOIN spgroups as gp JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers where ug.invitedaccepted=0 and ug.userid="+userid;
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
-        console.log(err);
+        //console.log(err);
         res.status(400).send('Error!')
     }else {
-                console.log(output)
+                //console.log(output)
                 res.status(200).send(output);
             }
     })
@@ -381,7 +381,7 @@ app.post('/acceptinvitation',function(req,res){
     const userid =req.body.userid;
     const useremail = req.body.useremail;
     const grpname= req.body.currentgrp;
-    console.log(userid, grpname,useremail)
+    //console.log(userid, grpname,useremail)
     sqlquery="UPDATE usersgroups,balancetbl JOIN usersgroups as ug JOIN balancetbl as sb JOIN balancetbl as sb1 JOIN spgroups as gp JOIN spgroups as gp1 JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.payee=u.email and sb.groupid=gp1.groupid set ug.invitedaccepted=1, sb.payee_invite=1, sb1.payer_invite=1 where ug.userid="+
     userid+" and gp.gpname='"+grpname+"' and sb.payee='"+useremail+"' and gp1.gpname='"+grpname+"' and sb1.payer='"+useremail+"';";
     console.log(sqlquery);
@@ -521,21 +521,21 @@ app.post('/addabill',function(req,res){
 
 app.post('/leavegroup',function(req,res){
     console.log("Inside  leavegroup");    
-    console.log(req.body);
+    //console.log(req.body);
     const userid = req.body.userid;
     const useremail =req.body.useremail;
     const grpname= req.body.grpname;
-    console.log(userid, grpname)
+    //console.log(userid, grpname)
     sqlquery="DELETE ug,sb,sb1 FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN balancetbl as sb1 INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN spgroups as gp2 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid  and sb1.groupid=gp2.groupid where ug.userid= "+userid+" and gp.gpname='"+
     grpname+"' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='"+useremail+"' and sb1.payer='"+useremail+"' and gp1.gpname='"+
     grpname+"'; ";
-    console.log(sqlquery);
+    //console.log(sqlquery);
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
-        console.log(err);
+        //console.log(err);
         res.status(400).send('Error!')
     }else {
-                console.log(output)
+                //console.log(output)
                 res.status(200).send("Left Group Succesfully!!");
             }
     })

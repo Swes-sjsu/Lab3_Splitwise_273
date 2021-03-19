@@ -3,14 +3,14 @@ import { render, cleanup } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import Login from './Login';
+import Profilepage from './profile_page';
 import Navheader from '../navbar/navbar';
 
 const component = TestRenderer.create(
   <MemoryRouter>
-    <Login>
+    <Profilepage>
       <Navheader />
-    </Login>{' '}
+    </Profilepage>{' '}
   </MemoryRouter>
 );
 
@@ -21,13 +21,13 @@ it('renders', async () => {
   expect(component.toJSON()).toMatchSnapshot();
 });
 
-test('Check for login butoon', async () => {
+test('look for save butoon', async () => {
   const { getByTestId } = render(
     <MemoryRouter>
-      <Login>
+      <Profilepage>
         <Navheader />
-      </Login>{' '}
+      </Profilepage>{' '}
     </MemoryRouter>
   );
-  expect(getByTestId('login')).toHaveTextContent('Login');
+  expect(getByTestId('Saveupdates')).toHaveTextContent('Save');
 });

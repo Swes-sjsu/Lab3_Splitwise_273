@@ -383,7 +383,7 @@ class Profilepage extends Component {
                     </Form.Control>
                   </Form.Group>
                 </div>
-                <div className="savebtn">
+                <div className="savebtn" data-testid="Saveupdates">
                   <Button className="Signup-default" onClick={this.submitsave}>
                     Save
                   </Button>

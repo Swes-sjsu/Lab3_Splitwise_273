@@ -3,14 +3,11 @@ import { render, cleanup } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import Login from './Login';
-import Navheader from '../navbar/navbar';
+import Createnewgroup from './create_new_group';
 
 const component = TestRenderer.create(
   <MemoryRouter>
-    <Login>
-      <Navheader />
-    </Login>{' '}
+    <Createnewgroup />
   </MemoryRouter>
 );
 
@@ -21,13 +18,11 @@ it('renders', async () => {
   expect(component.toJSON()).toMatchSnapshot();
 });
 
-test('Check for login butoon', async () => {
+test('Check for create button', async () => {
   const { getByTestId } = render(
     <MemoryRouter>
-      <Login>
-        <Navheader />
-      </Login>{' '}
+      <Createnewgroup />
     </MemoryRouter>
   );
-  expect(getByTestId('login')).toHaveTextContent('Login');
+  expect(getByTestId('Create')).toHaveTextContent('Save');
 });
