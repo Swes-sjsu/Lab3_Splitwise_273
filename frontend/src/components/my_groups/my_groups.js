@@ -220,11 +220,16 @@ class Mygroups extends Component {
 
             <section className="mygroups-left-sec">
               <div className="mygroups-left-section-block">
-                <div className="title">Invitation pending List</div>
+                <div className="title">
+                  <h3>Invitation Pending </h3>
+                </div>
               </div>
               <div>
                 {checkifinvitesnull ? (
-                  <h2>No Invites Pending!</h2>
+                  <h4>
+                    {' '}
+                    <br /> NO INVITES PENDING!
+                  </h4>
                 ) : (
                   <div>
                     {' '}
@@ -232,8 +237,13 @@ class Mygroups extends Component {
                       <ul className="mygroups-button">
                         <li>
                           <Button
-                            className="myinvites-default"
+                            className="Signup-default"
                             onClick={this.showHandler}
+                            style={{
+                              height: '50px',
+                              width: '350px',
+                              'font-size': '22px',
+                            }}
                           >
                             {groupname}
                           </Button>
@@ -275,10 +285,16 @@ class Mygroups extends Component {
 
             <section className="mygroups-center-sec">
               <div className="mygroups-center-section-block">
-                <div className="title">My Groups List</div>
+                <div className="title">
+                  <h3>My Groups </h3>
+                </div>
               </div>
               {checkifgroupsnull ? (
-                <h2>No groups to display!</h2>
+                <h4>
+                  {' '}
+                  <br />
+                  YOU ARE NOT PART OF ANY GROUPS AS YET!
+                </h4>
               ) : (
                 <div>
                   {' '}
@@ -286,8 +302,14 @@ class Mygroups extends Component {
                     <ul className="mygroups-button">
                       <li>
                         <Button
-                          className="mygroups-default"
+                          className="login-default"
+                          size="lg"
                           onClick={(e) => this.gotogrouppage(groupname, e)}
+                          style={{
+                            height: '50px',
+                            width: '350px',
+                            'font-size': '22px',
+                          }}
                         >
                           {groupname}
                         </Button>
@@ -299,7 +321,10 @@ class Mygroups extends Component {
             </section>
           </div>
 
-          <div className="mygroups-right" style={{ width: '100px' }} />
+          <div
+            className="mygroups-right"
+            style={{ width: '100px', display: 'flex', 'flex-direction': 'row' }}
+          />
           <Select
             options={gpselectoptions}
             placeholder="GroupName"
@@ -311,6 +336,12 @@ class Mygroups extends Component {
           <Button
             className="mygroups-default"
             onClick={(e) => this.gotogrouppage(selectedvalue, e)}
+            style={{
+              float: 'right',
+              'background-color': '#68f7ce',
+              'border-color': '#5bc5a7',
+              color: 'black',
+            }}
           >
             GO
           </Button>

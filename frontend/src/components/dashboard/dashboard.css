@@ -1,11 +1,16 @@
+.dashboard-flex{
+  width: 1280px;
+  min-width: 1000px;
+  margin: 0 auto;
+}
 .dashboard-box {
     flex:auto;
     float: left;
     border-left: 1px solid rgb(177, 177, 177);
     border-right: 1px solid rgb(177, 177, 177);
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    width: 1080px;
-    height:900px;
+    width: 1080px; 
+    height: 880px;
   }
   .dashboard-heading {
     overflow:hidden;
@@ -41,7 +46,7 @@
   .dashboard-center-section-block {
     font-size: 15px;
     display: inline-block;
-    width: 350px;
+    width: 300px;
     text-align: center;
     padding: 10px;
     line-height: 30px;
@@ -82,13 +87,63 @@
     padding-left: 20px;
     border-right: 1px solid rgb(196, 196, 196);
     margin-left: 10px;
-    color: black;
+    color: #000000;
   }
   
   .transactions-owed {
     width: 520px ;
     float: left;
     padding-left: 20px;
-    color: black;
+    color: #000000;
+  }
+
+  .profile-pic {
+    width: 30px;
+    height: 30px;
+    background-size: cover;
+    display:inline-block;
+  
+  }
+  .profile-pic-header {
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+    display:inline-block;
+    margin-right: 5px;
+  
+  }
+
+  
+  .transactions-owe, .transactions-owed {
+    display: inline-block;
+    margin-left: 10px;
   }
   
+  .transactions div:nth-child(1) {
+    color:black;
+  }
+  
+  .transactions-owe div:nth-child(2) {
+    color: #fb7a00;
+  }
+  
+  .transactions-owed div:nth-child(2) {
+    color: #3ac3ab;
+  }
+
+  .totalamt-owe {
+    color: #ff652f;
+  }
+  
+  .totalamt-owed {
+    color: #5bc5a7;
+  
+  }
+  
+  .negative {
+    color: #ff652f;
+  }
+  
+  .positive {
+    color: #5bc5a7;
+  }

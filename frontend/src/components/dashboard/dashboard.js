@@ -356,6 +356,7 @@ class Dashboard extends Component {
     if (isEmpty(totalpayeruser)) {
       checkifyouowednull = true;
     }
+
     return (
       <div>
         {redirectVar}
@@ -368,7 +369,7 @@ class Dashboard extends Component {
           <div className="dashboard-box">
             <section className="dashboard-heading-buttons">
               <section className="dashboard-heading">
-                <h1>Dashboard</h1>
+                <h1 data-testid="Dashboard">Dashboard</h1>
 
                 <ul className="button-right">
                   <li>
@@ -425,9 +426,7 @@ class Dashboard extends Component {
                   <div className="title">Total Balance</div>
                   {totalsummary.map((expense) => (
                     <ul className="group-expenses">
-                      <p>
-                        <span>{expense.totalblc}</span>
-                      </p>
+                      <span>{expense.totalblc}</span>
                     </ul>
                   ))}
                 </div>
@@ -437,9 +436,7 @@ class Dashboard extends Component {
                     <div className="title">You Owe</div>
                     {totalsummary.map((expense) => (
                       <ul className="group-expenses">
-                        <p>
-                          <span>{expense.youowe}</span>
-                        </p>
+                        <span>{expense.youowe}</span>
                       </ul>
                     ))}
                   </div>
@@ -449,9 +446,7 @@ class Dashboard extends Component {
                   <div className="title">You Are Owed</div>
                   {totalsummary.map((expense) => (
                     <ul className="group-expenses">
-                      <p>
-                        <span>{expense.youareowed}</span>
-                      </p>
+                      <span>{expense.youareowed}</span>
                     </ul>
                   ))}
                 </div>
@@ -464,7 +459,6 @@ class Dashboard extends Component {
                 <div>You are owed</div>
               </div>
               <div className="transactions-owe">
-                you owe test
                 {checkifyouowenull ? (
                   <h2>YOU OWE NOTHING</h2>
                 ) : (
@@ -478,28 +472,26 @@ class Dashboard extends Component {
                               {' '}
                               You Owe {expense2.formatindiamt2} to{' '}
                               {expense2.payer2}
-                              {payeebalances.map((expense) => (
-                                <ul className="group-expenses">
-                                  <p>
-                                    {(() => {
-                                      if (expense2.payer2 === expense.payer) {
-                                        return (
-                                          <div>
-                                            <span>
-                                              {' '}
-                                              You Owe {
-                                                expense.formatindiamt
-                                              } to {expense.payer} for{' '}
-                                              {expense.grpname}{' '}
-                                            </span>
-                                          </div>
-                                        );
-                                      }
-                                      return <p> </p>;
-                                    })()}
-                                  </p>
-                                </ul>
-                              ))}
+                              {payeebalances
+                                .filter(
+                                  (exp1) => exp1.payer === expense2.payer2
+                                )
+                                .map((filteredexp1) => (
+                                  <ul className="group-expenses">
+                                    <p>
+                                      <div>
+                                        <span>
+                                          {' '}
+                                          You Owe {
+                                            filteredexp1.formatindiamt
+                                          }{' '}
+                                          to {filteredexp1.payer} for{' '}
+                                          {filteredexp1.grpname}{' '}
+                                        </span>
+                                      </div>
+                                    </p>
+                                  </ul>
+                                ))}
                             </span>
                           </p>
                         </li>
@@ -523,20 +515,22 @@ class Dashboard extends Component {
                               {' '}
                               {expense3.payee3} owes you{' '}
                               {expense3.formatindiamt3}
-                              {payerbalances.map((expense1) => (
-                                <ul className="group-expenses">
-                                  <li>
-                                    <p>
-                                      <span>
-                                        {' '}
-                                        {expense1.payee1} owes you{' '}
-                                        {expense1.formatindiamt1} for{' '}
-                                        {expense1.grpname1}{' '}
-                                      </span>
-                                    </p>
-                                  </li>
-                                </ul>
-                              ))}
+                              {payerbalances
+                                .filter((exp) => exp.payee1 === expense3.payee3)
+                                .map((filteredexp) => (
+                                  <ul className="group-expenses">
+                                    <li>
+                                      <p>
+                                        <span>
+                                          {' '}
+                                          {filteredexp.payee1} owes you{' '}
+                                          {filteredexp.formatindiamt1} for{' '}
+                                          {filteredexp.grpname1}{' '}
+                                        </span>
+                                      </p>
+                                    </li>
+                                  </ul>
+                                ))}
                             </span>
                           </p>
                         </li>

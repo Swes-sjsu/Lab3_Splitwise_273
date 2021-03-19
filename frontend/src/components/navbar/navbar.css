@@ -2,6 +2,7 @@
     background-color: #3ac3ab;
     font-weight: bold;
     color:#fff;
+    height: 65px;
 }
 .icon{
   display: flex;
@@ -10,16 +11,34 @@
 }
 
 .avatar{
-  display: flex;
-  max-width: 60px ;
+  display:flex;
+  max-width: 80px ;
   max-height: 60px;
-  margin-right: 5px;
-    float: left;
-    background: 50% 50% no-repeat; /* 50% 50% centers image in div */
+  background: cover; /* 50% 50% centers image in div */
     background-size: auto 100%; /* Interchange this value depending on prefering width vs. height */
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
+  margin-right: 3px;
+  border-radius: 100/2;
 }
+
+.navbar-right ul{
+  float: left;
+vertical-align: bottom;
+margin-left: 5px;
+list-style: none;
+overflow: hidden;
+padding-top: 7px;
+}
+
+.navbar-right li{
+ 
+  vertical-align: bottom;
+  margin-left: 5px;
+  list-style: none;
+  padding-top: 7px;
+  }
+
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -73,7 +92,7 @@
     font-family: 'Helvetica Neue';
 }
 .Signup-default:hover{
-    color: #fb7a00;
+    color: #a09a94;
     background-color: #fb6400;
     border-color: #3ac3ab;
   }
@@ -97,14 +116,12 @@
     border:none;
 }
 
-.Dropdown.Item {
-  background-color: #3ac3ab;
-  color:rgb(0, 0, 0);
-  border:none;
+.logout-class{
+  color: #000000;
 }
 
 div.dropdown-menu.show {
-  background-color: #3ac3ab;
+  background-color: #fb7a00;
   font-size: 17px;
   display: block;
   font-weight: bold;
@@ -112,11 +129,15 @@ div.dropdown-menu.show {
 
 }
 
+.dropdown .dropdown-menu .dropdown-item:active, .dropdown .dropdown-menu .dropdown-item:hover{background-color: #fb7a00 !important;}
+
 div.dropdown-menu.show:hover{
-    color: #fb7a00;
-    background-color: #3ac3ab;
+    background-color: #fb6400;
     border-color: #3ac3ab;
+    color:rgb(0, 0, 0) !important;
 }
+
+
 .main-div {
   background: rgb(238, 238, 238);
   border-bottom: 1px solid rgb(214, 214, 214);
@@ -144,69 +165,65 @@ div.dropdown-menu.show:hover{
 }
 
 .sidebar-wrapper {
-  background: rgb(221, 221, 221);
+  background: rgb(240, 240, 240);
   height: 800px;
   font-size: 17px;
+  width: 180px;
+  float: left;
+  margin-right:15px;
+  
   }
 
-  .nav-link {
-    font-family: "Verdana";
-    color: rgb(253, 253, 253);
-    }
-    .navItem {
-      color: white;
-      }
-    .nav-item1 {
-      font-family: "Verdana";
-      color: rgb(0, 0, 0) !important;
-      }
-
-      .nav-link1 {
-        font-family: "Verdana";
-        color: rgb(2, 2, 2);
-        }
-
-        .nav-link2 {
-          font-family: "Verdana";
-          color: rgb(2, 2, 2);
-          float: right;
-          }
-          
-          .nav nav-item1:after {
-            content: "";
-            display: block;
-            height: 1px;
-            width: 40%;
-            margin: px;
-            background: rgb(0, 0, 0);
-}
-
 .navlist ul {
-  padding: 15px;
+  padding: 0.5px;
   font-family: 'Helvetica Neue';
   font-size: 17px;
   vertical-align: bottom;
+  text-decoration: none;
 
 }
 
 .navlist li {
-  padding-top: 20px;
-  padding: 10px;
+  padding-top: 2px;
+  padding: 2px;
   list-style: none;
-  font-family: 'Helvetica Neue';
+  font-family: 'Verdana';
+  font-weight: 550;
+}
+
+.nav-link1 {
+  padding-top: 2px;
+  padding: 2px;
+  list-style: none;
+  font-family: 'Verdana';
   font-size: 15px;
   vertical-align: bottom;
-  margin-left: 2px;
+  text-decoration: none;
+  color: #3a3a3a;
+  }
 
-}
+  .nav-link1:hover {
+    text-decoration: none;
+    color: #000000;
+  }
+
+  .nav-link1::after {
+    text-decoration: none;
+    color: #000000;
+    background-color: #3ac3ab;
+  }
 
 .nav-link2 {
   font-family: "Verdana";
   color: rgb(2, 2, 2);
-  float: right;
-  padding: 10px;
+  text-align: center;
+  padding: 0.5px;
   list-style: none;
   color: #999;
-  font-family: 'Helvetica Neue';
   font-size: 15px;
+  }
+
+  .nav-link2:hover {
+    text-decoration: none;
+    color: #000000;
   }

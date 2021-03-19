@@ -4,8 +4,8 @@
     border-left: 1px solid rgb(177, 177, 177);
     border-right: 1px solid rgb(177, 177, 177);
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    width: 1080px;
-    height:900px;
+    width: 880px;
+    height:880px;
   }
   .grouppage-heading {
     overflow:hidden;
@@ -54,3 +54,36 @@
     color: white !important;
     }
   
+.group-expenses_1 {
+  border-left: 1px solid rgb(196, 196, 196);
+  border-right: 1px solid rgb(196, 196, 196);
+  display: flex,
+  
+}
+
+.group-expenses_1 li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block; 
+  width: 90%
+}
+
+.Row {
+  display: flex;
+  flex-direction:row;
+}
+
+.Column{
+  flex: 1 1 0px;
+}
+
+.avatarfordisplay {
+
+    display: flex;
+    max-width: 65px ;
+    max-height: 65px;
+    width: auto;
+    height: auto;
+
+}

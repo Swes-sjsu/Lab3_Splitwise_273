@@ -20,6 +20,7 @@ class Recentactivity extends Component {
     this.state = {
       userid: '',
       recent: [],
+      recentsetlle: [],
       groupslist: [],
       gpselectoptions: [],
       selectedvalue: [],
@@ -142,7 +143,12 @@ class Recentactivity extends Component {
         console.log(response.data);
         console.log(typeof response.data);
         const { data } = response;
+        const data1 = response.data[0];
+        const data2 = response.data[1];
+        let mergedata1anddata2 = [];
         console.log(data);
+        console.log(data1);
+        console.log(data2);
         const date = new Date('2013-03-10T02:00:00Z');
         console.log(
           `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
@@ -172,6 +178,48 @@ class Recentactivity extends Component {
         this.setState({
           recent: arrayofrecentactivities,
         });
+
+        const arrayofrecentactivitiesdata1 = data1.map((el1) => ({
+          paid: el1.usersname,
+          gpname: el1.gpname,
+          descp: el1.tdescription,
+          amnt: symbolvalue + numeral(el1.tamount).format('0,0.00'),
+          date1: el1.tdate,
+          formatedmonth: new Date(el1.tdate).toLocaleString('default', {
+            month: 'short',
+          }),
+          formatedday: new Date(el1.tdate).getUTCDate(),
+        }));
+        console.log(arrayofrecentactivitiesdata1);
+
+        const arrayofrecentactivitiesdata2 = data2.map((el2) => ({
+          paid: el2.usersname,
+          gpname: el2.gpname,
+          descp: el2.tdescription,
+          amnt: symbolvalue + numeral(el2.tamount).format('0,0.00'),
+          date1: el2.tdate,
+          formatedmonth: new Date(el2.tdate).toLocaleString('default', {
+            month: 'short',
+          }),
+          formatedday: new Date(el2.tdate).getUTCDate(),
+        }));
+        console.log(arrayofrecentactivitiesdata2);
+        mergedata1anddata2 = [
+          ...arrayofrecentactivitiesdata1,
+          ...arrayofrecentactivitiesdata2,
+        ];
+        // mergedata1anddata2 = [...data1, ...data2];
+        console.log(mergedata1anddata2);
+        const sortades = (recentsettle) => (key) =>
+          [...recentsettle].sort((intitial, next) => intitial[key] > next[key]);
+
+        const descsortsettle = sortades(mergedata1anddata2)('tdate');
+        console.log(descsortsettle);
+
+        this.setState({
+          recent: arrayofrecentactivities,
+          recentsetlle: descsortsettle,
+        });
       })
       .catch((err) => console.log(err));
   };
@@ -188,8 +236,16 @@ class Recentactivity extends Component {
       groupslist,
       gpselectoptions,
       selectedvalue,
+      recentsetlle,
     } = this.state;
-    console.log(recent, userid, groupslist, gpselectoptions, selectedvalue);
+    console.log(
+      recent,
+      userid,
+      groupslist,
+      gpselectoptions,
+      selectedvalue,
+      recentsetlle
+    );
     let checkifactivitynull = false;
     if (isEmpty(recent)) {
       checkifactivitynull = true;

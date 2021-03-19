@@ -17,32 +17,41 @@ class Sidebarcomp extends Component {
             <ul className="navlist">
               <li className="nav-item">
                 <li className="nav-item1">
-                  <NavLink className="nav-link1" to="/dashboard" />
-                </li>
+                  <NavLink
+                    className="nav-link1"
+                    to="/dashboard"
+                    style={{ color: 'inherit', textDecoration: 'none' }}
+                  />
+                </li>{' '}
+                <hr />
                 <NavLink className="nav-link1" to="/dashboard">
-                  <p>Dashboard</p>
+                  Dashboard
                 </NavLink>
               </li>
+              <hr />
               <li className="nav-item1">
                 <NavLink className="nav-link1" to="/recentactivity">
-                  <p>Recent Acitivity</p>
+                  Recent Acitivity
                 </NavLink>
               </li>
+              <hr />
+              <li className="nav-item1">
+                <NavLink className="nav-link1" to="/profile">
+                  My Profile
+                </NavLink>
+              </li>
+              <hr />
               <li className="nav-item1">
                 <NavLink className="nav-link1" to="/mygroups">
-                  <p> My Groups</p>
+                  My Groups
                 </NavLink>
               </li>
               <li>
                 <NavLink to="/createnewgroup" className="nav-link2">
-                  <p> + Add </p>
+                  + Add
                 </NavLink>
-              </li>
-              <li className="nav-item1">
-                <NavLink className="nav-link1" to="/profile">
-                  <p>My Profile</p>
-                </NavLink>
-              </li>
+              </li>{' '}
+              <hr />
             </ul>
           </div>
         </Nav>

@@ -76,6 +76,10 @@ class Groupdetails extends Component {
           descp: el.tdescription,
           paid: el.usersname,
           amnt: symbolvalue + numeral(el.tamount).format('0,0.00'),
+          formatedmonth: new Date(el.tdate).toLocaleString('default', {
+            month: 'short',
+          }),
+          formatedday: new Date(el.tdate).getUTCDate(),
         }));
         console.log(arrayofactivities);
         this.setState({
@@ -110,7 +114,6 @@ class Groupdetails extends Component {
           payeename: el.payee_name,
           balance: el.balance,
           formatedbalance: symbolvalue + numeral(el.balance).format('0,0.00'),
-          // settled: el.settled,
         }));
 
         let x;
@@ -312,9 +315,10 @@ class Groupdetails extends Component {
                       <Form.Group>
                         <Image
                           src={expensepic}
-                          className="avatar"
+                          className="avatarfordesc"
                           alt="expense pic"
                         />
+                        <br />
                         <Form.Label>Description: </Form.Label>
                         <Form.Control
                           type="text"
@@ -378,26 +382,52 @@ class Groupdetails extends Component {
             </section>
 
             <section className="grouppage-center-sec">
-              <div className="grouppage-center-section-block">
-                <div className="title">Payments Made</div>
-              </div>
+              <div className="grouppage-center-section-block" />
 
               <div className="grouppage-center-section-block">
                 <div className="grouppage-block-border">
-                  <div className="title">Time</div>
                   {checkifactivitiesnull ? (
                     <h2>No transactions to display!</h2>
                   ) : (
                     <div>
                       {' '}
                       {activties.map((expense) => (
-                        <ul className="group-expenses">
+                        <ul className="group-expenses_1">
                           <li>
                             <p>
-                              <span> {expense.expdate}</span>
-                              <span> {expense.descp}</span>
-                              <span> {expense.paid}</span>
-                              <span> Paid : {expense.amnt}</span>
+                              <div className="Row">
+                                <div className="Column">
+                                  {expense.formatedmonth} <br />{' '}
+                                  {expense.formatedday}{' '}
+                                </div>
+                                <div className="Column">
+                                  {' '}
+                                  <Image
+                                    src={expensepic}
+                                    className="avatarfordisplay"
+                                    alt="expense pic"
+                                  />
+                                </div>
+
+                                <div className="Column">{expense.descp}</div>
+                                <div className="Column"> </div>
+                                <div className="Column"> </div>
+                                <div className="Column"> </div>
+                                <div className="Column"> </div>
+                                <div className="Column"> </div>
+                                <div className="Column"> </div>
+                                <div className="Column">
+                                  {expense.paid} <br /> {expense.amnt}
+                                </div>
+                              </div>
+                              <hr
+                                style={{
+                                  height: '2px',
+                                  border: 'none',
+                                  color: 'black',
+                                  'background-color': 'Grey',
+                                }}
+                              />
                             </p>
                           </li>
                         </ul>

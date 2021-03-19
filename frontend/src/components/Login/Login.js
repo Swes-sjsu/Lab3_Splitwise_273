@@ -148,7 +148,7 @@ class Login extends Component {
                 </label>
               </div>
               <button
-                type="button"
+                type="submit"
                 className="login-default "
                 onClick={this.submitLogin}
                 formNoValidate

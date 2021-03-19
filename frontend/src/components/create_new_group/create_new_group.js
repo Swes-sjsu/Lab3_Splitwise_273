@@ -203,97 +203,153 @@ class Createnewgroup extends Component {
       <div>
         {redirectVar}
         <Navheader />
-        <div id="group_avatar">
-          <Image src={grouppic} className="avatar" alt="group pic" />
-          <label htmlFor="group_avatar">
-            Change your group avatar
-            <input
-              type="file"
-              name="group_avatar"
-              id="group_avatar"
-              onChange={this.groupphtochangeHandler}
-            />
-          </label>
-        </div>
-        <Form ref={this.groupform} id="groupform" className="groupform">
-          <div className="createnewgroup">
-            <h2>START A NEW GROUP</h2>
-            <div>
-              <h3>My group shall be called....</h3>
-              <input
-                type="text"
-                name="group_name"
-                id="group_name"
-                onChange={this.groupnameChangeHandler}
-                required
-              />
+
+        <div className="profilepage-block">
+          <section
+            className=" createpage-blocksec"
+            style={{
+              float: 'left',
+              width: '300px',
+              height: '300px',
+              'padding-left': '20px',
+              'padding-top': '1px',
+            }}
+          >
+            <div id="creategroup_avatar">
+              <Image src={grouppic} className="grpavatar" alt="group pic" />
+              <br />
+              <label htmlFor="group_avatar">
+                Change your group avatar <br />
+                <input
+                  type="file"
+                  name="group_avatar"
+                  id="group_avatar"
+                  onChange={this.groupphtochangeHandler}
+                />
+              </label>
+              <br />
             </div>
-            <div className="group_members">
-              <div className="users">
-                <h2>Group members</h2>
-                <div className="group-member">
-                  <div className="grpnameemail">
-                    {username}(<em>{email}</em>)
+          </section>
+
+          <section className="create-group-box">
+            <section
+              className="right-box"
+              style={{
+                float: 'right',
+                width: '350px',
+                'padding-left': '20px',
+                'padding-top': '1px',
+              }}
+            >
+              <Form ref={this.groupform} id="groupform" className="groupform">
+                <div className="createnewgroup">
+                  <h2>START A NEW GROUP</h2>
+                  <div>
+                    <h3>My group shall be called....</h3>
+                    <input
+                      type="text"
+                      name="group_name"
+                      id="group_name"
+                      onChange={this.groupnameChangeHandler}
+                      required
+                    />
                   </div>
-                  {groupmembers.map((groupmember, id) => (
-                    <div className="grpnameemail">
-                      <Select
-                        options={selectUsername}
-                        placeholder="Name"
-                        className="name ui-autocomplete-input"
-                        type="text"
-                        // value={groupmember.gmusersname}
-                        name={`group_members_${id + 1}_username`}
-                        id={`group_members_${id + 1}_username`}
-                        onChange={(e) => this.groupmembersChangeHandler(id, e)}
-                        // autoComplete="off"
-                        required
-                      />
-                      <button
-                        type="button"
-                        name="removegm"
-                        onClick={() => this.removegroupmember(groupmember)}
-                        className="removegm"
-                      >
-                        X
-                      </button>
+                  <br />
+                  <div className="group_members">
+                    <div className="users">
+                      <h2>Group members</h2>
+                      <div className="group-member">
+                        <div className="grpnameemail">
+                          {username}(<em>{email}</em>)
+                        </div>
+                        {groupmembers.map((groupmember, id) => (
+                          <div
+                            className="grpnameemail"
+                            style={{
+                              width: '300px',
+                              display: 'flex',
+                              'flex-direction': 'row',
+                            }}
+                          >
+                            <div
+                              className="grpnameemail"
+                              style={{
+                                width: '300px',
+                              }}
+                            >
+                              <Select
+                                options={selectUsername}
+                                className="div-select"
+                                type="text"
+                                // value={groupmember.gmusersname}
+                                name={`group_members_${id + 1}_username`}
+                                id={`group_members_${id + 1}_username`}
+                                onChange={(e) =>
+                                  this.groupmembersChangeHandler(id, e)
+                                }
+                                // autoComplete="off"
+                                required
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              name="removegm"
+                              onClick={() =>
+                                this.removegroupmember(groupmember)
+                              }
+                              className="removegm"
+                              style={{
+                                'background-color': 'white',
+                                border: 'none',
+                                color: '#ff652f',
+                                'font-weight': 'bolder',
+                              }}
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={this.addgroupmember}
+                          className="addgm"
+                          style={{
+                            'background-color': 'white',
+                            color: '#3ac3ab',
+                            border: 'none',
+                            'font-weight': 'bolder',
+                          }}
+                        >
+                          + Add Person
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={this.addgroupmember}
-                    className="addgm"
-                  >
-                    + Add Person
-                  </button>
+                    <div id="invite_link_container">
+                      <div className="invitelink">
+                        <div />
+                      </div>
+                      <div className="savebtn">
+                        <button
+                          type="button"
+                          className="Signup-default"
+                          onClick={this.submitgroupcreate}
+                          formNoValidate
+                        >
+                          Save
+                        </button>
+                        <p className="errmsg" style={{ color: 'maroon' }}>
+                          {' '}
+                          {errorMessage}{' '}
+                        </p>
+                        {redirecttogroup}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div id="invite_link_container">
-                <h2>Invite group members by link</h2>
-                <div className="invitelink">
-                  Send this link to your friends, and when they click it,they
-                  will automatically be added to this group.
-                  <div />
-                </div>
-                <div className="save">
-                  <button
-                    type="button"
-                    className="Signup-default"
-                    onClick={this.submitgroupcreate}
-                    formNoValidate
-                  >
-                    Save
-                  </button>
-                  <p className="errmsg" style={{ color: 'maroon' }}>
-                    {' '}
-                    {errorMessage}{' '}
-                  </p>
-                  {redirecttogroup}
-                </div>
-              </div>
-            </div>
-          </div>
-        </Form>
+              </Form>
+            </section>
+          </section>
+        </div>
       </div>
     );
   }

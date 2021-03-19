@@ -232,7 +232,7 @@ class Signup extends Component {
                   )}
                 </div>
                 <button
-                  type="button"
+                  type="submit"
                   onClick={this.submitsignup}
                   className="Signup-default"
                   formNoValidate

@@ -305,7 +305,7 @@ app.post('/createnewgroup',grpupdatepic.single("group_avatar"),function(req,res)
                     for (let i = 0; i <gpmems.length;i++){
                         for (let j = 0; j < gpmems.length; j++){
                             if(gpmems[i]!==gpmems[j]){
-                            insertgpmembers="INSERT INTO balancetbl(payer,payee,balance,groupid,payee_invite) VALUES ('"+gpmems[i]+"', '"+gpmems[j]+"', 0 ,'"+groupid1+"',0)";
+                            insertgpmembers="INSERT INTO balancetbl(payer,payee,balance,groupid,payee_invite,settled) VALUES ('"+gpmems[i]+"', '"+gpmems[j]+"', 0 ,'"+groupid1+"',0,0)";
                                         dbconnection.query(insertgpmembers,(err,output2) => {
                                             if(err){
                                                 console.log("Error")
@@ -573,7 +573,7 @@ app.get('/getrecentacitvities/:userid', function(req,res){
     const userid =req.params.userid;
     console.log(userid)
     sqlquery="Select t.payed_by, u1.usersname, t.groupid,gp.gpname,  t.tamount, t.tdate, t.tdescription from transaction t INNER JOIN spgroups gp  INNER JOIN users u   INNER JOIN users u1  INNER JOIN usersgroups ug ON t.groupid= ug.groupid and ug.groupid= gp.groupid and ug.invitedaccepted=1 and u.idusers=ug.userid and u1.email=t.payed_by where u.idusers="+
-    userid+" ORDER BY tdate desc;";
+    userid+" ORDER BY tdate desc; Select t.payed_by, u.usersname, t.groupid,'$$$$'as gpname,  t.tamount, t.tdate, t.tdescription from transaction t INNER JOIN users u  ON t.payed_by=u.email where u.idusers= "+userid+ " and t.groupid = -1 ORDER BY tdate desc;";
 
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -595,7 +595,10 @@ app.post('/settleup', function(req,res){
     const currentuseremail = req.body.useremail;
     console.log(userid)
     sqlquery="UPDATE balancetbl SET balance=0, settled=2 where ((payer='"+currentuseremail+"' and payee='"+settledupemail+"') or (payer='"+settledupemail+"' and payee='"+currentuseremail+
-    "')); "; 
+    "')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('"+settledupemail
+    +"', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '"+currentuseremail
+    +"')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('"+currentuseremail
+    +"', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '"+settledupemail+"'))"; 
     console.log(sqlquery)
     dbconnection.query(sqlquery,async(err,output,fields)=> {
         if(err){
@@ -603,7 +606,7 @@ app.post('/settleup', function(req,res){
         res.status(400).send('Error!')
     }else {
                 console.log(output); 
-                res.status(200).send("settled up succesfuklly!");
+                res.status(200).send("settled up succesfully!");
             }
     })
         

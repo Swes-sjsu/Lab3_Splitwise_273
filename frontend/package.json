@@ -13,7 +13,6 @@
     "bootstrap": "^4.6.0",
     "concurrently": "^6.0.0",
     "form-data": "^4.0.0",
-    "jest": "^26.6.3",
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
     "prop-types": "^15.7.2",
@@ -30,6 +29,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-select": "^4.2.1",
+    "react-test-renderer": "^17.0.1",
     "save": "^2.4.0",
     "universal-cookie": "^4.0.4",
     "web-vitals": "^1.1.0"

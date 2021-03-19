@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
 import cookie from 'react-cookies';
-// import { Image } from 'react-bootstrap';
+import { Image } from 'react-bootstrap';
 import './navbar.css';
 // #fb7a00
 
@@ -40,16 +40,24 @@ class Navheader extends Component {
             </Button>
           </li>
           <li>
-            <Navbar.Brand classname="Navbar-Brand" variant="light" href="/">
-              <img src={profilepic} className="avatar" alt="profile pic" />
-            </Navbar.Brand>
-
+            <Image
+              src={profilepic}
+              className="avatar"
+              alt="profile pic"
+              roundedCircle
+            />
+          </li>
+          <li>
             <Dropdown id="nav-dropdown" default>
               {sessionStorage.getItem('username')}
               <Dropdown.Toggle variant="default" />
               <Dropdown.Menu>
                 <Dropdown.Item>
-                  <Link to="/" onClick={this.handleLogout}>
+                  <Link
+                    className="logout-class"
+                    to="/"
+                    onClick={this.handleLogout}
+                  >
                     Logout
                   </Link>
                 </Dropdown.Item>
