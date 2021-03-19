@@ -13,6 +13,7 @@ import Sidebarcomp from '../navbar/sidebar';
 import Navheader from '../navbar/navbar';
 import '../navbar/navbar.css';
 import '../dashboard/dashboard.css';
+import './recent_activity.css';
 
 class Recentactivity extends Component {
   constructor(props) {
@@ -80,9 +81,11 @@ class Recentactivity extends Component {
     console.log(recent);
     if (asc === false && desc === true) {
       const sortasc = (recent1) => (key) =>
-        [...recent1]
-          .sort((intitial, next) => intitial[key] > next[key])
-          .reverse();
+        [...recent1].sort(
+          (intitial, next) =>
+            new Date(intitial[key]).getTime() - new Date(next[key]).getTime()
+        );
+      // .reverse();
 
       const ascsort = sortasc(recent)('date1');
       this.setState({
@@ -99,7 +102,10 @@ class Recentactivity extends Component {
     if (asc === true && desc === false) {
       const sortadesc = (recent1) => (key) =>
         [...recent1]
-          .sort((intitial, next) => intitial[key] > next[key])
+          .sort(
+            (intitial, next) =>
+              new Date(intitial[key]).getTime() - new Date(next[key]).getTime()
+          )
           .reverse();
 
       const descsort = sortadesc(recent)('date1');
@@ -190,10 +196,12 @@ class Recentactivity extends Component {
           descp: el1.tdescription,
           amnt: symbolvalue + numeral(el1.tamount).format('0,0.00'),
           date1: el1.tdate,
+          time1: new Date(el1.tdate).toLocaleTimeString(),
           formatedmonth: new Date(el1.tdate).toLocaleString('default', {
             month: 'short',
           }),
           formatedday: new Date(el1.tdate).getUTCDate(),
+          formatedyear: new Date(el1.tdate).getUTCFullYear(),
         }));
         console.log(arrayofrecentactivitiesdata1);
 
@@ -203,10 +211,12 @@ class Recentactivity extends Component {
           descp: el2.tdescription,
           amnt: symbolvalue + numeral(el2.tamount).format('0,0.00'),
           date1: el2.tdate,
+          time1: new Date(el2.tdate).toLocaleTimeString(),
           formatedmonth: new Date(el2.tdate).toLocaleString('default', {
             month: 'short',
           }),
           formatedday: new Date(el2.tdate).getUTCDate(),
+          formatedyear: new Date(el2.tdate).getUTCFullYear(),
         }));
         console.log(arrayofrecentactivitiesdata2);
         mergedata1anddata2 = [
@@ -214,11 +224,26 @@ class Recentactivity extends Component {
           ...arrayofrecentactivitiesdata2,
         ];
         // mergedata1anddata2 = [...data1, ...data2];
-        console.log(mergedata1anddata2);
+        /* Array.prototype.push.apply(
+  arrayofrecentactivitiesdata1,
+  arrayofrecentactivitiesdata2
+); */
+        console.log(
+          new Date(arrayofrecentactivitiesdata1[0].date1).toLocaleTimeString(),
+          new Date(arrayofrecentactivitiesdata1[0].date1).toLocaleString()
+        );
+        // console.log(arrayofrecentactivitiesdata1);
         const sortades = (recentsettle) => (key) =>
-          [...recentsettle].sort((intitial, next) => intitial[key] > next[key]);
+          [...recentsettle]
+            .sort(
+              (intitial, next) =>
+                new Date(intitial[key]).getTime() -
+                new Date(next[key]).getTime()
+            )
+            .reverse();
 
-        const descsortsettle = sortades(mergedata1anddata2)('tdate');
+        const descsortsettle = sortades(mergedata1anddata2)('date1');
+        console.log(mergedata1anddata2);
         console.log(descsortsettle);
 
         this.setState({
@@ -275,16 +300,22 @@ class Recentactivity extends Component {
 
               <section className="dashboard-center-sec">
                 <div className="dashboard-center-section-block">
-                  <div className="title">
-                    <h2>Recent activity</h2>
+                  <div className="title" style={{ 'text-align': 'center' }}>
+                    <h2>RECENT ACTIVITY</h2>
                   </div>
                 </div>
 
                 <div className="dashboard-center-section-block">
                   <div className="dashboard-block-border">
-                    <div className="title">Recent activity </div>
+                    <div className="title" style={{ 'text-align': 'center' }}>
+                      {' '}
+                      RECENT ACTIVITY{' '}
+                    </div>
                     <Dropdown>
-                      <Dropdown.Toggle variant="success" id="dropdown-basic">
+                      <Dropdown.Toggle
+                        className="login-default"
+                        id="dropdown-basic"
+                      >
                         Sort
                       </Dropdown.Toggle>
 
@@ -309,58 +340,125 @@ class Recentactivity extends Component {
                 </div>
 
                 <div className="dashboard-center-section-block">
-                  <div className="title">Recent activity </div>
-                  <div className="mygroups-right" style={{ width: '50px' }} />
+                  <div className="title" style={{ 'text-align': 'center' }}>
+                    {' '}
+                    RECENT ACTIVITY{' '}
+                  </div>
+                  <div
+                    className="mygroups-right"
+                    style={{
+                      width: '300px',
+                      display: 'flex',
+                      'flex-direction': 'row',
+                    }}
+                  />
 
                   <Select
                     options={gpselectoptions}
                     placeholder="GroupName"
                     className="div-select"
                     onChange={(e) => this.gpselectoptionshandler(e)}
+                    styles={{
+                      display: 'flex',
+                      'flex-direction': 'row',
+                    }}
                   />
-                  <span>
-                    <Button
-                      className="mygroups-default"
-                      onClick={(e) => this.displayresults(selectedvalue, e)}
-                    >
-                      GO
-                    </Button>
-                  </span>
+                  <Button
+                    className="Signup-default"
+                    onClick={(e) => this.displayresults(selectedvalue, e)}
+                    tyles={{
+                      display: 'inline-block',
+                      float: 'right',
+                    }}
+                  >
+                    GO
+                  </Button>
                 </div>
               </section>
             </section>
 
-            <section className="transcations-sec">
-              <div className="tranactions-heading">
+            <section className="transcations-sec1" style={{ width: '80%' }}>
+              <div className="tranactions-heading1">
                 {checkifactivitynull ? (
                   <h2>YOU HAVE NO ACTIVTIES TO DISPLAY ! </h2>
                 ) : (
                   <div>
                     {' '}
                     {recent.map((activities) => (
-                      <ul className="recent-expenses">
+                      <ul
+                        className="recent-expenses"
+                        style={{ 'list-style-type': 'none' }}
+                      >
                         <li>
-                          <p>
-                            {(() => {
-                              if (
-                                JSON.stringify(activities.paid) ===
-                                JSON.stringify(currusername)
-                              ) {
-                                return <div>YOU </div>;
-                              }
-
-                              return <div>{activities.paid} </div>;
-                            })()}
-                            <span>
-                              {' '}
-                              paid {activities.amnt} &quot;{activities.descp}
-                              &quot; in &quot;
-                              {activities.gpname}&quot;
-                            </span>
-                            <div>
-                              <span> {activities.date1} </span>
-                            </div>
-                          </p>
+                          <div
+                            className="Row"
+                            style={{ display: 'flex', 'flex-direction': 'row' }}
+                          >
+                            <p>
+                              {JSON.stringify(activities.paid) ===
+                                JSON.stringify(currusername) &&
+                                JSON.stringify(activities.gpname) !==
+                                  JSON.stringify('$$$$') && (
+                                  <p>
+                                    <p>
+                                      <b>YOU </b>added a payment of{' '}
+                                      <h6
+                                        style={{
+                                          color: '#3bb894',
+                                          'font-weight': 'bold',
+                                        }}
+                                      >
+                                        {activities.amnt}
+                                      </h6>{' '}
+                                      for <b>&quot;{activities.descp}&quot;</b>{' '}
+                                      in <b>{activities.gpname} </b>
+                                    </p>
+                                  </p>
+                                )}
+                              {JSON.stringify(activities.paid) !==
+                                JSON.stringify(currusername) && (
+                                <p>
+                                  <b>{activities.paid} </b>added a payment of{' '}
+                                  <h6
+                                    style={{
+                                      color: '#ff652f',
+                                      'font-weight': 'bold',
+                                    }}
+                                  >
+                                    {activities.amnt}
+                                  </h6>{' '}
+                                  for <b>&quot;{activities.descp}&quot;</b> in{' '}
+                                  <b>{activities.gpname} </b>;
+                                </p>
+                              )}
+                              {JSON.stringify(activities.paid) ===
+                                JSON.stringify(currusername) &&
+                                JSON.stringify(activities.gpname) ===
+                                  JSON.stringify('$$$$') && (
+                                  <p>
+                                    <b>You {activities.descp}</b>
+                                  </p>
+                                )}
+                              <p>
+                                <span>
+                                  {activities.formatedmonth}{' '}
+                                  {activities.formatedday},{' '}
+                                  {activities.formatedyear} at{' '}
+                                  {activities.time1}
+                                </span>
+                              </p>
+                            </p>
+                          </div>
+                          <hr
+                            style={{
+                              height: '2px',
+                              border: 'none',
+                              color: 'grey',
+                              'background-color': 'Grey',
+                              'padding-top': '1px',
+                              'padding-bottom': '1px',
+                            }}
+                          />
                         </li>
                       </ul>
                     ))}

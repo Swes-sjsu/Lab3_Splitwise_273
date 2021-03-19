@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import numeral from 'numeral';
 import { Modal, Form } from 'react-bootstrap';
-// import { Row, Col, Container, Jumbotron } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
 import Select from 'react-select';
 import Navheader from '../navbar/navbar';
@@ -425,7 +424,14 @@ class Dashboard extends Component {
                 <div className="dashboard-center-section-block">
                   <div className="title">Total Balance</div>
                   {totalsummary.map((expense) => (
-                    <ul className="group-expenses">
+                    <ul
+                      className="group-expenses"
+                      style={{
+                        color: '#3bb894',
+                        'font-weight': 'bold',
+                        'list-style-type': 'none',
+                      }}
+                    >
                       <span>{expense.totalblc}</span>
                     </ul>
                   ))}
@@ -435,7 +441,15 @@ class Dashboard extends Component {
                   <div className="dashboard-block-border">
                     <div className="title">You Owe</div>
                     {totalsummary.map((expense) => (
-                      <ul className="group-expenses">
+                      <ul
+                        className="group-expenses"
+                        style={{
+                          color: '#ff652f',
+                          'font-weight': 'bold',
+                          'list-style-type': 'none',
+                          'text-align': 'center',
+                        }}
+                      >
                         <span>{expense.youowe}</span>
                       </ul>
                     ))}
@@ -445,7 +459,14 @@ class Dashboard extends Component {
                 <div className="dashboard-center-section-block">
                   <div className="title">You Are Owed</div>
                   {totalsummary.map((expense) => (
-                    <ul className="group-expenses">
+                    <ul
+                      className="group-expenses"
+                      style={{
+                        color: '#3bb894',
+                        'font-weight': 'bold',
+                        'list-style-type': 'none',
+                      }}
+                    >
                       <span>{expense.youareowed}</span>
                     </ul>
                   ))}
@@ -465,26 +486,54 @@ class Dashboard extends Component {
                   <div>
                     {' '}
                     {totalpayeeuser.map((expense2) => (
-                      <ul className="group-expenses">
-                        <li>
+                      <ul
+                        className="group-expenses"
+                        style={{
+                          'list-style-type': 'none',
+                        }}
+                      >
+                        <ul>
                           <p>
                             <span>
                               {' '}
-                              You Owe {expense2.formatindiamt2} to{' '}
-                              {expense2.payer2}
+                              You Owe{' '}
+                              <h7
+                                style={{
+                                  color: '#ff652f',
+                                  'font-weight': 'bold',
+                                }}
+                              >
+                                {expense2.formatindiamt2}
+                              </h7>{' '}
+                              to {expense2.payer2}
                               {payeebalances
                                 .filter(
                                   (exp1) => exp1.payer === expense2.payer2
                                 )
                                 .map((filteredexp1) => (
-                                  <ul className="group-expenses">
-                                    <p>
+                                  <ul
+                                    className="group-expenses"
+                                    style={{
+                                      'list-style-type': 'none',
+                                    }}
+                                  >
+                                    <p
+                                      style={{
+                                        color: 'rgb(136, 135, 135)',
+                                      }}
+                                    >
                                       <div>
                                         <span>
                                           {' '}
-                                          You Owe {
-                                            filteredexp1.formatindiamt
-                                          }{' '}
+                                          You Owe{' '}
+                                          <h7
+                                            style={{
+                                              color: '#ff652f',
+                                              'font-weight': 'bold',
+                                            }}
+                                          >
+                                            {filteredexp1.formatindiamt}
+                                          </h7>{' '}
                                           to {filteredexp1.payer} for{' '}
                                           {filteredexp1.grpname}{' '}
                                         </span>
@@ -494,41 +543,68 @@ class Dashboard extends Component {
                                 ))}
                             </span>
                           </p>
-                        </li>
+                        </ul>
                       </ul>
                     ))}
                   </div>
                 )}
               </div>
               <div className="transactions-owed">
-                you are owed test
                 {checkifyouowednull ? (
                   <h2>YOU ARE OWED NOTHING</h2>
                 ) : (
                   <div>
                     {' '}
                     {totalpayeruser.map((expense3) => (
-                      <ul className="group-expenses">
+                      <ul
+                        className="group-expenses"
+                        style={{
+                          'list-style-type': 'none',
+                        }}
+                      >
                         <li>
                           <p>
                             <span>
                               {' '}
-                              {expense3.payee3} owes you{' '}
-                              {expense3.formatindiamt3}
+                              <b>{expense3.payee3}</b>
+                              <br />{' '}
+                              <h7
+                                style={{
+                                  color: '#3bb894',
+                                  'font-weight': 'bold',
+                                }}
+                              >
+                                owes you {expense3.formatindiamt3}
+                              </h7>
                               {payerbalances
                                 .filter((exp) => exp.payee1 === expense3.payee3)
                                 .map((filteredexp) => (
                                   <ul className="group-expenses">
-                                    <li>
-                                      <p>
+                                    <ul
+                                      style={{
+                                        'list-style-type': 'circle',
+                                      }}
+                                    >
+                                      <p
+                                        style={{
+                                          color: 'rgb(136, 135, 135)',
+                                        }}
+                                      >
                                         <span>
                                           {' '}
                                           {filteredexp.payee1} owes you{' '}
-                                          {filteredexp.formatindiamt1} for{' '}
-                                          {filteredexp.grpname1}{' '}
+                                          <h7
+                                            style={{
+                                              color: '#3bb894',
+                                              'font-weight': 'bold',
+                                            }}
+                                          >
+                                            {filteredexp.formatindiamt1}{' '}
+                                          </h7>{' '}
+                                          for {filteredexp.grpname1}{' '}
                                         </span>
                                       </p>
-                                    </li>
+                                    </ul>
                                   </ul>
                                 ))}
                             </span>

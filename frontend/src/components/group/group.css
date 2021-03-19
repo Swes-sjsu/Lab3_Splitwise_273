@@ -78,6 +78,14 @@
   flex: 1 1 0px;
 }
 
+.Column p {
+  color:rgb(124, 124, 124);
+}
+
+.Column h5 {
+  color: #4cad92;
+}
+
 .avatarfordisplay {
 
     display: flex;
@@ -86,4 +94,30 @@
     width: auto;
     height: auto;
 
+}
+
+.avatar1{
+  display: flex;
+  max-width: 500px ;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+}
+.grouppage-right{
+  padding: 20px;
+  text-align: center;
+}
+
+.grouppage-right h2{
+  padding: 20px;
+  text-align: center;
+}
+
+.group-expenses-group li{
+  list-style-type: none;
+  margin: 0;
+  padding-left: 20px ;
+  display: inline-block; 
+  width: 20%; 
+  text-align: center;
 }

@@ -284,6 +284,8 @@ class Groupdetails extends Component {
     if (isEmpty(individuals)) {
       checkifsummiesnull = true;
     }
+
+    const currusername = sessionStorage.getItem('username');
     console.log(activties);
     return (
       <div>
@@ -385,6 +387,7 @@ class Groupdetails extends Component {
               <div className="grouppage-center-section-block" />
 
               <div className="grouppage-center-section-block">
+                <br />
                 <div className="grouppage-block-border">
                   {checkifactivitiesnull ? (
                     <h2>No transactions to display!</h2>
@@ -409,15 +412,17 @@ class Groupdetails extends Component {
                                   />
                                 </div>
 
-                                <div className="Column">{expense.descp}</div>
-                                <div className="Column"> </div>
+                                <div className="Column">
+                                  <h4>{expense.descp}</h4>
+                                </div>
                                 <div className="Column"> </div>
                                 <div className="Column"> </div>
                                 <div className="Column"> </div>
                                 <div className="Column"> </div>
                                 <div className="Column"> </div>
                                 <div className="Column">
-                                  {expense.paid} <br /> {expense.amnt}
+                                  <p>{expense.paid} </p>
+                                  <h5>{expense.amnt} </h5>
                                 </div>
                               </div>
                               <hr
@@ -441,28 +446,41 @@ class Groupdetails extends Component {
         </div>
 
         <div className="grouppage-right" />
-        <div className="title">You Owe</div>
+        <div className="title"> </div>
         {checkifsummiesnull ? (
-          <h2>Will be displayed after invites are accepted !</h2>
+          <h5>NONE HAVE ACCEPTED THE INVITES TO THE GROUP!</h5>
         ) : (
           <div>
             {' '}
             <h2>Groups Summary</h2>
             {summaries.map((expense) => (
-              <ul className="group-expenses">
+              <ul className="group-expenses-group">
                 <li>
-                  <p>
-                    {expense.payee} owes {expense.formattotalamt} in Total{' '}
-                  </p>
+                  {(() => {
+                    if (
+                      JSON.stringify(expense.payee) ===
+                      JSON.stringify(currusername)
+                    ) {
+                      return <h6>You owe </h6>;
+                    }
+
+                    return <h6>{expense.payee} owes </h6>;
+                  })()}
+                  <h6>
+                    <h7 style={{ color: '#ff652f', 'text-weight': 'bold' }}>
+                      {expense.formattotalamt}{' '}
+                    </h7>
+                    in Total{' '}
+                  </h6>
                 </li>
               </ul>
             ))}
-            <h2>Who Owes how much</h2>
+            <h2> Details :</h2>
             {individuals.map((expense) => (
-              <ul className="group-expenses">
+              <ul className="group-expenses-group">
                 <li>
-                  <p>
-                    {expense.payeename} owes {expense.payername} :{' '}
+                  {expense.payeename} owes {expense.payername}{' '}
+                  <p style={{ color: '#ff652f', 'text-weight': 'bold' }}>
                     {expense.formatedbalance}
                   </p>
                 </li>
