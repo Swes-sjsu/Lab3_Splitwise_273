@@ -142,14 +142,19 @@ class Recentactivity extends Component {
       .then((response) => {
         console.log(response.data);
         console.log(typeof response.data);
-        const { data } = response;
+        // const { data } = response;
         const data1 = response.data[0];
         const data2 = response.data[1];
         let mergedata1anddata2 = [];
-        console.log(data);
+        // console.log(data);
         console.log(data1);
         console.log(data2);
-        const date = new Date('2013-03-10T02:00:00Z');
+        const defaultcurr = sessionStorage.getItem('defaultcurrency');
+        console.log(defaultcurr);
+        const regExp = /\(([^)]+)\)/;
+        const getvalue = regExp.exec(defaultcurr);
+        const symbolvalue = getvalue[1];
+        /* const date = new Date('2013-03-10T02:00:00Z');
         console.log(
           `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
         );
@@ -178,7 +183,7 @@ class Recentactivity extends Component {
         this.setState({
           recent: arrayofrecentactivities,
         });
-
+*/
         const arrayofrecentactivitiesdata1 = data1.map((el1) => ({
           paid: el1.usersname,
           gpname: el1.gpname,
@@ -217,8 +222,7 @@ class Recentactivity extends Component {
         console.log(descsortsettle);
 
         this.setState({
-          recent: arrayofrecentactivities,
-          recentsetlle: descsortsettle,
+          recent: descsortsettle,
         });
       })
       .catch((err) => console.log(err));
