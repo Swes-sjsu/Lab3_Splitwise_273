@@ -212,7 +212,7 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function(req,res)
                 // console.log(output[0].usersname)
                 req.session.cookie.username = username;
                 req.session.cookie.email = email;
-                res.status(200).send({"username" : username,"email" : email, "profilephoto":profilephoto});
+                res.status(200).send({"username" : username,"email" : email, "profilephoto":profilephoto, "defaultcurrency":defaultcurrency});
             }
     })
         

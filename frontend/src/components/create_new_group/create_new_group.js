@@ -40,6 +40,7 @@ class Createnewgroup extends Component {
     this.getuseroptions(userid1);
   }
 
+  // get the list of all users part of application to be used for the dropdown selection except the current users
   getuseroptions = (userid) => {
     axios
       .get(`http://localhost:3001/getuseroptions/${userid}`, {
@@ -67,24 +68,11 @@ class Createnewgroup extends Component {
   };
 
   groupmembersChangeHandler = (id, e) => {
-    //  const { groupmembers } = this.state;
-    // eslint-disable-next-line react/destructuring-assignment
-    // const updatedList = [...this.state.groupmembers];
-    // const gmusername1= {...updatedList[id], {updatedList[id].gmusername: e.target.value}};
     const { groupmembers } = this.state;
     const updatedList = [...groupmembers];
     updatedList[id].gmemail = e.value;
     console.log(updatedList);
     this.setState(updatedList);
-    /* const newgroupmembers = groupmembers.map((groupmember, gmid) => {
-      if (id !== gmid) return groupmember;
-      return [...groupmember, e.target.value];
-    });
-    this.setState({
-      groupmembers: newgroupmembers,
-    });
-    // eslint-disable-next-line react/destructuring-assignment
-    console.log(groupmembers); */
   };
 
   groupphtochangeHandler = (e) => {
@@ -107,17 +95,12 @@ class Createnewgroup extends Component {
 
   removegroupmember = (id) => {
     const { groupmembers } = this.state;
-    /* const updatedList = [...groupmembers];
-    updatedList.splice(id, 1);
-    console.log(updatedList);
-    this.setState({
-      groupmembers: updatedList,
-    }); */
     this.setState({
       groupmembers: groupmembers.filter((s) => s !== id),
     });
   };
 
+  // create group with the memebers added
   submitgroupcreate = async (e) => {
     e.preventDefault();
     const {

@@ -32,6 +32,7 @@ class Dashboard extends Component {
     this.settleupchnagehandler = this.settleupchnagehandler.bind(this);
   }
 
+  // get the total balances
   componentWillMount() {
     const userid1 = sessionStorage.getItem('userid');
     const useremail1 = sessionStorage.getItem('useremail');
@@ -56,6 +57,7 @@ class Dashboard extends Component {
     this.setState({ settleupwith: newarr });
   };
 
+  // send data to settle up with an user
   settleuphandler = (settleupwith1, e) => {
     e.preventDefault();
     this.setState({ popup: false, settleuplist: [], settleupwith: '' });
@@ -85,6 +87,7 @@ class Dashboard extends Component {
       });
   };
 
+  // function to get the total balances
   gettotalbalances = (userid) => {
     axios
       .get(`http://localhost:3001/gettotalbalances/${userid}`, {
@@ -97,7 +100,6 @@ class Dashboard extends Component {
         const username = sessionStorage.getItem('username');
         const useremail = sessionStorage.getItem('useremail');
         const defaultcurr = sessionStorage.getItem('defaultcurrency');
-        console.log(defaultcurr, useremail);
         const regExp = /\(([^)]+)\)/;
         const getvalue = regExp.exec(defaultcurr);
         const symbolvalue = getvalue[1];
@@ -106,8 +108,7 @@ class Dashboard extends Component {
           youowe: symbolvalue + numeral(el.You_owe).format('0,0.00'),
           youareowed: symbolvalue + numeral(el.You_are_owed).format('0,0.00'),
         }));
-        // Total Summary details
-        console.log(arraytotalsummary);
+
         this.setState({
           totalsummary: arraytotalsummary,
         });
@@ -121,12 +122,10 @@ class Dashboard extends Component {
           balance: el.balance,
           grpname: el.gpname,
         }));
-        console.log(arraytotalsummary);
+
         this.setState({
           totalsummary: arraytotalsummary,
         });
-
-        console.log(arrayindisummaries);
 
         // payee details for the logged in user
         const payeearr = [];
@@ -155,9 +154,6 @@ class Dashboard extends Component {
 
         let x;
         let y;
-        // let balancetotal = 0;
-        // const balancetotal2 = 0;
-
         for (let i = 0; i < arrayindisummaries.length; i += 1) {
           x = -1;
           if (
@@ -175,18 +171,11 @@ class Dashboard extends Component {
             }
             if (x > -1) {
               totalamaount[x] += arrayindisummaries[i].balance;
-              // totalamaount.push(balancetotal);
-              // totalpayername.push(arrayindisummaries[i].payername);
-              // totalpayeename.push(username);
-              console.log(totalamaount);
-              console.log(totalpayername);
-              console.log(totalpayeename);
             } else {
               totalpayername.push(arrayindisummaries[i].payername);
               totalamaount.push(arrayindisummaries[i].balance);
               totalpayeename.push(username);
             }
-            console.log(x, totalpayername);
           } else if (
             username === arrayindisummaries[i].payername &&
             arrayindisummaries[i].balance !== 0
@@ -203,17 +192,10 @@ class Dashboard extends Component {
             }
             if (x > -1) {
               totalamaount1[x] += arrayindisummaries[i].balance;
-              // totalamaount1.push(balancetotal2);
-              // totalpayeename1.push(arrayindisummaries[i].payeename);
-              // totalpayername1.push(username);
-              console.log(totalamaount1);
-              console.log(totalpayername1);
-              console.log(totalpayeename1);
             } else {
               totalpayeename1.push(arrayindisummaries[i].payeename);
               totalamaount1.push(arrayindisummaries[i].balance);
               totalpayername1.push(username);
-              // console.log();
             }
           }
         }
@@ -284,12 +266,7 @@ class Dashboard extends Component {
                 (el) => el === arrayindisummaries[j].payeeemail
               );
             }
-            /* if (y > -1) {
-              settleupemaillist.push(arrayindisummaries[j].payeeemail);
-            } else {
-              settleupnamelist.push(arrayindisummaries[j].payeename);
-              settleupemaillist.push(arrayindisummaries[j].payeeemail);
-            } */
+
             if (y === -1) {
               settleupnamelist.push(arrayindisummaries[j].payeename);
               settleupemaillist.push(arrayindisummaries[j].payeeemail);
@@ -304,12 +281,7 @@ class Dashboard extends Component {
                 (el) => el === arrayindisummaries[j].payeremail
               );
             }
-            /* if (y > -1) {
-              settleupemaillist.push(arrayindisummaries[j].payeremail);
-            } else {
-              settleupnamelist.push(arrayindisummaries[j].payername);
-              settleupemaillist.push(arrayindisummaries[j].payeremail);
-            } */
+
             if (y === -1) {
               settleupnamelist.push(arrayindisummaries[j].payername);
               settleupemaillist.push(arrayindisummaries[j].payeremail);
@@ -321,7 +293,6 @@ class Dashboard extends Component {
           value: settleupemaillist[indx],
           label: settleupnamelist[indx],
         }));
-        console.log(arrayforselect);
         this.setState({
           settleuplist: [...arrayforselect],
         });
@@ -427,7 +398,7 @@ class Dashboard extends Component {
                     <ul
                       className="group-expenses"
                       style={{
-                        color: '#3bb894',
+                        color: 'black',
                         'font-weight': 'bold',
                         'list-style-type': 'none',
                       }}

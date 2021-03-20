@@ -54,6 +54,7 @@ class Groupdetails extends Component {
     });
   }
 
+  // function to get grp expenses
   getgrpexpenses = (gpname) => {
     axios
       .get(`http://localhost:3001/getgrpexpenses/${gpname}`, {
@@ -89,6 +90,7 @@ class Groupdetails extends Component {
       .catch((err) => console.log(err));
   };
 
+  // function to get summary expenses
   getsummaryexpenses = (gpname) => {
     axios
       .get(`http://localhost:3001/getsummaryexpenses/${gpname}`, {
@@ -120,7 +122,6 @@ class Groupdetails extends Component {
         const payeeperson = [];
         const payeebalance = [];
         const payeename = [];
-        // const objofpayees = { payee: '', totalblnc: 0 };
 
         for (let i = 0; i < arrayofindividuals.length; i += 1) {
           x = -1;
@@ -131,7 +132,6 @@ class Groupdetails extends Component {
           }
 
           if (x === -1) {
-            console.log('inside if x=-1');
             payeeperson.push(arrayofindividuals[i].payee);
             payeename.push(arrayofindividuals[i].payeename);
             payeebalance.push(arrayofindividuals[i].balance);
@@ -146,7 +146,6 @@ class Groupdetails extends Component {
           formattotalamt:
             symbolvalue + numeral(payeebalance[indx]).format('0,0.00'),
         }));
-        console.log(arrayofsummaries);
         this.setState({
           summaries: [...arrayofsummaries],
         });
@@ -169,7 +168,6 @@ class Groupdetails extends Component {
   showHandler1 = () => {
     const { summaries } = this.state;
     const currentusrname = sessionStorage.getItem('username');
-    console.log(summaries.length);
     for (let i = 0; i < summaries.length; i += 1) {
       if (
         currentusrname === summaries[i].payee &&
@@ -201,7 +199,6 @@ class Groupdetails extends Component {
     this.setState({ popup: false, description: '', amount: '' });
     const { grpname } = this.state;
     const { useremail } = this.state;
-    // const useremail = sessionStorage.getItem('useremail');
     const bill = {
       descript,
       amountvalue,

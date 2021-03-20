@@ -141,25 +141,6 @@ class Profilepage extends Component {
     formdata.append('language', language);
     // const formheaders = formdata.getHeaders();
     console.log(formdata);
-    /* 
-    axios
-      .post('http://localhost:3001/updateprofile', formdata, {
-        headers: {
-          ...formheaders,
-        },
-      })
-      
-      axios({
-      method: 'post',
-      url: 'http://localhost:3001/updateprofile',
-      data: formdata,
-      headers: { 'content-type': 'multipart/form-data' }, 
-    }) 
-    // 
-    fetch('http://localhost:3001/updateprofile', {
-      method: 'post',
-      data: formdata,
-    }) */
     axios({
       method: 'post',
       url: 'http://localhost:3001/updateprofile',
@@ -176,6 +157,10 @@ class Profilepage extends Component {
           sessionStorage.setItem('username', response.data.username);
           sessionStorage.setItem('useremail', response.data.email);
           sessionStorage.setItem('profilepic', response.data.profilephoto);
+          sessionStorage.setItem(
+            'defaultcurrency',
+            response.data.defaultcurrency
+          );
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({ redirecttohome: redirectVar1 });
         } else {
