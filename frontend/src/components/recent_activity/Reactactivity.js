@@ -283,7 +283,7 @@ class Recentactivity extends Component {
             <Sidebarcomp />
           </div>
 
-          <div className="dashboard-box">
+          <div className="dashboard-box" style={{ overflowY: 'auto' }}>
             <section className="dashboard-heading-buttons">
               <section className="dashboard-heading">
                 <h1>Recent Activity </h1>
@@ -296,7 +296,7 @@ class Recentactivity extends Component {
               <section className="dashboard-center-sec">
                 <div className="dashboard-center-section-block">
                   <div className="title" style={{ 'text-align': 'center' }}>
-                    <h2>RECENT ACTIVITY</h2>
+                    <h7>RECENT ACTIVITY</h7>
                   </div>
                 </div>
 
@@ -375,7 +375,7 @@ class Recentactivity extends Component {
             <section className="transcations-sec1" style={{ width: '80%' }}>
               <div className="tranactions-heading1">
                 {checkifactivitynull ? (
-                  <h2>YOU HAVE NO ACTIVTIES TO DISPLAY ! </h2>
+                  <h7>YOU HAVE NO ACTIVTIES TO DISPLAY ! </h7>
                 ) : (
                   <div>
                     {' '}

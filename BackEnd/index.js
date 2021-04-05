@@ -124,7 +124,12 @@ app.post('/signup', function (req, res) {
               console.log(req.session.email);
               idusers1 = output.insertId;
               console.log(idusers1);
-              res.status(200).send({ username: username, user_id: idusers1, email: email });
+              res.status(200).send({
+                username: username,
+                user_id: idusers1,
+                email: email,
+                currencydef: 'USD ($)',
+              });
             }
           }
         );
@@ -158,16 +163,14 @@ app.post('/login', function (req, res) {
             req.session.cookie.username = output[0].usersname;
             req.session.cookie.email = email;
             //console.log(req.session.cookie.username,req.session.cookie.email )
-            res
-              .status(200)
-              .send({
-                username: output[0].usersname,
-                user_id: output[0].idusers,
-                email: output[0].email,
-                profilepic: output[0].profphoto,
-                currencydef: output[0].currencydef,
-                TZ: output[0].timezone,
-              });
+            res.status(200).send({
+              username: output[0].usersname,
+              user_id: output[0].idusers,
+              email: output[0].email,
+              profilepic: output[0].profphoto,
+              currencydef: output[0].currencydef,
+              TZ: output[0].timezone,
+            });
           } else {
             res.status(401).send('Please enter valid password!');
           }
@@ -201,7 +204,7 @@ app.get('/getuserdetails/:id', function (req, res) {
 
 app.post('/updateprofile', updatepic.single('profile_avatar'), function (req, res) {
   console.log('Inside  updateprofile');
-  // console.log(req.body);
+  console.log(req.body);
   const userid = req.body.idusers;
   const username = req.body.username;
   const email = req.body.email;
@@ -262,14 +265,12 @@ app.post('/updateprofile', updatepic.single('profile_avatar'), function (req, re
       // console.log(output[0].usersname)
       req.session.cookie.username = username;
       req.session.cookie.email = email;
-      res
-        .status(200)
-        .send({
-          username: username,
-          email: email,
-          profilephoto: profilephoto,
-          defaultcurrency: defaultcurrency,
-        });
+      res.status(200).send({
+        username: username,
+        email: email,
+        profilephoto: profilephoto,
+        defaultcurrency: defaultcurrency,
+      });
     }
   });
 });
@@ -300,8 +301,9 @@ app.post('/createnewgroup', grpupdatepic.single('group_avatar'), function (req, 
   const userid = req.body.idusers;
   const grpname = req.body.group_name;
   const groupcreatedbyemail = req.body.groupcreatedbyemail;
+  const gpmememails = req.body.gpmememails;
   const grpmemadded = { type: 'gpemails', gpemails: req.body.gpmememails };
-  console.log(grpmemadded);
+  console.log(gpmememails, grpmemadded);
   var stringgpmemadded = JSON.stringify(req.body.gpmememails);
   var replacebraces = stringgpmemadded.replace(/[\[\]\'\"]/g, '');
   var gpmems = replacebraces.split(',');

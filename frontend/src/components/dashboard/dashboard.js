@@ -452,7 +452,7 @@ class Dashboard extends Component {
               </div>
               <div className="transactions-owe">
                 {checkifyouowenull ? (
-                  <h2>YOU OWE NOTHING</h2>
+                  <h7>YOU OWE NOTHING</h7>
                 ) : (
                   <div>
                     {' '}
@@ -522,7 +522,7 @@ class Dashboard extends Component {
               </div>
               <div className="transactions-owed">
                 {checkifyouowednull ? (
-                  <h2>YOU ARE OWED NOTHING</h2>
+                  <h7>YOU ARE OWED NOTHING</h7>
                 ) : (
                   <div>
                     {' '}

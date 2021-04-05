@@ -161,8 +161,12 @@ class Profilepage extends Component {
             'defaultcurrency',
             response.data.defaultcurrency
           );
-          const redirectVar1 = <Redirect to="/dashboard" />;
-          this.setState({ redirecttohome: redirectVar1 });
+          this.getusercurrentdetails(userid);
+          this.setState({
+            updatedpic: false,
+          });
+          //const redirectVar1 = <Redirect to="/dashboard" />;
+          //this.setState({ redirecttohome: redirectVar1 });
         } else {
           this.setState({
             redirecttohome: null,
@@ -185,7 +189,7 @@ class Profilepage extends Component {
     if (!cookie.load('cookie')) {
       redirectVar = <Redirect to="/" />;
     }
-    const { redirecttohome } = this.state;
+    //const { redirecttohome } = this.state;
     let profilepic = '/Profile_photos/default_avatar.png';
     const {
       username,
@@ -208,7 +212,6 @@ class Profilepage extends Component {
         {redirectVar}
         <Navheader />
         <div className="profilepage-block">
-          {redirecttohome}
           <h2> Your account </h2>
           <section>
             <div className="avatar-div">

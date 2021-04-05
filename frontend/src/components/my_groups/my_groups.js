@@ -4,7 +4,7 @@ import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Button from 'react-bootstrap/Button';
 import { Modal } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 // import { Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
@@ -25,6 +25,7 @@ class Mygroups extends Component {
       popup: false,
       gpselectoptions: [],
       selectedvalue: {},
+      groupinvite: '',
     };
 
     // Bind the handlers to this class
@@ -49,12 +50,12 @@ class Mygroups extends Component {
     });
   }
 
-  showHandler = () => {
-    this.setState({ popup: true });
+  showHandler = (grpname) => {
+    this.setState({ popup: true, groupinvite: grpname });
   };
 
   closeHandler = () => {
-    this.setState({ popup: false });
+    this.setState({ popup: false, groupinvite: '' });
   };
 
   getuserpgroups = (userid) => {
@@ -102,14 +103,14 @@ class Mygroups extends Component {
       .catch((err) => console.log(err));
   };
 
-  acceptinvitation = (groupname, e) => {
-    e.preventDefault();
-    console.log(e.target.value);
+  acceptinvitation = () => {
+    //e.preventDefault();
+    //console.log(e.target.value);
     this.setState({ popup: false });
-    const { popup, userid, useremail } = this.state;
-    const currentgrp = groupname;
+    const { popup, userid, useremail, groupinvite } = this.state;
+    //const currentgrp = groupinvite;
     const data = {
-      currentgrp,
+      currentgrp: groupinvite,
       userid,
       useremail,
     };
@@ -132,16 +133,17 @@ class Mygroups extends Component {
         console.log(err.response.data);
         alert(err.response.data);
       });
+    this.setState({ groupinvite: '' });
   };
 
-  denyinvitation = (groupname, e) => {
-    e.preventDefault();
-    console.log(e.target.value);
+  denyinvitation = () => {
+    //e.preventDefault();
+    //console.log(e.target.value);
     this.setState({ popup: false });
-    const { popup, userid, useremail } = this.state;
-    const currentgrp = groupname;
+    const { popup, userid, useremail, groupinvite } = this.state;
+    //const currentgrp = groupname;
     const data = {
-      currentgrp,
+      currentgrp: groupinvite,
       userid,
       useremail,
     };
@@ -164,6 +166,7 @@ class Mygroups extends Component {
         console.log(err.response.data);
         alert(err.response.data);
       });
+    this.setState({ groupinvite: '' });
   };
 
   gotogrouppage = (groupname, e) => {
@@ -188,7 +191,7 @@ class Mygroups extends Component {
     const { redirecttopage } = this.state;
     const { groupslist, gpselectoptions } = this.state;
     const { invitelist } = this.state;
-    const { popup, selectedvalue } = this.state;
+    const { popup, selectedvalue, groupinvite } = this.state;
 
     console.log(groupslist, invitelist, selectedvalue);
     let checkifinvitesnull = false;
@@ -221,15 +224,12 @@ class Mygroups extends Component {
             <section className="mygroups-left-sec">
               <div className="mygroups-left-section-block">
                 <div className="title">
-                  <h3>Invitation Pending </h3>
+                  <h6>Invitation Pending </h6>
                 </div>
               </div>
               <div>
                 {checkifinvitesnull ? (
-                  <h4>
-                    {' '}
-                    <br /> NO INVITES PENDING!
-                  </h4>
+                  <h7> NO INVITES PENDING!</h7>
                 ) : (
                   <div>
                     {' '}
@@ -238,46 +238,44 @@ class Mygroups extends Component {
                         <li>
                           <Button
                             className="Signup-default"
-                            onClick={this.showHandler}
+                            onClick={() => this.showHandler(groupname)}
                             style={{
-                              height: '50px',
+                              height: '33px',
                               width: '350px',
-                              'font-size': '22px',
+                              'font-size': '17px',
                             }}
                           >
                             {groupname}
                           </Button>
-
-                          <Modal show={popup} onHide={this.closeHandler}>
-                            <Modal.Header closeButton>
-                              <Modal.Title>Group Invitation</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                              Do you wish to accept the invitaion to join the
-                              group or reject the invitation?
-                            </Modal.Body>
-                            <Modal.Footer>
-                              <Button
-                                className="login-default"
-                                onClick={(e) =>
-                                  this.acceptinvitation(groupname, e)
-                                }
-                              >
-                                √ Accept
-                              </Button>
-                              <Button
-                                className="Signup-default"
-                                onClick={(e) =>
-                                  this.denyinvitation(groupname, e)
-                                }
-                              >
-                                x Reject
-                              </Button>
-                            </Modal.Footer>
-                          </Modal>
                         </li>
                       </ul>
                     ))}
+                    <Modal show={popup} onHide={this.closeHandler}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Group Invitation</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        Do you wish to accept the invitaion to join the group{' '}
+                        <span>
+                          <b>{groupinvite}</b>
+                        </span>{' '}
+                        or reject the invitation?
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button
+                          className="login-default"
+                          onClick={() => this.acceptinvitation()}
+                        >
+                          √ Accept
+                        </Button>
+                        <Button
+                          className="Signup-default"
+                          onClick={() => this.denyinvitation()}
+                        >
+                          x Reject
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 )}
               </div>
@@ -286,15 +284,15 @@ class Mygroups extends Component {
             <section className="mygroups-center-sec">
               <div className="mygroups-center-section-block">
                 <div className="title">
-                  <h3>My Groups </h3>
+                  <h6>My Groups </h6>
                 </div>
               </div>
               {checkifgroupsnull ? (
-                <h4>
+                <h7>
                   {' '}
                   <br />
                   YOU ARE NOT PART OF ANY GROUPS AS YET!
-                </h4>
+                </h7>
               ) : (
                 <div>
                   {' '}
@@ -306,9 +304,9 @@ class Mygroups extends Component {
                           size="lg"
                           onClick={(e) => this.gotogrouppage(groupname, e)}
                           style={{
-                            height: '50px',
+                            height: '33px',
                             width: '350px',
-                            'font-size': '22px',
+                            'font-size': '17px',
                           }}
                         >
                           {groupname}

@@ -5,7 +5,7 @@ import { Redirect } from 'react-router';
 // import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { Modal, Form, Image } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
+import { isEmpty, isNumber } from 'lodash';
 import numeral from 'numeral';
 import Sidebarcomp from '../navbar/sidebar';
 import Navheader from '../navbar/navbar';
@@ -23,7 +23,7 @@ class Groupdetails extends Component {
       popup: false,
       popup1: false,
       description: '',
-      amount: '',
+      amount: 0.0,
       activties: [{}],
       individuals: [{}],
       summaries: [{}],
@@ -162,7 +162,7 @@ class Groupdetails extends Component {
   };
 
   closeHandler = () => {
-    this.setState({ popup: false, description: '', amount: '' });
+    this.setState({ popup: false, description: '', amount: 0.0 });
   };
 
   showHandler1 = () => {
@@ -177,6 +177,12 @@ class Groupdetails extends Component {
         return;
       }
     }
+    if (summaries.length === 0) {
+      this.setState({
+        popup1: true,
+      });
+      return;
+    }
     alert('Please Clear all the debts to leave the group!');
   };
 
@@ -189,14 +195,18 @@ class Groupdetails extends Component {
   };
 
   amtchangehandler = (e) => {
-    this.setState({ amount: e.target.value });
+    this.setState({ amount: Number(e.target.value) });
   };
 
   addhandler = (des, amt, e) => {
     e.preventDefault();
+    if (!des || !amt || typeof amt !== 'number' || amt < 0) {
+      alert(' Please enter valid description or amount!! ');
+      return;
+    }
     const descript = des;
     const amountvalue = amt;
-    this.setState({ popup: false, description: '', amount: '' });
+    this.setState({ popup: false, description: '', amount: 0.0 });
     const { grpname } = this.state;
     const { useremail } = this.state;
     const bill = {
@@ -327,7 +337,7 @@ class Groupdetails extends Component {
                         />
                         <Form.Label>Amount: </Form.Label>
                         <Form.Control
-                          type="text"
+                          type="number"
                           onChange={this.amtchangehandler}
                           value={amount}
                           placeholder="Amount"
@@ -388,7 +398,7 @@ class Groupdetails extends Component {
                 <br />
                 <div className="grouppage-block-border">
                   {checkifactivitiesnull ? (
-                    <h2>No transactions to display!</h2>
+                    <h7>No transactions to display!</h7>
                   ) : (
                     <div>
                       {' '}
@@ -446,7 +456,7 @@ class Groupdetails extends Component {
         <div className="grouppage-right" />
         <div className="title"> </div>
         {checkifsummiesnull ? (
-          <h5>NONE HAVE ACCEPTED THE INVITES TO THE GROUP!</h5>
+          <h7>NONE HAVE ACCEPTED THE INVITES TO THE GROUP!</h7>
         ) : (
           <div>
             {' '}

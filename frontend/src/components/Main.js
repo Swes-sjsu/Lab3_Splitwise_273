@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 // import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Route, Switch } from 'react-router-dom';
-import Login from './login/Login';
-import Signup from './signup/Signup';
-import LandingPage from './landingPage/LandingPage';
+import Login from './Login/Login';
+import Signup from './Signup/Signup';
+import LandingPage from './LandingPage/LandingPage';
 import Dashboard from './dashboard/dashboard';
 import Createnewgroup from './create_new_group/create_new_group';
 import Profilepage from './profilepage/profile_page';

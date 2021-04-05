@@ -71,6 +71,7 @@ class Createnewgroup extends Component {
     const { groupmembers } = this.state;
     const updatedList = [...groupmembers];
     updatedList[id].gmemail = e.value;
+    updatedList[id].gmusername = e.label;
     console.log(updatedList);
     this.setState(updatedList);
   };
@@ -96,7 +97,7 @@ class Createnewgroup extends Component {
   removegroupmember = (id) => {
     const { groupmembers } = this.state;
     this.setState({
-      groupmembers: groupmembers.filter((s) => s !== id),
+      groupmembers: groupmembers.filter((s) => s.gmemail !== id.gmemail),
     });
   };
 
@@ -115,15 +116,34 @@ class Createnewgroup extends Component {
     const gplist = [];
     if (groupname === '') {
       alert('Please enter a group name');
+      this.setState({
+        errorMessage1: 'Please enter a group name!',
+      });
+      return;
     }
     for (let i = 0; i < groupmembers.length; i += 1) {
       if (groupmembers[i].gmemail === '') {
         alert('Please fill the username or email id');
+        return;
       } else {
         gplist.push(groupmembers[i].gmemail);
       }
     }
     console.log(gplist);
+
+    let duplicateExist = false;
+    duplicateExist = gplist.some((element, index) => {
+      return gplist.indexOf(element) !== index;
+    });
+
+    if (duplicateExist) {
+      alert('Please select unique group memebers!');
+      this.setState({
+        errorMessage: 'Please select unique group members!',
+      });
+      return;
+    }
+
     const formdata = new FormData(this.groupform.current);
     if (updatedpic) {
       formdata.append('group_avatar', grouphoto, grouphoto.name);
@@ -177,7 +197,7 @@ class Createnewgroup extends Component {
     }
     const { email, username } = this.state;
     const { groupmembers } = this.state;
-    const { errorMessage } = this.state;
+    const { errorMessage, errorMessage1 } = this.state;
     const { redirecttogroup } = this.state;
     const { selectUsername } = this.state;
     console.log(username, email);
@@ -237,6 +257,10 @@ class Createnewgroup extends Component {
                       required
                     />
                   </div>
+                  <p className="errmsg" style={{ color: 'maroon' }}>
+                    {' '}
+                    {errorMessage1}{' '}
+                  </p>
                   <br />
                   <div className="group_members">
                     <div className="users">
@@ -251,7 +275,7 @@ class Createnewgroup extends Component {
                             style={{
                               width: '300px',
                               display: 'flex',
-                              'flex-direction': 'row',
+                              flexDirection: 'row',
                             }}
                           >
                             <div
@@ -264,7 +288,10 @@ class Createnewgroup extends Component {
                                 options={selectUsername}
                                 className="div-select"
                                 type="text"
-                                // value={groupmember.gmusersname}
+                                value={{
+                                  label: groupmember.gmusername,
+                                  value: groupmember.gmemail,
+                                }}
                                 name={`group_members_${id + 1}_username`}
                                 id={`group_members_${id + 1}_username`}
                                 onChange={(e) =>
@@ -309,6 +336,10 @@ class Createnewgroup extends Component {
                     </div>
                     <div id="invite_link_container">
                       <div className="invitelink">
+                        <p className="errmsg" style={{ color: 'maroon' }}>
+                          {' '}
+                          {errorMessage}{' '}
+                        </p>
                         <div />
                       </div>
                       <div className="savebtn">
@@ -321,10 +352,6 @@ class Createnewgroup extends Component {
                         >
                           Save
                         </button>
-                        <p className="errmsg" style={{ color: 'maroon' }}>
-                          {' '}
-                          {errorMessage}{' '}
-                        </p>
                         {redirecttogroup}
                       </div>
                     </div>

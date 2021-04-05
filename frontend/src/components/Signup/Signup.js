@@ -122,10 +122,12 @@ class Signup extends Component {
             const resuserid = response.data.user_id;
             const resusername = response.data.username;
             const resemail = response.data.email;
+            const rescurrency = response.data.currencydef;
             sessionStorage.setItem('userid', resuserid);
             sessionStorage.setItem('username', resusername);
             sessionStorage.setItem('useremail', resemail);
             sessionStorage.setItem('profilepic', null);
+            sessionStorage.setItem('defaultcurrency', rescurrency);
             const redirectVar1 = <Redirect to="/dashboard" />;
             this.setState({ redirecttohome: redirectVar1 });
           } else {

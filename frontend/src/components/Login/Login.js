@@ -23,13 +23,10 @@ class Login extends Component {
     this.submitLogin = this.submitLogin.bind(this);
   }
 
-  // Call the Will Mount to set the auth Flag to false
   componentWillMount() {
     this.setState({
-      // verifyauth: false,
       redirecttohome: null,
     });
-    // sessionStorage.clear();
   }
 
   // username change handler to update state variable with the text entered by the user
@@ -50,11 +47,22 @@ class Login extends Component {
   submitLogin = async (e) => {
     // prevent page from refresh
     e.preventDefault();
+
     const { email, password } = this.state;
+    if (email === '') {
+      alert('Please enter email address');
+      this.setState({
+        errorMessage1: 'Please enter email address!',
+      });
+      return;
+    }
     const data = {
       email,
       password,
     };
+    this.setState({
+      errorMessage1: '',
+    });
     // set the with credentials to true
     axios.defaults.withCredentials = true;
     // make a post request with the user data
@@ -102,7 +110,7 @@ class Login extends Component {
     if (cookie.load('cookie')) {
       redirectVar = <Redirect to="/dashboard" />;
     }
-    const { errorMessage } = this.state;
+    const { errorMessage, errorMessage1 } = this.state;
     const { redirecttohome } = this.state;
     return (
       <div>
@@ -129,6 +137,10 @@ class Login extends Component {
                     formNoValidate
                   />
                 </label>
+                <p className="errmsg" style={{ color: 'maroon' }}>
+                  {' '}
+                  {errorMessage1}{' '}
+                </p>
               </div>
               <div className="form-group">
                 <label htmlFor="email">
