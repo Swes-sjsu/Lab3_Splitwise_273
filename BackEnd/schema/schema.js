@@ -13,10 +13,11 @@ const {
   getpgroupinvitesQuery,
   getgrpexpensesQuery,
   getsummaryexpensesQuery,
+  gettotalbalancesQuery,
 } = require('../routes/getqueries');
 const { acceptinvitationQuery, denyinvitationQuery } = require('../routes/acceptdenyinvite');
-const { addbillQuery } = require('../routes/addbill');
-const { creategroupQuery } = require('../routes/creategroup');
+const { addbillQuery, settleupQuery } = require('../routes/addbill');
+const { creategroupQuery, leavegroupQuery } = require('../routes/create&leavegroup');
 const updateprofileQuery = require('../routes/updateprofile');
 const saltRounds = 10;
 
@@ -84,10 +85,14 @@ const BalancesType = new GraphQLObjectType({
     bid: { type: GraphQLID },
     payer: { type: GraphQLString }, // payer email
     payee: { type: GraphQLString }, // payee email
-    payer_name: { type: GraphQLString },
-    payee_name: { type: GraphQLString },
+    payer_username: { type: GraphQLString },
+    payee_username: { type: GraphQLString },
     balance: { type: GraphQLFloat },
     settled: { type: GraphQLInt },
+    Total_balance: { type: GraphQLFloat },
+    You_owe: { type: GraphQLFloat },
+    You_are_owed: { type: GraphQLFloat },
+    gpname: { type: GraphQLString },
   }),
 });
 
@@ -172,6 +177,17 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, context) {
         let result = await getsummaryexpensesQuery(args);
+        console.log(result);
+        return result;
+      },
+    },
+    totalsummary: {
+      type: new GraphQLList(BalancesType),
+      args: {
+        user_id: { type: GraphQLID },
+      },
+      async resolve(parent, args, context) {
+        let result = await gettotalbalancesQuery(args);
         console.log(result);
         return result;
       },
@@ -272,6 +288,32 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(parent, args, context) {
         let result = await addbillQuery(args);
+        console.log(result);
+        return result;
+      },
+    },
+    settleup: {
+      type: TransactionsType,
+      args: {
+        user_id: { type: GraphQLID },
+        email: { type: GraphQLString },
+        settleupwith: { type: GraphQLString },
+      },
+      async resolve(parent, args, context) {
+        let result = await settleupQuery(args);
+        console.log(result);
+        return result;
+      },
+    },
+    leavegroup: {
+      type: GroupType,
+      args: {
+        user_id: { type: GraphQLID },
+        email: { type: GraphQLString },
+        groupname: { type: GraphQLString },
+      },
+      async resolve(parent, args, context) {
+        let result = await leavegroupQuery(args);
         console.log(result);
         return result;
       },

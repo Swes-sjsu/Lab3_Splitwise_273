@@ -132,7 +132,13 @@ class Signup extends Component {
           const resusername = response.data.signup.username;
           const resemail = response.data.signup.email;
           const rescurrency = response.data.signup.currencydef;
-          const resprofile = response.data.signup.profilepic;
+          let resprofile;
+          if (response.data.signup.profilepic === '' || ' ' || 'undefined') {
+            resprofile =
+              'https://splitwise-profilepictures.s3.amazonaws.com/default_avatar.png';
+          } else {
+            resprofile = response.data.signup.profilepic;
+          }
           sessionStorage.setItem('userid', resuserid);
           sessionStorage.setItem('username', resusername);
           sessionStorage.setItem('useremail', resemail);

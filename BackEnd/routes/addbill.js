@@ -51,4 +51,42 @@ const addbillQuery = (req) => {
   });
 };
 
-module.exports = { addbillQuery };
+const settleupQuery = (req) => {
+  return new Promise(async (resolve, reject) => {
+    console.log('Inside  settleup');
+    const userid = req.user_id;
+    const settledupemail = req.settleupwith;
+    const currentuseremail = req.email;
+
+    sqlquery =
+      "UPDATE balancetbl SET balance=0, settled=2 where ((payer='" +
+      currentuseremail +
+      "' and payee='" +
+      settledupemail +
+      "') or (payer='" +
+      settledupemail +
+      "' and payee='" +
+      currentuseremail +
+      "')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('" +
+      settledupemail +
+      "', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '" +
+      currentuseremail +
+      "')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('" +
+      currentuseremail +
+      "', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '" +
+      settledupemail +
+      "'))";
+    console.log(sqlquery);
+    dbconnection.query(sqlquery, async (err, output, fields) => {
+      if (err) {
+        console.log(err);
+        reject({ status: 400, message: err.message });
+      } else {
+        console.log(output);
+        resolve({ status: 200, message: 'settled up succesfully!' });
+      }
+    });
+  });
+};
+
+module.exports = { addbillQuery, settleupQuery };

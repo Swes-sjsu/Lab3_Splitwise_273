@@ -114,4 +114,37 @@ const creategroupQuery = (req) => {
   });
 };
 
-module.exports = { creategroupQuery };
+const leavegroupQuery = (req) => {
+  return new Promise(async (resolve, reject) => {
+    console.log('Inside  leavegroup');
+    //console.log(req.body);
+    const userid = req.user_id;
+    const useremail = req.email;
+    const grpname = req.groupname;
+    //console.log(userid, grpname)
+    sqlquery =
+      'DELETE ug,sb,sb1 FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN balancetbl as sb1 INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN spgroups as gp2 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid  and sb1.groupid=gp2.groupid where ug.userid= ' +
+      userid +
+      " and gp.gpname='" +
+      grpname +
+      "' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='" +
+      useremail +
+      "' and sb1.payer='" +
+      useremail +
+      "' and gp1.gpname='" +
+      grpname +
+      "'; ";
+    //console.log(sqlquery);
+    dbconnection.query(sqlquery, async (err, output, fields) => {
+      if (err) {
+        //console.log(err);
+        reject({ status: 400, message: err.message });
+      } else {
+        //console.log(output)
+        resolve({ status: 200, message: 'Left Group Succesfully!!' });
+      }
+    });
+  });
+};
+
+module.exports = { creategroupQuery, leavegroupQuery };

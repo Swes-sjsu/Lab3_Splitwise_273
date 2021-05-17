@@ -13,9 +13,6 @@ const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema/schema');
 const saltRounds = 10;
 
-//use cors to allow cross origin resource sharing
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-
 //use express session to maintain session data
 app.use(
   session({
@@ -28,7 +25,8 @@ app.use(
 );
 
 app.use(bodyParser.json());
-
+//use cors to allow cross origin resource sharing
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 //Allow Access Control
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -45,7 +43,7 @@ app.use(function (req, res, next) {
 app.use('/graphql', (req, res) => {
   return graphqlHTTP({
     schema,
-    graphiql: true, // or whatever you want
+    graphiql: true,
     context: { req, res },
   })(req, res);
 });
@@ -88,64 +86,7 @@ var grpupdatepic = multer({
   fileFilter: filetypes,
 });
 
-app.post('/leavegroup', function (req, res) {
-  console.log('Inside  leavegroup');
-  //console.log(req.body);
-  const userid = req.body.userid;
-  const useremail = req.body.useremail;
-  const grpname = req.body.grpname;
-  //console.log(userid, grpname)
-  sqlquery =
-    'DELETE ug,sb,sb1 FROM usersgroups as ug INNER JOIN balancetbl as sb INNER JOIN balancetbl as sb1 INNER JOIN spgroups as gp INNER JOIN spgroups as gp1 INNER JOIN spgroups as gp2 INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers and sb.groupid=gp1.groupid  and sb1.groupid=gp2.groupid where ug.userid= ' +
-    userid +
-    " and gp.gpname='" +
-    grpname +
-    "' and ug.invitedaccepted=1 and sb.payee_invite=1 and sb1.payer_invite=1 and sb.payee='" +
-    useremail +
-    "' and sb1.payer='" +
-    useremail +
-    "' and gp1.gpname='" +
-    grpname +
-    "'; ";
-  //console.log(sqlquery);
-  dbconnection.query(sqlquery, async (err, output, fields) => {
-    if (err) {
-      //console.log(err);
-      res.status(400).send('Error!');
-    } else {
-      //console.log(output)
-      res.status(200).send('Left Group Succesfully!!');
-    }
-  });
-});
-
-app.get('/gettotalbalances/:userid', function (req, res) {
-  console.log('Inside  getgrpexpenses');
-  console.log(req.body);
-  const userid = req.params.userid;
-  console.log(userid);
-  sqlquery =
-    'SELECT sb.payer,  u.usersname as payer_username, sb.payee, u1.usersname as payee_username,sb.balance, sb.groupid, gp.gpname FROM balancetbl sb JOIN spgroups gp JOIN users u JOIN users u1 ON sb.groupid=gp.groupid and sb.payer=u.email and sb.payee= u1.email where payee_invite=1 and payer_invite=1 and u.idusers=' +
-    userid +
-    ' or u1.idusers=' +
-    userid +
-    ' ORDER BY sb.groupid ; SELECT @youareowed := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payer where payee_invite=1 and payer_invite=1 and u.idusers=' +
-    userid +
-    ')  AS You_are_owed, @youowe := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payee where payee_invite=1 and payer_invite=1 and u.idusers=' +
-    userid +
-    ')  AS You_owe,(@youareowed - @youowe)  AS Total_balance;';
-
-  dbconnection.query(sqlquery, async (err, output, fields) => {
-    if (err) {
-      console.log(err);
-      res.status(400).send('Error!');
-    } else {
-      console.log(output);
-      res.status(200).send(output);
-    }
-  });
-});
-
+/*
 app.get('/getrecentacitvities/:userid', function (req, res) {
   console.log('Inside  getrecentacitvities');
   console.log(req.body);
@@ -168,43 +109,7 @@ app.get('/getrecentacitvities/:userid', function (req, res) {
     }
   });
 });
-
-app.post('/settleup', function (req, res) {
-  console.log('Inside  settleup');
-  console.log(req.body);
-  const userid = req.body.userid;
-  const settledupemail = req.body.settleupwith;
-  const currentuseremail = req.body.useremail;
-  console.log(userid);
-  sqlquery =
-    "UPDATE balancetbl SET balance=0, settled=2 where ((payer='" +
-    currentuseremail +
-    "' and payee='" +
-    settledupemail +
-    "') or (payer='" +
-    settledupemail +
-    "' and payee='" +
-    currentuseremail +
-    "')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('" +
-    settledupemail +
-    "', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '" +
-    currentuseremail +
-    "')); INSERT INTO transaction ( payed_by, groupid, tamount, tdescription) VALUES ('" +
-    currentuseremail +
-    "', -1, 0, (Select CONCAT('Settled up with',' ',usersname) from users where email = '" +
-    settledupemail +
-    "'))";
-  console.log(sqlquery);
-  dbconnection.query(sqlquery, async (err, output, fields) => {
-    if (err) {
-      console.log(err);
-      res.status(400).send('Error!');
-    } else {
-      console.log(output);
-      res.status(200).send('settled up succesfully!');
-    }
-  });
-});
+*/
 
 //start your server on port 3001
 app.listen(3001);

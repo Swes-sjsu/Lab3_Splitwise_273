@@ -156,7 +156,7 @@ const getsummaryexpensesQuery = (req) => {
     console.log('Inside  getgrpexpenses');
 
     const gpname = req.groupname;
-    let bid, payer, payee, payer_name, payee_name, balance, settled;
+    let bid, payer, payee, payer_username, payee_username, balance, settled;
     let outputlist = [];
     sqlquery =
       "SELECT count(*) FROM usersgroups ug INNER JOIN spgroups as gp INNER JOIN users as u ON ug.groupid=gp.groupid and ug.userid=u.idusers WHERE gp.gpname ='" +
@@ -179,16 +179,16 @@ const getsummaryexpensesQuery = (req) => {
           } else {
             for (let i = 0; i < output1.length; i++) {
               bid = output1[i].id;
-              payer_name = output1[i].payer_name;
-              payee_name = output1[i].payee_name;
+              payer_username = output1[i].payer_name;
+              payee_username = output1[i].payee_name;
               payer = output1[i].payer;
               payee = output1[i].payee;
               balance = output1[i].balance;
               settled = output1[i].settled;
               let details = {
                 bid: bid,
-                payer_name: payer_name,
-                payee_name: payee_name,
+                payer_username: payer_username,
+                payee_username: payee_username,
                 payer: payer,
                 payee: payee,
                 balance: balance,
@@ -204,6 +204,79 @@ const getsummaryexpensesQuery = (req) => {
   });
 };
 
+const gettotalbalancesQuery = (req) => {
+  return new Promise(async (resolve, reject) => {
+    console.log('Inside  getgrpexpenses');
+    const userid = req.user_id;
+    let Total_balance,
+      You_owe,
+      You_are_owed,
+      payer,
+      payer_username,
+      payee,
+      payee_username,
+      balance,
+      gpname;
+    let outputlist = [];
+    sqlquery =
+      'SELECT sb.payer,  u.usersname as payer_username, sb.payee, u1.usersname as payee_username,sb.balance, sb.groupid, gp.gpname FROM balancetbl sb JOIN spgroups gp JOIN users u JOIN users u1 ON sb.groupid=gp.groupid and sb.payer=u.email and sb.payee= u1.email where payee_invite=1 and payer_invite=1 and u.idusers=' +
+      userid +
+      ' or u1.idusers=' +
+      userid +
+      ' ORDER BY sb.groupid ; SELECT @youareowed := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payer where payee_invite=1 and payer_invite=1 and u.idusers=' +
+      userid +
+      ')  AS You_are_owed, @youowe := (SELECT SUM(balance) as you_are_owed FROM splitwise.balancetbl sb JOIN users u JOIN spgroups gp ON sb.groupid=gp.groupid and u.email = sb.payee where payee_invite=1 and payer_invite=1 and u.idusers=' +
+      userid +
+      ')  AS You_owe,(@youareowed - @youowe)  AS Total_balance;';
+
+    dbconnection.query(sqlquery, async (err, output, fields) => {
+      if (err) {
+        console.log(err);
+        reject({ status: 400, message: err.message });
+      } else {
+        console.log(output);
+        for (let i = 0; i < output.length - 1; i++) {
+          if (output[i].You_owe !== 'undefined' || '') {
+            for (let j = 0; j < output[i].length; j++) {
+              payer_username = output[i][j].payer_username;
+              payee_username = output[i][j].payee_username;
+              payer = output[i][j].payer;
+              payee = output[i][j].payee;
+              balance = output[i][j].balance;
+              gpname = output[i][j].gpname;
+              let details = {
+                payer_username: payer_username,
+                payee_username: payee_username,
+                payer: payer,
+                payee: payee,
+                balance: balance,
+                gpname: gpname,
+              };
+              outputlist.push(details);
+            }
+          }
+        }
+        let len = output.length;
+        if (output[len - 1]) {
+          for (let j = 0; j < output[len - 1].length; j++) {
+            console.log('swes', output[j]);
+            Total_balance = output[len - 1][j].Total_balance;
+            You_owe = output[len - 1][j].You_owe;
+            You_are_owed = output[len - 1][j].You_are_owed;
+            let details = {
+              Total_balance: Total_balance,
+              You_owe: You_owe,
+              You_are_owed: You_are_owed,
+            };
+            outputlist.push(details);
+          }
+        }
+        resolve(outputlist, (status = 200), (message = 'get group summary expenses Succesful'));
+      }
+    });
+  });
+};
+
 module.exports = {
   userdetailsQuery,
   useroptionsQuery,
@@ -211,4 +284,5 @@ module.exports = {
   getpgroupinvitesQuery,
   getgrpexpensesQuery,
   getsummaryexpensesQuery,
+  gettotalbalancesQuery,
 };
