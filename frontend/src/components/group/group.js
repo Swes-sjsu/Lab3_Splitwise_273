@@ -5,7 +5,7 @@ import { Redirect } from 'react-router';
 // import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { Modal, Form, Image } from 'react-bootstrap';
-import { isEmpty, isNumber } from 'lodash';
+import { isEmpty } from 'lodash';
 import numeral from 'numeral';
 import Sidebarcomp from '../navbar/sidebar';
 import Navheader from '../navbar/navbar';
@@ -273,13 +273,8 @@ class Groupdetails extends Component {
     if (!cookie.load('cookie')) {
       redirectVar = <Redirect to="/" />;
     }
-    const {
-      grpname,
-      activties,
-      individuals,
-      summaries,
-      redirecttomygroup,
-    } = this.state;
+    const { grpname, activties } = this.state;
+    const { individuals, summaries, redirecttomygroup } = this.state;
     const { popup, popup1 } = this.state;
     const { description, amount } = this.state;
     const expensepic = '/Group_photos/expense.png';

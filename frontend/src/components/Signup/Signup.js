@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import '../../App.css';
-import axios from 'axios';
-import bcrypt from 'bcryptjs';
+// import axios from 'axios';
+// import bcrypt from 'bcryptjs';
+// import Proptypes from 'prop-types';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
 import Navheader from '../navbar/navbar';
 import '../navbar/navbar.css';
+import { signupMutation } from '../../mutations/mutation';
 
-const saltRounds = 10;
+// const saltRounds = 10;
 
 class Signup extends Component {
   constructor(props) {
@@ -55,8 +59,10 @@ class Signup extends Component {
       passworderrors: '',
     };
 
-    const emailpattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,4})$/;
-    const pwdpattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/;
+    const emailpattern =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,4})$/;
+    const pwdpattern =
+      /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/;
 
     const { username, email, password } = this.state;
 
@@ -106,9 +112,47 @@ class Signup extends Component {
       const data = {
         username,
         email,
-        encryptpassword: await bcrypt.hash(password, saltRounds),
+        password,
       };
       console.log(data);
+
+      try {
+        // eslint-disable-next-line react/destructuring-assignment
+        const response = await this.props.signupMutation({
+          variables: {
+            username,
+            email,
+            password,
+          },
+        });
+        console.log(response);
+        console.log(response.data.signup.status);
+        if (response.data.signup.status === 200) {
+          const resuserid = response.data.signup.user_id;
+          const resusername = response.data.signup.username;
+          const resemail = response.data.signup.email;
+          const rescurrency = response.data.signup.currencydef;
+          const resprofile = response.data.signup.profilepic;
+          sessionStorage.setItem('userid', resuserid);
+          sessionStorage.setItem('username', resusername);
+          sessionStorage.setItem('useremail', resemail);
+          sessionStorage.setItem('profilepic', resprofile);
+          sessionStorage.setItem('defaultcurrency', rescurrency);
+          const redirectVar1 = <Redirect to="/dashboard" />;
+          this.setState({ redirecttohome: redirectVar1 });
+        } else {
+          this.setState({
+            redirecttohome: null,
+          });
+        }
+      } catch (err) {
+        console.log(err.response.data.signup.message);
+        alert(err.response.data.signup.message);
+        this.setState({
+          errorMessage: err.response.data.signup.message,
+        });
+      }
+      /*
       // set the with credentials to true
       axios.defaults.withCredentials = true;
       // make a post request with the user data
@@ -142,7 +186,7 @@ class Signup extends Component {
           this.setState({
             errorMessage: err.response.data,
           });
-        });
+        }); */
     }
   };
 
@@ -250,4 +294,7 @@ class Signup extends Component {
   }
 }
 // export Signup Component
-export default Signup;
+
+export default compose(graphql(signupMutation, { name: 'signupMutation' }))(
+  Signup
+);

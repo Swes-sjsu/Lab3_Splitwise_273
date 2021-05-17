@@ -3,15 +3,22 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { CookiesProvider } from 'react-cookie';
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+const client = new ApolloClient({
+  uri: 'http://localhost:3001/graphql',
+});
+
 ReactDOM.render(
-  <React.StrictMode>
+  <ApolloProvider client={client}>
     <CookiesProvider>
       <App />
     </CookiesProvider>
-  </React.StrictMode>,
+  </ApolloProvider>,
+
   document.getElementById('root')
 );
 

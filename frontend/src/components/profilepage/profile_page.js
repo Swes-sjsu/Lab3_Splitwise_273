@@ -24,9 +24,12 @@ class Profilepage extends Component {
       defaultcurrency: '',
       timezone: '',
       language: '',
-      redirecttohome: null,
+      // redirecttohome: null,
       userid: '',
       updatedpic: false,
+      usernameerrors: '',
+      emailerrors: '',
+      phoneerrors: '',
     };
 
     // Bind the handlers to this class
@@ -34,9 +37,8 @@ class Profilepage extends Component {
     this.emailChangeHandler = this.emailChangeHandler.bind(this);
     this.phonenumberChangeHandler = this.phonenumberChangeHandler.bind(this);
     this.profilephtochangeHandler = this.profilephtochangeHandler.bind(this);
-    this.defaultcurrencychangeHandler = this.defaultcurrencychangeHandler.bind(
-      this
-    );
+    this.defaultcurrencychangeHandler =
+      this.defaultcurrencychangeHandler.bind(this);
     this.timezonechangeHandler = this.timezonechangeHandler.bind(this);
     this.languagechangeHandler = this.languagechangeHandler.bind(this);
     this.submitsave = this.submitsave.bind(this);
@@ -117,6 +119,47 @@ class Profilepage extends Component {
     });
   };
 
+  isformvalid = () => {
+    let formisvalid = true;
+    const formerrors = {
+      usernameerrors: '',
+      emailerrors: '',
+      phoneerrors: '',
+    };
+
+    const emailpattern =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,4})$/;
+    const phnpattern = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
+    const { username, email, phonenumber } = this.state;
+
+    if (username.length === 0) {
+      formisvalid = false;
+      formerrors.usernameerrors = 'Username cannot be blank!';
+      console.log(formerrors.usernameerrors);
+    }
+
+    if (!emailpattern.test(email)) {
+      formisvalid = false;
+      if (email.length === 0) {
+        formerrors.emailerrors = 'Email address cannot be blank!';
+      } else {
+        formerrors.emailerrors = 'Email ID is not Valid!';
+      }
+      console.log(formerrors.emailerrors);
+    }
+    if (!phnpattern.test(phonenumber) && phonenumber.length > 0) {
+      formisvalid = false;
+      formerrors.phoneerrors = 'Phone Number is not valid!';
+      console.log(formerrors.phoneerrors);
+    }
+    this.setState((prevstate) => ({
+      ...prevstate,
+      ...formerrors,
+    }));
+    return formisvalid;
+  };
+
   submitsave = (e) => {
     e.preventDefault();
     const {
@@ -127,61 +170,65 @@ class Profilepage extends Component {
       language,
       updatedpic,
     } = this.state;
-    const formdata = new FormData(this.profileform.current);
-    if (updatedpic) {
-      // const stream = fs.createReadStream(profilephoto.name);
-      formdata.append('profile_avatar', profilephoto, profilephoto.name);
-    } else {
-      const imagename = sessionStorage.getItem('profilepic');
-      formdata.append('profile_avatar', imagename);
-    }
-    formdata.append('idusers', userid);
-    formdata.append('currencydef', defaultcurrency);
-    formdata.append('timezone', timezone);
-    formdata.append('language', language);
-    // const formheaders = formdata.getHeaders();
-    console.log(formdata);
-    axios({
-      method: 'post',
-      url: 'http://localhost:3001/updateprofile',
-      data: formdata,
-      headers: {
-        // eslint-disable-next-line no-underscore-dangle
-        'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
-      },
-    })
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        if (response.status === 200) {
-          console.log(response.data);
-          sessionStorage.setItem('username', response.data.username);
-          sessionStorage.setItem('useremail', response.data.email);
-          sessionStorage.setItem('profilepic', response.data.profilephoto);
-          sessionStorage.setItem(
-            'defaultcurrency',
-            response.data.defaultcurrency
-          );
-          this.getusercurrentdetails(userid);
-          this.setState({
-            updatedpic: false,
-          });
-          //const redirectVar1 = <Redirect to="/dashboard" />;
-          //this.setState({ redirecttohome: redirectVar1 });
-        } else {
-          this.setState({
-            redirecttohome: null,
-          });
-        }
+    const formisvalidated = this.isformvalid();
+    console.log(formisvalidated);
+    if (formisvalidated) {
+      const formdata = new FormData(this.profileform.current);
+      if (updatedpic) {
+        // const stream = fs.createReadStream(profilephoto.name);
+        formdata.append('profile_avatar', profilephoto, profilephoto.name);
+      } else {
+        const imagename = sessionStorage.getItem('profilepic');
+        formdata.append('profile_avatar', imagename);
+      }
+      formdata.append('idusers', userid);
+      formdata.append('currencydef', defaultcurrency);
+      formdata.append('timezone', timezone);
+      formdata.append('language', language);
+      // const formheaders = formdata.getHeaders();
+      console.log(formdata);
+      axios({
+        method: 'post',
+        url: 'http://localhost:3001/updateprofile',
+        data: formdata,
+        headers: {
+          // eslint-disable-next-line no-underscore-dangle
+          'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
+        },
       })
-      .catch((err) => {
-        console.log(err.response);
-        alert(err.response.data);
-        this.setState({
-          errorMessage: err.response.data,
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (response.status === 200) {
+            console.log(response.data);
+            sessionStorage.setItem('username', response.data.username);
+            sessionStorage.setItem('useremail', response.data.email);
+            sessionStorage.setItem('profilepic', response.data.profilephoto);
+            sessionStorage.setItem(
+              'defaultcurrency',
+              response.data.defaultcurrency
+            );
+            this.getusercurrentdetails(userid);
+            this.setState({
+              updatedpic: false,
+            });
+            // const redirectVar1 = <Redirect to="/dashboard" />;
+            // this.setState({ redirecttohome: redirectVar1 });
+          } else {
+            this.setState({
+              // redirecttohome: null,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err.response);
+          alert(err.response.data);
+          this.setState({
+            errorMessage: err.response.data,
+          });
+          const { errorMessage } = this.state;
+          console.log(errorMessage);
         });
-        const { errorMessage } = this.state;
-        console.log(errorMessage);
-      });
+    }
   };
 
   render() {
@@ -189,7 +236,7 @@ class Profilepage extends Component {
     if (!cookie.load('cookie')) {
       redirectVar = <Redirect to="/" />;
     }
-    //const { redirecttohome } = this.state;
+    // const { redirecttohome } = this.state;
     let profilepic = '/Profile_photos/default_avatar.png';
     const {
       username,
