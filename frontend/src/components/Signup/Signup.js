@@ -141,6 +141,11 @@ class Signup extends Component {
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({ redirecttohome: redirectVar1 });
         } else {
+          console.log(response.data.signup.message);
+          alert(response.data.signup.message);
+          this.setState({
+            errorMessage: response.data.signup.message,
+          });
           this.setState({
             redirecttohome: null,
           });
