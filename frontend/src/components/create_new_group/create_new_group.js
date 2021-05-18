@@ -1,11 +1,16 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import Select from 'react-select';
 import '../../App.css';
-import axios from 'axios';
 import { Form, Image } from 'react-bootstrap';
+import { graphql, withApollo } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
+import { uploadFile } from 'react-s3';
 import Navheader from '../navbar/navbar';
+import { creategroupMutation } from '../../mutations/mutation';
+import { useroptionsQuery } from '../../query/query';
 import '../navbar/navbar.css';
 
 class Createnewgroup extends Component {
@@ -41,24 +46,26 @@ class Createnewgroup extends Component {
   }
 
   // get the list of all users part of application to be used for the dropdown selection except the current users
-  getuseroptions = (userid) => {
-    axios
-      .get(`http://localhost:3001/getuseroptions/${userid}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        const { data } = response;
-        const usernametext = data.map((txt) => ({
-          value: txt.email,
-          label: `${txt.usersname}(${txt.email})`,
-        }));
-        console.log(usernametext);
-        console.log(response.data);
-        this.setState({ selectUsername: usernametext });
-      })
-      .catch((err) => console.log(err));
+  getuseroptions = async (userid) => {
+    try {
+      const response = await this.props.client.query({
+        query: useroptionsQuery,
+        variables: { user_id: userid },
+      });
+      const { useroptions } = response.data;
+      const usernametext = useroptions.map((txt) => ({
+        value: txt.email,
+        label: `${txt.username}(${txt.email})`,
+      }));
+      console.log(usernametext);
+      this.setState({ selectUsername: usernametext });
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
   groupnameChangeHandler = (e) => {
@@ -77,12 +84,36 @@ class Createnewgroup extends Component {
   };
 
   groupphtochangeHandler = (e) => {
-    this.setState({
-      grouphoto: e.target.files[0],
-      updatedpic: true,
-    });
+    const S3_BUCKET = 'splitwise-profilepictures';
+    const REGION = 'us-east-1';
+    const ACCESS_KEY = 'AKIAJSP2ZFMVUPCPOXLA';
+    const SECRET_ACCESS_KEY = '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';
+
+    const config = {
+      bucketName: S3_BUCKET,
+      region: REGION,
+      accessKeyId: ACCESS_KEY,
+      secretAccessKey: SECRET_ACCESS_KEY,
+    };
+
     console.log(e.target.files[0]);
     console.log(e.target.files[0].name);
+    this.setState({
+      // profilephoto: e.target.files[0],
+      setSelectedfile: e.target.files[0],
+      updatedpic: true,
+    });
+    const { setSelectedfile } = this.state;
+    console.log(setSelectedfile);
+    uploadFile(e.target.files[0], config)
+      .then((data) => {
+        const loc = data.location;
+        console.log(loc);
+        this.setState({
+          grouphoto: loc,
+        });
+      })
+      .catch((err) => console.error(err));
   };
 
   addgroupmember = () => {
@@ -114,6 +145,7 @@ class Createnewgroup extends Component {
       groupmembers,
     } = this.state;
     const gplist = [];
+    console.log(username, updatedpic);
     if (groupname === '') {
       alert('Please enter a group name');
       this.setState({
@@ -143,50 +175,36 @@ class Createnewgroup extends Component {
       return;
     }
 
-    const formdata = new FormData(this.groupform.current);
-    if (updatedpic) {
-      formdata.append('group_avatar', grouphoto, grouphoto.name);
-    } else {
-      const imagename = '';
-      formdata.append('group_avatar', imagename);
-    }
-    formdata.append('idusers', userid);
-    formdata.append('groupcreatedby', username);
-    formdata.append('groupcreatedbyemail', email);
-    formdata.append('gpmememails[]', gplist);
-    axios({
-      method: 'post',
-      url: 'http://localhost:3001/createnewgroup',
-      data: formdata,
-      headers: {
-        // eslint-disable-next-line no-underscore-dangle
-        'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
-      },
-    })
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log('response ', response.data);
-        if (response.status === 200) {
-          sessionStorage.setItem('groupname', response.data);
-          const redirectVar1 = <Redirect to="/group" />;
-          this.setState({
-            redirecttogroup: redirectVar1,
-          });
-        } else {
-          console.log(response.data);
-          alert(response.data);
-          this.setState({
-            redirecttogroup: null,
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        alert(err.response.data);
-        this.setState({
-          errorMessage: err.response.data,
-        });
+    try {
+      const response = await this.props.creategroupMutation({
+        variables: {
+          user_id: userid,
+          groupname,
+          groupcreatedbyemail: email,
+          groupmemebers: gplist,
+          grouppic: grouphoto,
+        },
       });
+      console.log(response.data.creategroup);
+      console.log('Status Code : ', response.status);
+      console.log('response ', response.data);
+      if (response.data.creategroup.status === 200) {
+        const redirectVar1 = (
+          <Redirect to={{ pathname: '/group', state: { gName: groupname } }} />
+        );
+        this.setState({
+          redirecttogroup: redirectVar1,
+        });
+
+        sessionStorage.setItem('groupname', response.data);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
   render() {
@@ -364,4 +382,9 @@ class Createnewgroup extends Component {
     );
   }
 }
-export default Createnewgroup;
+// export default Createnewgroup;
+export default compose(
+  withApollo,
+  graphql(creategroupMutation, { name: 'creategroupMutation' })
+  // graphql(useroptionsQuery, { name: 'useroptionsQuery' })
+)(Createnewgroup);

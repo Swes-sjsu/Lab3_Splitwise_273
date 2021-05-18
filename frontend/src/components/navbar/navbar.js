@@ -25,13 +25,8 @@ class Navheader extends Component {
     let isloggedin = null;
     if (cookie.load('cookie')) {
       console.log('Able to read cookie');
-      let profilepic = '/Profile_photos/default_avatar.png';
       const imagename = sessionStorage.getItem('profilepic');
-      console.log(imagename);
-      if (imagename !== 'null') {
-        profilepic = `/Profile_photos/${imagename}`;
-        console.log(profilepic);
-      }
+      // console.log(imagename);
       isloggedin = (
         <ul className="nav navbar-nav navbar-right">
           <li>
@@ -41,7 +36,7 @@ class Navheader extends Component {
           </li>
           <li>
             <Image
-              src={profilepic}
+              src={imagename}
               className="avatar"
               alt="profile pic"
               roundedCircle

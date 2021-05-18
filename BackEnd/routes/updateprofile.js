@@ -3,14 +3,14 @@ const dbconnection = require('../config/conn');
 const updateprofile = (req) => {
   return new Promise(async (resolve, reject) => {
     console.log('Inside  updateprofile');
-    const userid = req.id;
+    const userid = req.user_id;
     const username = req.username;
     const email = req.email;
     const phonenumber = req.phonenumber;
     const defaultcurrency = req.currencydef;
     const timezone = req.timezone;
     const language = req.language;
-    const profilephoto = req.profile_avatar;
+    const profilephoto = req.profilepic;
 
     sqlquery =
       "UPDATE users SET usersname = '" +
@@ -45,6 +45,9 @@ const updateprofile = (req) => {
           email: email,
           profilepic: profilephoto,
           currencydef: defaultcurrency,
+          phonenumber: phonenumber,
+          timezone: timezone,
+          language: language,
           message: 'Update Profile Successful',
         });
       }

@@ -43,7 +43,7 @@ const addbillQuery = (req) => {
             reject({ status: 400, message: err.message });
           } else {
             console.log(output);
-            resolve({ status: 400, message: 'Bill added Succesfully' });
+            resolve({ status: 200, message: 'Bill added Succesfully' });
           }
         });
       }

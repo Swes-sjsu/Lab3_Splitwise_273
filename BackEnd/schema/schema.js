@@ -73,7 +73,7 @@ const TransactionsType = new GraphQLObjectType({
     tdescription: { type: GraphQLString },
     payedBy: { type: GraphQLString },
     tamount: { type: GraphQLFloat },
-    // groupname : { type: GraphQLString },
+    groupname : { type: GraphQLString },
   }),
 });
 
@@ -100,21 +100,6 @@ const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   description: 'Root Query',
   fields: {
-    login: {
-      type: UserType,
-      args: {
-        email: { type: GraphQLString },
-        password: { type: GraphQLString },
-      },
-      async resolve(parent, args, context) {
-        let result = await loginQuery(args);
-        console.log(result);
-        context.res.cookie('cookie', result.email, { maxAge: 900000, httpOnly: false, path: '/' });
-        context.req.session.user = result.username;
-        context.req.session.email = result.email;
-        return result;
-      },
-    },
     userdetails: {
       type: UserType,
       args: {
@@ -122,7 +107,7 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, context) {
         let result = await userdetailsQuery(args);
-        // console.log(result);
+        console.log("result from query backend", result); 
         return result;
       },
     },
@@ -217,10 +202,25 @@ const Mutation = new GraphQLObjectType({
         return result;
       },
     },
+    login: {
+      type: UserType,
+      args: {
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
+      async resolve(parent, args, context) {
+        let result = await loginQuery(args);
+        console.log(result);
+        context.res.cookie('cookie', result.email, { maxAge: 900000, httpOnly: false, path: '/' });
+        context.req.session.user = result.username;
+        context.req.session.email = result.email;
+        return result;
+      },
+    },
     updateprofile: {
       type: UserType,
       args: {
-        id: { type: GraphQLID },
+        user_id: { type: GraphQLID },
         username: { type: GraphQLString },
         email: { type: GraphQLString },
         phonenumber: { type: GraphQLString },
@@ -231,7 +231,7 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(parent, args, context) {
         let result = await updateprofileQuery(args);
-        console.log(result);
+        console.log("Result from mutation backend ", result);
         context.req.session.user = result.username;
         context.req.session.email = result.email;
         return result;

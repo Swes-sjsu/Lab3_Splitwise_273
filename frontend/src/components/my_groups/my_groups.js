@@ -1,15 +1,21 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
-import axios from 'axios';
 import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Button from 'react-bootstrap/Button';
 import { Modal } from 'react-bootstrap';
-import isEmpty from 'lodash/isEmpty';
+import { graphql, withApollo } from 'react-apollo';
+import { flowRight as compose, isEmpty } from 'lodash';
 // import { Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import Navheader from '../navbar/navbar';
 import Sidebarcomp from '../navbar/sidebar';
+import {
+  acceptinviteMutation,
+  denyinviteMutation,
+} from '../../mutations/mutation';
+import { usergroupsQuery, usergroupinvitesQuery } from '../../query/query';
 import '../navbar/navbar.css';
 import '../dashboard/dashboard.css';
 import './my_groups.css';
@@ -58,121 +64,133 @@ class Mygroups extends Component {
     this.setState({ popup: false, groupinvite: '' });
   };
 
-  getuserpgroups = (userid) => {
-    axios
-      .get(`http://localhost:3001/getuserpgroups/${userid}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        console.log(typeof response.data);
-        const newaar = response.data.map((el) => el.gpname);
-        console.log(newaar);
-        const { data } = response;
-        const arrayforselect = data.map((el) => ({
-          value: el.gpname,
-          label: el.gpname,
-        }));
-        console.log(arrayforselect);
-        this.setState({
-          groupslist: newaar,
-          gpselectoptions: arrayforselect,
-        });
-      })
-      .catch((err) => console.log(err));
+  getuserpgroups = async (userid) => {
+    try {
+      const response = await this.props.client.query({
+        query: usergroupsQuery,
+        variables: { user_id: userid },
+      });
+      const { usergroups } = response.data;
+
+      console.log(usergroups);
+      const newaar = usergroups.map((el) => el.groupname);
+      console.log(newaar);
+      const arrayforselect = usergroups.map((el) => ({
+        value: el.groupname,
+        label: el.groupname,
+      }));
+      console.log(arrayforselect);
+      this.setState({
+        groupslist: newaar,
+        gpselectoptions: arrayforselect,
+      });
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
-  getpgroupinvites = (userid) => {
-    axios
-      .get(`http://localhost:3001/getpgroupinvites/${userid}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        console.log(typeof response.data);
-        const newaar = response.data.map((el) => el.gpname);
-        console.log(newaar);
-        this.setState({
-          invitelist: newaar,
-        });
-      })
-      .catch((err) => console.log(err));
+  getpgroupinvites = async (userid) => {
+    try {
+      const response = await this.props.client.query({
+        query: usergroupinvitesQuery,
+        variables: { user_id: userid },
+      });
+      const { usergroupsinvites } = response.data;
+
+      console.log(' User groups invites response ', usergroupsinvites);
+
+      const newaar = usergroupsinvites.map((el) => el.groupname);
+      console.log(newaar);
+      this.setState({
+        invitelist: newaar,
+      });
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
-  acceptinvitation = () => {
+  acceptinvitation = async () => {
     // e.preventDefault();
     // console.log(e.target.value);
     this.setState({ popup: false });
     const { popup, userid, useremail, groupinvite } = this.state;
     // const currentgrp = groupinvite;
-    const data = {
-      currentgrp: groupinvite,
-      userid,
-      useremail,
-    };
-    console.log(data, popup);
-    axios
-      .post('http://localhost:3001/acceptinvitation', data)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log('response ', response.data);
-        if (response.status === 200) {
-          console.log(response.data);
-          this.getuserpgroups(userid);
-          this.getpgroupinvites(userid);
-        } else {
-          console.log(response.data);
-          alert(response.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        alert(err.response.data);
+
+    console.log(popup);
+
+    try {
+      const response = await this.props.acceptinviteMutation({
+        variables: {
+          user_id: userid,
+          currentgrp: groupinvite,
+          email: useremail,
+        },
       });
+      console.log(response.data.acceptinvite);
+      if (response.data.acceptinvite.status === 200) {
+        console.log(response.data);
+        this.getuserpgroups(userid);
+        this.getpgroupinvites(userid);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
+
     this.setState({ groupinvite: '' });
   };
 
-  denyinvitation = () => {
+  denyinvitation = async () => {
     // e.preventDefault();
     // console.log(e.target.value);
     this.setState({ popup: false });
     const { popup, userid, useremail, groupinvite } = this.state;
-    // const currentgrp = groupname;
-    const data = {
-      currentgrp: groupinvite,
-      userid,
-      useremail,
-    };
-    console.log(data, popup);
-    axios
-      .post('http://localhost:3001/denyinvitation', data)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log('response ', response.data);
-        if (response.status === 200) {
-          console.log(response.data);
-          this.getuserpgroups(userid);
-          this.getpgroupinvites(userid);
-        } else {
-          console.log(response.data);
-          alert(response.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        alert(err.response.data);
+
+    console.log(popup);
+
+    try {
+      const response = await this.props.denyinviteMutation({
+        variables: {
+          user_id: userid,
+          currentgrp: groupinvite,
+          email: useremail,
+        },
       });
+      console.log(response.data.denyinvite);
+      if (response.data.denyinvite.status === 200) {
+        console.log(response.data);
+        this.getuserpgroups(userid);
+        this.getpgroupinvites(userid);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
+
     this.setState({ groupinvite: '' });
   };
 
   gotogrouppage = (groupname, e) => {
     e.preventDefault();
     sessionStorage.setItem('groupname', groupname);
-    const redirectVar1 = <Redirect to="/group" />;
+    // const redirectVar1 = <Redirect to="/group" />;
+    const redirectVar1 = (
+      <Redirect to={{ pathname: '/group', state: { gName: groupname } }} />
+    );
     this.setState({ redirecttopage: redirectVar1 });
   };
 
@@ -190,10 +208,10 @@ class Mygroups extends Component {
     }
     const { redirecttopage } = this.state;
     const { groupslist, gpselectoptions } = this.state;
-    const { invitelist } = this.state;
+    const { invitelist, errorMessage } = this.state;
     const { popup, selectedvalue, groupinvite } = this.state;
 
-    console.log(groupslist, invitelist, selectedvalue);
+    console.log(groupslist, invitelist, selectedvalue, errorMessage);
     let checkifinvitesnull = false;
     let checkifgroupsnull = false;
     if (isEmpty(invitelist)) {
@@ -349,4 +367,11 @@ class Mygroups extends Component {
     );
   }
 }
-export default Mygroups;
+// export default Mygroups;
+export default compose(
+  withApollo,
+  graphql(acceptinviteMutation, { name: 'acceptinviteMutation' }),
+  graphql(denyinviteMutation, { name: 'denyinviteMutation' })
+  // graphql(usergroupsQuery, { name: 'usergroupsQuery' }),
+  // graphql(usergroupinvitesQuery, { name: 'usergroupinvitesQuery',})
+)(Mygroups);

@@ -1,8 +1,11 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import '../../App.css';
-import axios from 'axios';
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
+import { loginMutation } from '../../mutations/mutation';
 import Navheader from '../navbar/navbar';
 import '../navbar/navbar.css';
 
@@ -49,20 +52,52 @@ class Login extends Component {
     e.preventDefault();
 
     const { email, password } = this.state;
-    if (email === '') {
+    if (email === '' || password === '') {
       alert('Please enter email address');
       this.setState({
-        errorMessage1: 'Please enter email address!',
+        errorMessage1: 'Please enter email address or password',
       });
       return;
     }
-    const data = {
-      email,
-      password,
-    };
+
     this.setState({
       errorMessage1: '',
     });
+
+    try {
+      const response = await this.props.loginMutation({
+        variables: {
+          email,
+          password,
+        },
+      });
+      console.log(' Login response ', response.data.login);
+      if (response.data.login.status === 200) {
+        const resuserid = response.data.login.user_id;
+        const resusername = response.data.login.username;
+        const resemail = response.data.login.email;
+        const rescurrency = response.data.login.currencydef;
+        const resprofile = response.data.login.profilepic;
+        sessionStorage.setItem('userid', resuserid);
+        sessionStorage.setItem('username', resusername);
+        sessionStorage.setItem('useremail', resemail);
+        sessionStorage.setItem('profilepic', resprofile);
+        sessionStorage.setItem('defaultcurrency', rescurrency);
+        const redirectVar1 = <Redirect to="/dashboard" />;
+        this.setState({ redirecttohome: redirectVar1 });
+      } else {
+        this.setState({
+          redirecttohome: null,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
+    /*
     // set the with credentials to true
     axios.defaults.withCredentials = true;
     // make a post request with the user data
@@ -103,6 +138,7 @@ class Login extends Component {
           errorMessage: err.response.data,
         });
       });
+      */
   };
 
   render() {
@@ -178,4 +214,8 @@ class Login extends Component {
   }
 }
 // export Login Component
-export default Login;
+// export default Login;
+
+export default compose(graphql(loginMutation, { name: 'loginMutation' }))(
+  Login
+);

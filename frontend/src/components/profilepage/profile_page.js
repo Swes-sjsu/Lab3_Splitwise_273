@@ -1,10 +1,14 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
-import axios from 'axios';
 import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Button from 'react-bootstrap/Button';
 import { Form, Image } from 'react-bootstrap';
-import FormData from 'form-data';
+import { uploadFile } from 'react-s3';
+import { graphql, withApollo } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
+import { userdetailsQuery } from '../../query/query';
+import { updateprofileMutation } from '../../mutations/mutation';
 import Navheader from '../navbar/navbar';
 
 // import DefaultAvatar from '../../../public/Profile_photos/default_avatar.png'; // import DefaultAvatar from '../  Profile_photos/default_avatar.png';
@@ -26,6 +30,7 @@ class Profilepage extends Component {
       language: '',
       // redirecttohome: null,
       userid: '',
+      setSelectedfile: null,
       updatedpic: false,
       usernameerrors: '',
       emailerrors: '',
@@ -52,26 +57,23 @@ class Profilepage extends Component {
     this.getusercurrentdetails(userid1);
   }
 
-  getusercurrentdetails = (userid) => {
-    axios
-      .get(`http://localhost:3001/getuserdetails/${userid}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log(response.data[0]);
-        this.setState({
-          email: response.data[0].email,
-          profilephoto: response.data[0].profphoto,
-          username: response.data[0].usersname,
-          phonenumber: response.data[0].usersphone,
-          defaultcurrency: response.data[0].currencydef,
-          timezone: response.data[0].timezone,
-          language: response.data[0].language,
-        });
-      })
-      .catch((err) => console.log(err));
+  getusercurrentdetails = async (userid) => {
+    const response = await this.props.client.query({
+      query: userdetailsQuery,
+      variables: { user_id: userid },
+    });
+    console.log(response.data.userdetails);
+    if (response.data.userdetails.status === 200) {
+      this.setState({
+        email: response.data.userdetails.email,
+        profilephoto: response.data.userdetails.profilepic,
+        username: response.data.userdetails.username,
+        phonenumber: response.data.userdetails.phonenumber,
+        defaultcurrency: response.data.userdetails.currencydef,
+        timezone: response.data.userdetails.timezone,
+        language: response.data.userdetails.language,
+      });
+    }
   };
 
   usrchangeHandler = (e) => {
@@ -93,15 +95,37 @@ class Profilepage extends Component {
   };
 
   profilephtochangeHandler = (e) => {
+    const S3_BUCKET = 'splitwise-profilepictures';
+    const REGION = 'us-east-1';
+    const ACCESS_KEY = 'AKIAJSP2ZFMVUPCPOXLA';
+    const SECRET_ACCESS_KEY = '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';
+
+    const config = {
+      bucketName: S3_BUCKET,
+      region: REGION,
+      accessKeyId: ACCESS_KEY,
+      secretAccessKey: SECRET_ACCESS_KEY,
+    };
     this.setState({
-      profilephoto: e.target.files[0],
+      // profilephoto: e.target.files[0],
+      setSelectedfile: e.target.files[0],
       updatedpic: true,
     });
-    console.log(e.target.files[0]);
-    console.log(e.target.files[0].name);
+    uploadFile(e.target.files[0], config)
+      .then((data) => {
+        const loc = data.location;
+        console.log(loc);
+        this.setState({
+          profilephoto: loc,
+        });
+      })
+      .catch((err) => {
+        console.error('error during upload file ', err);
+      });
   };
 
   defaultcurrencychangeHandler = (e) => {
+    console.log('currecny change ', e.target.value);
     this.setState({
       defaultcurrency: e.target.value,
     });
@@ -160,74 +184,84 @@ class Profilepage extends Component {
     return formisvalid;
   };
 
-  submitsave = (e) => {
+  submitsave = async (e) => {
     e.preventDefault();
     const {
+      email,
+      username,
       profilephoto,
       userid,
+      phonenumber,
       defaultcurrency,
       timezone,
       language,
       updatedpic,
     } = this.state;
     const formisvalidated = this.isformvalid();
-    console.log(formisvalidated);
+    console.log(updatedpic, formisvalidated);
     if (formisvalidated) {
-      const formdata = new FormData(this.profileform.current);
-      if (updatedpic) {
-        // const stream = fs.createReadStream(profilephoto.name);
-        formdata.append('profile_avatar', profilephoto, profilephoto.name);
-      } else {
-        const imagename = sessionStorage.getItem('profilepic');
-        formdata.append('profile_avatar', imagename);
-      }
-      formdata.append('idusers', userid);
-      formdata.append('currencydef', defaultcurrency);
-      formdata.append('timezone', timezone);
-      formdata.append('language', language);
-      // const formheaders = formdata.getHeaders();
-      console.log(formdata);
-      axios({
-        method: 'post',
-        url: 'http://localhost:3001/updateprofile',
-        data: formdata,
-        headers: {
-          // eslint-disable-next-line no-underscore-dangle
-          'content-type': `multipart/form-data; boundary=${formdata._boundary}`,
-        },
-      })
-        .then((response) => {
-          console.log('Status Code : ', response.status);
-          if (response.status === 200) {
-            console.log(response.data);
-            sessionStorage.setItem('username', response.data.username);
-            sessionStorage.setItem('useremail', response.data.email);
-            sessionStorage.setItem('profilepic', response.data.profilephoto);
-            sessionStorage.setItem(
-              'defaultcurrency',
-              response.data.defaultcurrency
-            );
-            this.getusercurrentdetails(userid);
-            this.setState({
-              updatedpic: false,
-            });
-            // const redirectVar1 = <Redirect to="/dashboard" />;
-            // this.setState({ redirecttohome: redirectVar1 });
-          } else {
-            this.setState({
-              // redirecttohome: null,
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err.response);
-          alert(err.response.data);
-          this.setState({
-            errorMessage: err.response.data,
-          });
-          const { errorMessage } = this.state;
-          console.log(errorMessage);
+      console.log(
+        'Swes inside form valideatded ',
+        formisvalidated,
+        profilephoto
+      );
+      try {
+        const response = await this.props.updateprofileMutation({
+          variables: {
+            user_id: userid,
+            email,
+            username,
+            phonenumber,
+            currencydef: defaultcurrency,
+            timezone,
+            language,
+            profilepic: profilephoto,
+          },
+          refetchQueries: [
+            { query: userdetailsQuery, variables: { user_id: userid } },
+          ],
         });
+        console.log(response.data.updateprofile.status);
+        console.log(response.data.updateprofile);
+        console.log(response.data);
+        if (response.data.updateprofile.status === 200) {
+          sessionStorage.setItem(
+            'username',
+            response.data.updateprofile.username
+          );
+          sessionStorage.setItem(
+            'useremail',
+            response.data.updateprofile.email
+          );
+          sessionStorage.setItem(
+            'profilepic',
+            response.data.updateprofile.profilepic
+          );
+          sessionStorage.setItem(
+            'defaultcurrency',
+            response.data.updateprofile.currencydef
+          );
+          // this.getusercurrentdetails(userid);
+          this.setState({
+            updatedpic: false,
+            // email: response.data.updateprofile.email,
+            // profilephoto: response.data.updateprofile.profilepic,
+            // username: response.data.updateprofile.username,
+            // phonenumber: response.data.updateprofile.phonenumber,
+            // defaultcurrency: response.data.updateprofile.currencydef,
+            // timezone: response.data.updateprofile.timezone,
+            // language: response.data.updateprofile.language,
+          });
+          // const redirectVar1 = <Redirect to="/dashboard" />;
+          // this.setState({ redirecttohome: redirectVar1 });
+        }
+      } catch (err) {
+        console.log(err);
+        alert(err);
+        this.setState({
+          errorMessage: JSON.stringify(err),
+        });
+      }
     }
   };
 
@@ -237,7 +271,7 @@ class Profilepage extends Component {
       redirectVar = <Redirect to="/" />;
     }
     // const { redirecttohome } = this.state;
-    let profilepic = '/Profile_photos/default_avatar.png';
+    // let profilepic = '/Profile_photos/default_avatar.png';
     const {
       username,
       email,
@@ -245,14 +279,12 @@ class Profilepage extends Component {
       defaultcurrency,
       timezone,
       language,
+      usernameerrors,
+      emailerrors,
+      phoneerrors,
     } = this.state;
-
     const imagename = sessionStorage.getItem('profilepic');
     console.log(imagename);
-    if (imagename !== 'null') {
-      profilepic = `/Profile_photos/${imagename}`;
-      console.log(profilepic);
-    }
     // if (profilephoto) profilepic = DefaultAvatar;
     return (
       <div>
@@ -262,7 +294,7 @@ class Profilepage extends Component {
           <h2> Your account </h2>
           <section>
             <div className="avatar-div">
-              <Image src={profilepic} className="avatar1" alt="profile pic" />
+              <Image src={imagename} className="avatar1" alt="profile pic" />
               <br />
               <label htmlFor="profile_avatar">
                 Change your avatar <br />
@@ -319,6 +351,24 @@ class Profilepage extends Component {
                     />
                   </label>
                 </div>
+                {usernameerrors && (
+                  <span className="errmsg" style={{ color: 'maroon' }}>
+                    {' '}
+                    {usernameerrors}{' '}
+                  </span>
+                )}
+                {emailerrors && (
+                  <span className="errmsg" style={{ color: 'maroon' }}>
+                    {' '}
+                    {emailerrors}{' '}
+                  </span>
+                )}
+                {phoneerrors && (
+                  <span className="errmsg" style={{ color: 'maroon' }}>
+                    {' '}
+                    {phoneerrors}{' '}
+                  </span>
+                )}
               </section>
 
               <section className="right-block">
@@ -432,4 +482,10 @@ class Profilepage extends Component {
   }
 }
 
-export default Profilepage;
+// export default Profilepage;
+
+export default compose(
+  withApollo,
+
+  graphql(updateprofileMutation, { name: 'updateprofileMutation' })
+)(Profilepage);

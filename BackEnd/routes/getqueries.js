@@ -3,25 +3,23 @@ const dbconnection = require('../config/conn');
 const userdetailsQuery = (req) => {
   return new Promise(async (resolve, reject) => {
     console.log('Inside  getuserprofile');
-    //console.log(req.body);
     const userid = req.user_id;
     console.log(userid);
     dbconnection.query(
-      'SELECT * FROM users where idusers = ? ',
+      'SELECT usersname,idusers,email,profphoto,usersphone,currencydef,timezone,language FROM users where idusers = ? ',
       [userid],
-      async (err, output, fields) => {
+       (err, output, fields) => {
         if (err) {
           //console.log(err);
           reject({ status: 400, message: err.message });
         } else {
-          //console.log(output)
-
           resolve({
             status: 200,
             username: output[0].usersname,
             user_id: output[0].idusers,
             email: output[0].email,
             profilepic: output[0].profphoto,
+            phonenumber: output[0].usersphone,
             currencydef: output[0].currencydef,
             timezone: output[0].timezone,
             language: output[0].language,
@@ -115,9 +113,11 @@ const getpgroupinvitesQuery = (req) => {
   });
 };
 
+
 const getgrpexpensesQuery = (req) => {
   return new Promise(async (resolve, reject) => {
     console.log('Inside getgrpexpenses');
+    console.log(req.groupname); 
     const gpname = req.groupname;
     let tid, tdate, tdescription, payedBy, tamount;
     let outputlist = [];
@@ -153,7 +153,7 @@ const getgrpexpensesQuery = (req) => {
 
 const getsummaryexpensesQuery = (req) => {
   return new Promise(async (resolve, reject) => {
-    console.log('Inside  getgrpexpenses');
+    console.log('Inside  getsummaryexpenses');
 
     const gpname = req.groupname;
     let bid, payer, payee, payer_username, payee_username, balance, settled;
@@ -206,8 +206,9 @@ const getsummaryexpensesQuery = (req) => {
 
 const gettotalbalancesQuery = (req) => {
   return new Promise(async (resolve, reject) => {
-    console.log('Inside  getgrpexpenses');
+    console.log('Inside gettotalbalancesQuery');
     const userid = req.user_id;
+    console.log(userid)
     let Total_balance,
       You_owe,
       You_are_owed,
@@ -234,7 +235,7 @@ const gettotalbalancesQuery = (req) => {
         console.log(err);
         reject({ status: 400, message: err.message });
       } else {
-        console.log(output);
+        // console.log(output);
         for (let i = 0; i < output.length - 1; i++) {
           if (output[i].You_owe !== 'undefined' || '') {
             for (let j = 0; j < output[i].length; j++) {
@@ -271,7 +272,7 @@ const gettotalbalancesQuery = (req) => {
             outputlist.push(details);
           }
         }
-        resolve(outputlist, (status = 200), (message = 'get group summary expenses Succesful'));
+        resolve(outputlist, (status = 200), (message = 'get total baalnce Succesful'));
       }
     });
   });

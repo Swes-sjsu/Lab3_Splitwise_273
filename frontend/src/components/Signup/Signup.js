@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import '../../App.css';
 // import axios from 'axios';
@@ -7,9 +8,9 @@ import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import { graphql } from 'react-apollo';
 import { flowRight as compose } from 'lodash';
+import { signupMutation } from '../../mutations/mutation';
 import Navheader from '../navbar/navbar';
 import '../navbar/navbar.css';
-import { signupMutation } from '../../mutations/mutation';
 
 // const saltRounds = 10;
 
@@ -117,7 +118,6 @@ class Signup extends Component {
       console.log(data);
 
       try {
-        // eslint-disable-next-line react/destructuring-assignment
         const response = await this.props.signupMutation({
           variables: {
             username,
@@ -147,20 +147,16 @@ class Signup extends Component {
           const redirectVar1 = <Redirect to="/dashboard" />;
           this.setState({ redirecttohome: redirectVar1 });
         } else {
-          console.log(response.data.signup.message);
-          alert(response.data.signup.message);
-          this.setState({
-            errorMessage: response.data.signup.message,
-          });
           this.setState({
             redirecttohome: null,
           });
         }
       } catch (err) {
-        console.log(err.response.data.signup.message);
-        alert(err.response.data.signup.message);
+        console.log(err.graphQLErrors[0].message);
+        alert('Email already exists!!Please Login or use a different email ID');
         this.setState({
-          errorMessage: err.response.data.signup.message,
+          errorMessage:
+            'Email already exists!!Please Login or use a different email ID',
         });
       }
       /*
@@ -206,7 +202,8 @@ class Signup extends Component {
     if (cookie.load('cookie')) {
       redirectVar = <Redirect to="/dashboard" />;
     }
-    const { usernameerrors, emailerrors, passworderrors } = this.state;
+    const { usernameerrors, emailerrors, passworderrors, errorMessage } =
+      this.state;
     const { redirecttohome } = this.state;
     return (
       <form>
@@ -296,6 +293,10 @@ class Signup extends Component {
                 >
                   Sign Up
                 </button>
+                <p className="errmsg" style={{ color: 'maroon' }}>
+                  {' '}
+                  {errorMessage}{' '}
+                </p>
               </div>
             </div>
           </div>

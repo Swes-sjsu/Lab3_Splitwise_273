@@ -1,14 +1,22 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 // import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { Modal, Form, Image } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
+import { graphql, withApollo } from 'react-apollo';
+import { flowRight as compose, isEmpty } from 'lodash';
+// import {  } from 'lodash';
 import numeral from 'numeral';
 import Sidebarcomp from '../navbar/sidebar';
 import Navheader from '../navbar/navbar';
+import { addbillMutation, leavegroupMutation } from '../../mutations/mutation';
+import {
+  getgroupexpensesQuery,
+  getgroupsummaryexpensesQuery,
+} from '../../query/query';
 import '../navbar/navbar.css';
 import '../dashboard/dashboard.css';
 import './group.css';
@@ -39,10 +47,11 @@ class Groupdetails extends Component {
     this.leavegrouphandler = this.leavegrouphandler.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const userid1 = sessionStorage.getItem('userid');
     const useremail1 = sessionStorage.getItem('useremail');
-    const grpname1 = sessionStorage.getItem('groupname');
+    const grpname1 = this.props.location.state.gName;
+    // const grpname1 = sessionStorage.getItem('groupname');
     const activities1 = this.getgrpexpenses(grpname1);
     const individuals1 = this.getsummaryexpenses(grpname1);
     this.setState({
@@ -55,106 +64,108 @@ class Groupdetails extends Component {
   }
 
   // function to get grp expenses
-  getgrpexpenses = (gpname) => {
-    axios
-      .get(`http://localhost:3001/getgrpexpenses/${gpname}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        console.log(typeof response.data);
-        const { data } = response;
-        const defaultcurr = sessionStorage.getItem('defaultcurrency');
-        console.log(defaultcurr);
-        const regExp = /\(([^)]+)\)/;
-        const getvalue = regExp.exec(defaultcurr);
-        const symbolvalue = getvalue[1];
-        const arrayofactivities = data.map((el) => ({
-          value: el.id,
-          expdate: el.tdate,
-          descp: el.tdescription,
-          paid: el.usersname,
-          amnt: symbolvalue + numeral(el.tamount).format('0,0.00'),
-          formatedmonth: new Date(el.tdate).toLocaleString('default', {
-            month: 'short',
-          }),
-          formatedday: new Date(el.tdate).getUTCDate(),
-        }));
-        console.log(arrayofactivities);
-        this.setState({
-          activties: arrayofactivities,
-        });
-      })
-      .catch((err) => console.log(err));
+  getgrpexpenses = async (gpname) => {
+    try {
+      const response = await this.props.client.query({
+        query: getgroupexpensesQuery,
+        variables: { groupname: gpname },
+      });
+      const { groupexpenses } = response.data;
+      console.log(groupexpenses);
+      const defaultcurr = sessionStorage.getItem('defaultcurrency');
+      console.log(defaultcurr);
+      const regExp = /\(([^)]+)\)/;
+      const getvalue = regExp.exec(defaultcurr);
+      const symbolvalue = getvalue[1];
+      const arrayofactivities = groupexpenses.map((el) => ({
+        value: el.id,
+        expdate: el.tdate,
+        descp: el.tdescription,
+        paid: el.usersname,
+        amnt: symbolvalue + numeral(el.tamount).format('0,0.00'),
+        formatedmonth: new Date(el.tdate).toLocaleString('default', {
+          month: 'short',
+        }),
+        formatedday: new Date(el.tdate).getUTCDate(),
+      }));
+      console.log(arrayofactivities);
+      this.setState({
+        activties: arrayofactivities,
+      });
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
   // function to get summary expenses
-  getsummaryexpenses = (gpname) => {
-    axios
-      .get(`http://localhost:3001/getsummaryexpenses/${gpname}`, {
-        headers: {
-          'content-type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        console.log(typeof response.data);
-        const { data } = response;
-        // const { summaries } = this.state;
-        const defaultcurr = sessionStorage.getItem('defaultcurrency');
-        console.log(defaultcurr);
-        const regExp = /\(([^)]+)\)/;
-        const getvalue = regExp.exec(defaultcurr);
-        const symbolvalue = getvalue[1];
-        const arrayofindividuals = data.map((el) => ({
-          id: el.id,
-          payer: el.payer,
-          payee: el.payee,
-          payername: el.payer_name,
-          payeename: el.payee_name,
-          balance: el.balance,
-          formatedbalance: symbolvalue + numeral(el.balance).format('0,0.00'),
-        }));
+  getsummaryexpenses = async (gpname) => {
+    try {
+      const response = await this.props.client.query({
+        query: getgroupsummaryexpensesQuery,
+        variables: { groupname: gpname },
+      });
+      const { groupsummaryexpenses } = response.data;
 
-        let x;
-        const payeeperson = [];
-        const payeebalance = [];
-        const payeename = [];
+      console.log(groupsummaryexpenses);
+      const defaultcurr = sessionStorage.getItem('defaultcurrency');
+      console.log(defaultcurr);
+      const regExp = /\(([^)]+)\)/;
+      const getvalue = regExp.exec(defaultcurr);
+      const symbolvalue = getvalue[1];
+      const arrayofindividuals = groupsummaryexpenses.map((el) => ({
+        id: el.id,
+        payer: el.payer,
+        payee: el.payee,
+        payername: el.payer_username,
+        payeename: el.payee_username,
+        balance: el.balance,
+        formatedbalance: symbolvalue + numeral(el.balance).format('0,0.00'),
+      }));
 
-        for (let i = 0; i < arrayofindividuals.length; i += 1) {
-          x = -1;
-          if (!isEmpty(payeeperson)) {
-            x = payeeperson.findIndex(
-              (el) => el === arrayofindividuals[i].payee
-            );
-          }
+      let x;
+      const payeeperson = [];
+      const payeebalance = [];
+      const payeename = [];
 
-          if (x === -1) {
-            payeeperson.push(arrayofindividuals[i].payee);
-            payeename.push(arrayofindividuals[i].payeename);
-            payeebalance.push(arrayofindividuals[i].balance);
-          } else {
-            payeebalance[x] += arrayofindividuals[i].balance;
-          }
+      for (let i = 0; i < arrayofindividuals.length; i += 1) {
+        x = -1;
+        if (!isEmpty(payeeperson)) {
+          x = payeeperson.findIndex((el) => el === arrayofindividuals[i].payee);
         }
-        const pp = Object.keys(payeeperson);
-        const arrayofsummaries = pp.map((indx) => ({
-          payee: payeename[indx],
-          totalamt: payeebalance[indx],
-          formattotalamt:
-            symbolvalue + numeral(payeebalance[indx]).format('0,0.00'),
-        }));
-        this.setState({
-          summaries: [...arrayofsummaries],
-        });
 
-        this.setState({
-          individuals: arrayofindividuals,
-        });
-      })
-      .catch((err) => console.log(err));
+        if (x === -1) {
+          payeeperson.push(arrayofindividuals[i].payee);
+          payeename.push(arrayofindividuals[i].payeename);
+          payeebalance.push(arrayofindividuals[i].balance);
+        } else {
+          payeebalance[x] += arrayofindividuals[i].balance;
+        }
+      }
+      const pp = Object.keys(payeeperson);
+      const arrayofsummaries = pp.map((indx) => ({
+        payee: payeename[indx],
+        totalamt: payeebalance[indx],
+        formattotalamt:
+          symbolvalue + numeral(payeebalance[indx]).format('0,0.00'),
+      }));
+      this.setState({
+        summaries: [...arrayofsummaries],
+      });
+
+      this.setState({
+        individuals: arrayofindividuals,
+      });
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
   showHandler = () => {
@@ -198,7 +209,7 @@ class Groupdetails extends Component {
     this.setState({ amount: Number(e.target.value) });
   };
 
-  addhandler = (des, amt, e) => {
+  addhandler = async (des, amt, e) => {
     e.preventDefault();
     if (!des || !amt || typeof amt !== 'number' || amt < 0) {
       alert(' Please enter valid description or amount!! ');
@@ -209,34 +220,40 @@ class Groupdetails extends Component {
     this.setState({ popup: false, description: '', amount: 0.0 });
     const { grpname } = this.state;
     const { useremail } = this.state;
-    const bill = {
-      descript,
-      amountvalue,
-      useremail,
-      grpname,
-    };
-    console.log(bill);
-    axios
-      .post('http://localhost:3001/addabill', bill)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log('response ', response.data);
-        if (response.status === 200) {
-          console.log(response.data);
-          this.getgrpexpenses(grpname);
-          this.getsummaryexpenses(grpname);
-        } else {
-          console.log(response.data);
-          alert(response.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        alert(err.response.data);
+    console.log(grpname);
+    try {
+      const response = await this.props.addbillMutation({
+        variables: {
+          groupname: grpname,
+          email: useremail,
+          descript,
+          amountvalue,
+        },
+        refetchQueries: [
+          { query: getgroupexpensesQuery, variables: { groupname: grpname } },
+          {
+            query: getgroupsummaryexpensesQuery,
+            variables: { groupname: grpname },
+          },
+        ],
       });
+      console.log(response.data.addbill);
+      if (response.data.addbill.status === 200) {
+        console.log(response.data.addbill.status);
+        console.log('swes', grpname);
+        this.getgrpexpenses(grpname);
+        this.getsummaryexpenses(grpname);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
-  leavegrouphandler = (e) => {
+  leavegrouphandler = async (e) => {
     e.preventDefault();
     this.setState({ popup: false });
     const { useremail, grpname, userid } = this.state;
@@ -246,26 +263,29 @@ class Groupdetails extends Component {
       grpname,
     };
     console.log(leavegrp);
-    axios
-      .post('http://localhost:3001/leavegroup', leavegrp)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log('response ', response.data);
-        if (response.status === 200) {
-          console.log(response.data);
-          const redirectVar1 = <Redirect to="/mygroups" />;
-          this.setState({
-            redirecttomygroup: redirectVar1,
-          });
-        } else {
-          console.log(response.data);
-          alert(response.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        alert(err.response.data);
+
+    try {
+      const response = await this.props.leavegroupMutation({
+        variables: {
+          user_id: userid,
+          email: useremail,
+          groupname: grpname,
+        },
       });
+      console.log(response.data.leavegroup);
+      if (response.data.leavegroup.status === 200) {
+        const redirectVar1 = <Redirect to="/mygroups" />;
+        this.setState({
+          redirecttomygroup: redirectVar1,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+      this.setState({
+        errorMessage: JSON.stringify(err),
+      });
+    }
   };
 
   render() {
@@ -273,10 +293,11 @@ class Groupdetails extends Component {
     if (!cookie.load('cookie')) {
       redirectVar = <Redirect to="/" />;
     }
-    const { grpname, activties } = this.state;
+    const { grpname, activties, errorMessage } = this.state;
     const { individuals, summaries, redirecttomygroup } = this.state;
     const { popup, popup1 } = this.state;
     const { description, amount } = this.state;
+    console.log(errorMessage);
     const expensepic = '/Group_photos/expense.png';
     let checkifactivitiesnull = false;
     if (isEmpty(activties)) {
@@ -496,4 +517,11 @@ class Groupdetails extends Component {
   }
 }
 
-export default Groupdetails;
+// export default Groupdetails;
+export default compose(
+  withApollo,
+  graphql(addbillMutation, { name: 'addbillMutation' }),
+  graphql(leavegroupMutation, { name: 'leavegroupMutation' })
+  // graphql(getgroupexpensesQuery, { name: 'getgroupexpensesQuery' }),
+  // graphql(getgroupsummaryexpensesQuery, { name: 'getgroupsummaryexpensesQuery',})
+)(Groupdetails);

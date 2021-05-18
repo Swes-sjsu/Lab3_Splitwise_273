@@ -13,7 +13,7 @@ const login = (req) => {
         async (err, output, fields) => {
           if (err) {
             //console.log(err);
-            resolve({ status: 400, message: err.message });
+            reject({ status: 400, message: err.message });
           } else {
             if (output.length > 0) {
               const passwordcompare = await bcrypt.compare(password, output[0].password);
@@ -31,10 +31,10 @@ const login = (req) => {
                 });
                 
               } else {
-                resolve({ status: 401, message: 'Please enter valid password!' });
+                reject({ status: 401, message: 'Please enter valid password!' });
               }
             } else {
-              resolve({ status: 400, message: 'Email ID not found! Please Signup!' });
+              reject({ status: 400, message: 'Email ID not found! Please Signup!' });
             }
           }
         }
