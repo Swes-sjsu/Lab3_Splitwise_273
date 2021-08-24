@@ -1,8 +1,8 @@
 const mysql = require('mysql');
 const dbconnection = mysql.createConnection({
-  host: 'splitwise-db.co7pzwu1hwvu.us-east-1.rds.amazonaws.com',
+  host: 'splitwise-db.********.us-east-1.rds.amazonaws.com',
   user: 'admin',
-  password: 'Swetha1234',
+  password: '',
   ssl: true,
   database: 'splitwise',
   multipleStatements: true,
